@@ -1,0 +1,52 @@
+<div id="right-column">
+<div aria-label="breadcrumbs navigation" role="navigation">
+<ol class="breadcrumb">
+<li><a href="../index.html">User Manual</a></li>
+<li><a href="index.html">Language</a></li>
+<li>Identifiers</li>
+</ol>
+</div>
+<div class="document clearer body">
+<a class="reference external image-reference" href="https://www.tradingview.com/pine-script-docs/en/v5/Introduction.html"><div align="right" class="align-right"><img alt="Pine Script™ logo" height="100" src="../_images/Pine_Script_logo.svg" width="100"/></div>
+</a>
+<div class="section" id="pageidentifiers">
+<span id="identifiers"></span><h1>Identifiers<a class="headerlink" href="#pageidentifiers" title="Permalink to this headline">¶</a></h1>
+<p>Identifiers are names used for user-defined variables and functions:</p>
+<ul class="simple">
+<li>They must begin with an uppercase (<code class="docutils literal notranslate"><span class="pre">A-Z</span></code>) or lowercase (<code class="docutils literal notranslate"><span class="pre">a-z</span></code>) letter, or an underscore (<code class="docutils literal notranslate"><span class="pre">_</span></code>).</li>
+<li>The next characters can be letters, underscores or digits (<code class="docutils literal notranslate"><span class="pre">0-9</span></code>).</li>
+<li>They are case-sensitive.</li>
+</ul>
+<p>Here are some examples:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="nx">myVar</span><span class="w"></span>
+<span class="nx">_myVar</span><span class="w"></span>
+<span class="nx">my123Var</span><span class="w"></span>
+<span class="nx">functionName</span><span class="w"></span>
+<span class="nx">MAX_LEN</span><span class="w"></span>
+<span class="nx">max_len</span><span class="w"></span>
+<span class="nx">maxLen</span><span class="w"></span>
+<span class="mi">3</span><span class="nx">barsDown</span><span class="w">  </span><span class="c">// NOT VALID!</span><span class="w"></span>
+</pre></div>
+</div>
+<p>The <a class="reference internal" href="../writing/Style_guide.html#pagestyleguide"><span class="std std-ref">Pine Script™ Style Guide</span></a> recommends using uppercase SNAKE_CASE for constants, and camelCase for other identifiers:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="nx">GREEN_COLOR</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="l">#4CAF50</span><span class="w"></span>
+<span class="nx">MAX_LOOKBACK</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">100</span><span class="w"></span>
+<span class="k">int </span><span class="nx">fastLength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">7</span><span class="w"></span>
+<span class="c">// Returns 1 if the argument is `true`, 0 if it is `false` or `na`.</span><span class="w"></span>
+<span class="nx">zeroOne</span><span class="p">(</span><span class="nx">boolValue</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="nx">boolValue</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mi">0</span><span class="w"></span>
+</pre></div>
+</div>
+<a class="reference external image-reference" href="https://www.tradingview.com/"><div align="center" class="align-center"><img alt="../_images/TradingView-Logo-Block.svg" src="../_images/TradingView-Logo-Block.svg" width="200px"/></div>
+</a>
+</div>
+</div>
+<div class="footer-relations">
+<div class="pull-left">
+<a class="btn btn-default" href="Script_structure.html" title="previous chapter (use the left arrow)">Script structure</a>
+</div>
+<div class="pull-right">
+<a class="btn btn-default" href="Operators.html" title="next chapter (use the right arrow)">Operators</a>
+</div>
+</div>
+<div class="clearer"></div>
+</div>

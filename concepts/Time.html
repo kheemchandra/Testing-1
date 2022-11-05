@@ -1,0 +1,522 @@
+<div id="right-column">
+<div aria-label="breadcrumbs navigation" role="navigation">
+<ol class="breadcrumb">
+<li><a href="../index.html">User Manual</a></li>
+<li><a href="index.html">Concepts</a></li>
+<li>Time</li>
+</ol>
+</div>
+<div class="document clearer body">
+<a class="reference external image-reference" href="https://www.tradingview.com/pine-script-docs/en/v5/Introduction.html"><div align="right" class="align-right"><img alt="Pine Script™ logo" height="100" src="../_images/Pine_Script_logo.svg" width="100"/></div>
+</a>
+<div class="section" id="time">
+<span id="pagetime"></span><h1>Time<a class="headerlink" href="#time" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><a class="reference internal" href="#introduction" id="id3">Introduction</a><ul>
+<li><a class="reference internal" href="#four-references" id="id4">Four references</a></li>
+<li><a class="reference internal" href="#time-built-ins" id="id5">Time built-ins</a></li>
+<li><a class="reference internal" href="#time-zones" id="id6">Time zones</a><ul>
+<li><a class="reference internal" href="#time-zone-strings" id="id7">Time zone strings</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#time-variables" id="id8">Time variables</a><ul>
+<li><a class="reference internal" href="#time-and-time-close" id="id9">`time` and `time_close`</a></li>
+<li><a class="reference internal" href="#time-tradingday" id="id10">`time_tradingday`</a></li>
+<li><a class="reference internal" href="#timenow" id="id11">`timenow`</a></li>
+<li><a class="reference internal" href="#calendar-dates-and-times" id="id12">Calendar dates and times</a></li>
+<li><a class="reference internal" href="#syminfo-timezone" id="id13">`syminfo.timezone()`</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#time-functions" id="id14">Time functions</a><ul>
+<li><a class="reference internal" href="#id1" id="id15">`time()` and `time_close()`</a><ul>
+<li><a class="reference internal" href="#testing-for-sessions" id="id16">Testing for sessions</a></li>
+<li><a class="reference internal" href="#testing-for-changes-in-higher-timeframes" id="id17">Testing for changes in higher timeframes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id2" id="id18">Calendar dates and times</a></li>
+<li><a class="reference internal" href="#timestamp" id="id19">`timestamp()`</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#formatting-dates-and-time" id="id20">Formatting dates and time</a></li>
+</ul>
+</div>
+<div class="section" id="introduction">
+<h2><a class="toc-backref" href="#id3">Introduction</a><a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="four-references">
+<h3><a class="toc-backref" href="#id4">Four references</a><a class="headerlink" href="#four-references" title="Permalink to this headline">¶</a></h3>
+<p>Four different references come into play when using date and time values in Pine Script™:</p>
+<ol class="arabic simple">
+<li><strong>UTC</strong>: The native format for time values in Pine Script™ is the <strong>Unix time in milliseconds</strong>.
+Unix time is the time elapsed since the <strong>Unix Epoch on January 1st, 1970 at UTC</strong>.
+See here for the <a class="reference external" href="https://www.unixtimestamp.com/" rel="nofollow">current Unix time in seconds</a>
+and here for more information on <a class="reference external" href="https://en.wikipedia.org/wiki/Unix_time" rel="nofollow">Unix Time</a>.
+A value for the Unix time is called a <em>timestamp</em>.
+Unix timestamps are always expressed in the UTC (or “GMT”, or “GMT+0”) time zone.
+They are measured from a fixed reference, i.e., the Unix Epoch, and do not vary with time zones.
+Some Pine Script™ built-ins use the UTC time zone as a reference.</li>
+<li><strong>Exchange time zone</strong>: A second time-related key reference for traders is the time zone of the exchange where an instrument is traded.
+Some built-ins like <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_hour">hour</a>
+return values in the exchange’s time zone.</li>
+<li><code class="docutils literal notranslate"><span class="pre">timezone</span></code> parameter: Some functions that normally return values in the exchange’s time zone,
+such as <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_hour">hour()</a>
+include a <code class="docutils literal notranslate"><span class="pre">timezone</span></code> parameter that allows you to adapt the function’s result to another time zone.
+Other functions like <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_time">time()</a>
+include both <code class="docutils literal notranslate"><span class="pre">session</span></code> and <code class="docutils literal notranslate"><span class="pre">timezone</span></code> parameters. In those cases, the <code class="docutils literal notranslate"><span class="pre">timezone</span></code> arguments
+applies to how the <code class="docutils literal notranslate"><span class="pre">session</span></code> argument is interpreted — not to the time value returned by the function.</li>
+<li><strong>Chart’s time zone</strong>: This is the time zone chosen by the user from the chart using the “Chart Settings/Symbol/Time Zone” field.
+This setting only affects the display of dates and times on the chart.
+It does not affect the behavior of Pine scripts, and they have no visiblity over this setting.</li>
+</ol>
+<p>We will note, when discussing variables or functions, if they return dates or times in UTC or exchange time zone.
+Scripts do not have visibility on the user’s time zone setting on his chart.</p>
+</div>
+<div class="section" id="time-built-ins">
+<h3><a class="toc-backref" href="#id5">Time built-ins</a><a class="headerlink" href="#time-built-ins" title="Permalink to this headline">¶</a></h3>
+<p>Pine Script™ has built-in <strong>variables</strong> to:</p>
+<ul class="simple">
+<li>Get timestamp information from the current bar (UTC time zone):
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_time">time</a> and
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_time_close">time_close</a></li>
+<li>Get timestamp information for the beginning of the current trading day (UTC time zone):
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_time_tradingday">time_tradingday</a></li>
+<li>Get the current time in one-second increments (UTC time zone):
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_timenow">timenow</a></li>
+<li>Retrieve calendar and time values from the bar (exchange time zone):
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_year">year</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_month">month</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_weekofyear">weekofyear</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_dayofmonth">dayofmonth</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_dayofweek">dayofweek</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_hour">hour</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_minute">minute</a> and
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_second">second</a></li>
+<li>Return the time zone of the exchange of the chart’s symbol with
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_syminfo{dot}timezone">syminfo.timezone</a></li>
+</ul>
+<p>There are also built-in <strong>functions</strong> that can:</p>
+<ul class="simple">
+<li>Return timestamps of bars from other timeframes
+with <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_time">time()</a> and
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_time_close">time_close()</a>,
+without the need for a <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_request{dot}security">request.security()</a> call</li>
+<li>Retrieve calendar and time values from any timestamp, which can be offset with a time zone:
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_year">year()</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_month">month()</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_weekofyear">weekofyear()</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_dayofmonth">dayofmonth()</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_dayofweek">dayofweek()</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_hour">hour()</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_minute">minute()</a> and
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_second">second()</a></li>
+<li>Create a timestamp using <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_timestamp">timestamp()</a></li>
+<li>Convert a timestamp to a formatted date/time string for display,
+using <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_str{dot}format">str.format()</a></li>
+<li>Input data and time values. See the section on <a class="reference internal" href="Inputs.html#pageinputs"><span class="std std-ref">Inputs</span></a>.</li>
+<li>Work with <a class="reference internal" href="Sessions.html#pagesessions"><span class="std std-ref">session information</span></a>.</li>
+</ul>
+</div>
+<div class="section" id="time-zones">
+<h3><a class="toc-backref" href="#id6">Time zones</a><a class="headerlink" href="#time-zones" title="Permalink to this headline">¶</a></h3>
+<p>TradingViewers can change the time zone used to display bar times on their charts.
+Pine scripts have no visiblity over this setting.
+While there is a <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_syminfo{dot}timezone">syminfo.timezone</a>
+variable to return the time zone of the exchange where the chart’s instrument is traded,
+there is <strong>no</strong> <code class="docutils literal notranslate"><span class="pre">chart.timezone</span></code> equivalent.</p>
+<p>When displaying times on the chart, this shows one way of providing users a way of adjusting your script’s time values to those of their chart.
+This way, your displayed times can match the time zone used by traders on their chart:</p>
+<img alt="../_images/Time-TimeZones-01.png" src="../_images/Time-TimeZones-01.png"/>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"Time zone control"</span><span class="p">)</span><span class="w"></span>
+<span class="nx">MS_IN_1H</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1000</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">60</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">60</span><span class="w"></span>
+<span class="nx">TOOLTIP01</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"Enter your time zone's offset (+ or −), including a decimal fraction if needed."</span><span class="w"></span>
+<span class="nx">hoursOffsetInput</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">input.float</span><span class="p">(</span><span class="mi">0</span><span class="mf">.0</span><span class="p">,</span><span class="w"> </span><span class="s2">"Timezone offset (in hours)"</span><span class="p">,</span><span class="w"> </span><span class="nx">minval</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="mi">12</span><span class="mf">.0</span><span class="p">,</span><span class="w"> </span><span class="nx">maxval</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">14</span><span class="mf">.0</span><span class="p">,</span><span class="w"> </span><span class="nx">step</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="mf">.5</span><span class="p">,</span><span class="w"> </span><span class="nx">tooltip</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">TOOLTIP01</span><span class="p">)</span><span class="w"></span>
+
+<span class="nx">printTable</span><span class="p">(</span><span class="nx">txt</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"></span>
+<span class="w">    </span><span class="k">var table </span><span class="nx">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">table.new</span><span class="p">(</span><span class="ni">position.middle_right</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="ni">table.cell</span><span class="p">(</span><span class="nx">t</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nx">txt</span><span class="p">,</span><span class="w"> </span><span class="nx">text_halign</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">text.align_right</span><span class="p">,</span><span class="w"> </span><span class="ni">bgcolor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">color.yellow</span><span class="p">)</span><span class="w"></span>
+
+<span class="nx">msOffsetInput</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">hoursOffsetInput</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nx">MS_IN_1H</span><span class="w"></span>
+<span class="nx">printTable</span><span class="p">(</span><span class="w"></span>
+<span class="w">  </span><span class="ni">str.format</span><span class="p">(</span><span class="s2">"Last bar''s open time UTC: {0,date,HH:mm:ss yyyy.MM.dd}"</span><span class="p">,</span><span class="w"> </span><span class="no">time</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"></span>
+<span class="w">  </span><span class="ni">str.format</span><span class="p">(</span><span class="s2">"\nLast bar''s close time UTC: {0,date,HH:mm:ss yyyy.MM.dd}"</span><span class="p">,</span><span class="w"> </span><span class="ni">time_close</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"></span>
+<span class="w">  </span><span class="ni">str.format</span><span class="p">(</span><span class="s2">"\n\nLast bar''s open time EXCHANGE: {0,date,HH:mm:ss yyyy.MM.dd}"</span><span class="p">,</span><span class="w"> </span><span class="no">time</span><span class="p">(</span><span class="ni">timeframe.period</span><span class="p">,</span><span class="w"> </span><span class="ni">syminfo.session</span><span class="p">,</span><span class="w"> </span><span class="ni">syminfo.timezone</span><span class="p">))</span><span class="w"> </span><span class="o">+</span><span class="w"></span>
+<span class="w">  </span><span class="ni">str.format</span><span class="p">(</span><span class="s2">"\nLast bar''s close time EXCHANGE: {0,date,HH:mm:ss yyyy.MM.dd}"</span><span class="p">,</span><span class="w"> </span><span class="ni">time_close</span><span class="p">(</span><span class="ni">timeframe.period</span><span class="p">,</span><span class="w"> </span><span class="ni">syminfo.session</span><span class="p">,</span><span class="w"> </span><span class="ni">syminfo.timezone</span><span class="p">))</span><span class="w"> </span><span class="o">+</span><span class="w"></span>
+<span class="w">  </span><span class="ni">str.format</span><span class="p">(</span><span class="s2">"\n\nLast bar''s open time OFFSET ({0}): {1,date,HH:mm:ss yyyy.MM.dd}"</span><span class="p">,</span><span class="w"> </span><span class="nx">hoursOffsetInput</span><span class="p">,</span><span class="w"> </span><span class="no">time</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">msOffsetInput</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"></span>
+<span class="w">  </span><span class="ni">str.format</span><span class="p">(</span><span class="s2">"\nLast bar''s close time OFFSET ({0}): {1,date,HH:mm:ss yyyy.MM.dd}"</span><span class="p">,</span><span class="w"> </span><span class="nx">hoursOffsetInput</span><span class="p">,</span><span class="w"> </span><span class="ni">time_close</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">msOffsetInput</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"></span>
+<span class="w">  </span><span class="ni">str.format</span><span class="p">(</span><span class="s2">"\n\nCurrent time OFFSET ({0}): {1,date,HH:mm:ss yyyy.MM.dd}"</span><span class="p">,</span><span class="w"> </span><span class="nx">hoursOffsetInput</span><span class="p">,</span><span class="w"> </span><span class="ni">timenow</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">msOffsetInput</span><span class="p">))</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Note that:</p>
+<ul class="simple">
+<li>We convert the user offset expressed in hours to milliseconds with <code class="docutils literal notranslate"><span class="pre">msOffsetInput</span></code>.
+We then add that offset to a timstamp in UTC format before converting it to display format, e.g., <code class="docutils literal notranslate"><span class="pre">time</span> <span class="pre">+</span> <span class="pre">msOffsetInput</span></code> and <code class="docutils literal notranslate"><span class="pre">timenow</span> <span class="pre">+</span> <span class="pre">msOffsetInput</span></code>.</li>
+<li>We use a tooltip to provide instructions to users.</li>
+<li>We provide <code class="docutils literal notranslate"><span class="pre">minval</span></code> and <code class="docutils literal notranslate"><span class="pre">maxval</span></code> values to protect the input field,
+and a <code class="docutils literal notranslate"><span class="pre">step</span></code> value of 0.5 so that when they use the field’s up/down arrows, they can intuitively figure out that fractions can be used.</li>
+<li>The <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_str{dot}format">str.format()</a>
+function formats our time values, namely the last bar’s time and the current time.</li>
+</ul>
+<p>Some functions that normally return values in the exchange’s time zone provide means to adapt their result to another time zone through the <code class="docutils literal notranslate"><span class="pre">timezone</span></code> parameter.
+This script illustrates how to do this with <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_hour">hour()</a>:</p>
+<img alt="../_images/Time-TimeZones-02.png" src="../_images/Time-TimeZones-02.png"/>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s1">'`hour(time, "GMT+0")` in orange'</span><span class="p">)</span><span class="w"></span>
+<span class="k">color </span><span class="nx">BLUE_LIGHT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="l">#0000FF30</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="ni">hour</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="nx">BLUE_LIGHT</span><span class="p">,</span><span class="w"> </span><span class="mi">8</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="ni">hour</span><span class="p">(</span><span class="no">time</span><span class="p">,</span><span class="w"> </span><span class="ni">syminfo.timezone</span><span class="p">))</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="ni">hour</span><span class="p">(</span><span class="no">time</span><span class="p">,</span><span class="w"> </span><span class="s2">"GMT+0"</span><span class="p">),</span><span class="s2">"UTC"</span><span class="p">,</span><span class="w"> </span><span class="ni">color.orange</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Note that:</p>
+<ul class="simple">
+<li>The <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_hour">hour</a> variable and the
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_hour">hour()</a> function normally returns a value in the exchange’s time zone.
+Accordingly, plots in blue for both <code class="docutils literal notranslate"><span class="pre">hour</span></code> and <code class="docutils literal notranslate"><span class="pre">hour(time,</span> <span class="pre">syminfo.timezone)</span></code> overlap.
+Using the function form with <code class="docutils literal notranslate"><span class="pre">syminfo.timezone</span></code> is thus redundant if the exchange’s hour is what’s required.</li>
+<li>The orange line plotting <code class="docutils literal notranslate"><span class="pre">hour(time,</span> <span class="pre">"GMT+0")</span></code>, however, returns the bar’s hour at UTC, or “GMT+0” time,
+which in this case is four hours less than the exchange’s time, since MSFT trades on the NASDAQ whose time zone is UTC-4.</li>
+</ul>
+<div class="section" id="time-zone-strings">
+<span id="pagetime-timezonestrings"></span><h4><a class="toc-backref" href="#id7">Time zone strings</a><a class="headerlink" href="#time-zone-strings" title="Permalink to this headline">¶</a></h4>
+<p>The argument used for the <code class="docutils literal notranslate"><span class="pre">timezone</span></code> parameter in functions such as
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_time">time()</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_timestamp">timestamp()</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_hour">hour()</a>, etc., can be in different formats,
+which you can find in the <a class="reference external" href="https://en.wikipedia.org/wiki/List_of_tz_database_time_zones" rel="nofollow">IANA time zone database name</a> reference page.
+Contents from the “TZ database name”, “UTC offset ±hh:mm” and “UTC DST offset ±hh:mm” columns of that page’s table can be used.</p>
+<p>To express an offset of +5.5 hours from UTC, these strings found in the reference page are all equivalent:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">"GMT+05:30"</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">"Asia/Calcutta"</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">"Asia/Colombo"</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">"Asia/Kolkata"</span></code></li>
+</ul>
+<p>Non-fractional offsets can be expressed in the <code class="docutils literal notranslate"><span class="pre">"GMT+5"</span></code> form. <code class="docutils literal notranslate"><span class="pre">"GMT+5.5"</span></code> is not allowed.</p>
+</div>
+</div>
+</div>
+<div class="section" id="time-variables">
+<h2><a class="toc-backref" href="#id8">Time variables</a><a class="headerlink" href="#time-variables" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="time-and-time-close">
+<h3><a class="toc-backref" href="#id9">`time` and `time_close`</a><a class="headerlink" href="#time-and-time-close" title="Permalink to this headline">¶</a></h3>
+<p>Let’s start by plotting <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_time">time</a> and
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_time_close">time_close</a>,
+the Unix timestamp in milliseconds of the bar’s opening and closing time:</p>
+<img alt="../_images/Time-TimeAndTimeclose-01.png" src="../_images/Time-TimeAndTimeclose-01.png"/>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"`time` and `time_close` values on bars"</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="no">time</span><span class="p">,</span><span class="w"> </span><span class="s2">"`time`"</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="ni">time_close</span><span class="p">,</span><span class="w"> </span><span class="s2">"`time_close`"</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Note that:</p>
+<ul class="simple">
+<li>The <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_time">time</a> and
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_time_close">time_close</a> variables
+returns a timestamp in <a class="reference external" href="https://en.wikipedia.org/wiki/Unix_time" rel="nofollow">UNIX time</a>, which is independent of the timezone selected by the user on his chart.
+In this case, the <strong>chart’s</strong> time zone setting is the exchange time zone, so whatever symbol is on the chart,
+its exchange time zone will be used for the display of the date and time values on the chart’s cursor.
+The NASDAQ’s time zone is UTC-4, but this only affects the chart’s display of date/time values; it has no impact on the
+values plotted by the script.</li>
+<li>The last <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_time">time</a>
+value for the plot shown in the scale is the number of milliseconds elapsed from 00:00:00 UTC, 1 January, 1970, until the bar’s opening time.
+It corresponds to 17:30 on the 27th of September 2021. However, because the chart is using the UTC-4 time zone (the NASDAQ’s time zone),
+it is displaying the 13:30 time, four hours earlier than UTC time.</li>
+<li>The difference between the two values on the last bar is the number of milliseconds in one hour (1000 * 60 * 60 = 3,600,000)
+because we are on a 1H chart.</li>
+</ul>
+</div>
+<div class="section" id="time-tradingday">
+<h3><a class="toc-backref" href="#id10">`time_tradingday`</a><a class="headerlink" href="#time-tradingday" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_time_tradingday">time_tradingday</a> is useful
+when a symbol trades on overnight sessions that start and close on different calendar days.
+This happens in forex markets, for example, where a session can open Sunday at 17:00 and close Monday at 17:00.</p>
+<p>The variable returns the time of the beginning of the trading day when used at timeframes of 1D and less.
+When used on timeframes higher than 1D,
+it returns the starting time of the last trading day in the bar (e.g., at 1W it will return the starting time of the last trading day of the week).</p>
+</div>
+<div class="section" id="timenow">
+<h3><a class="toc-backref" href="#id11">`timenow`</a><a class="headerlink" href="#timenow" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_timenow">timenow</a> returns the current time.
+It works in realtime, but also when a script executes on historical bars.
+In realtime, your scripts will only perceive changes when they execute on feed updates.
+When no updates occur the script is idle, so it cannot update its display.
+See the page on Pine Script™’s <a class="reference internal" href="../language/Execution_model.html#pageexecutionmodel"><span class="std std-ref">execution model</span></a> for more information.</p>
+<p>This script uses the values of <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_timenow">timenow</a>
+and <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_time_close">time_close</a>
+to calculate a realtime countdown for intraday bars.
+Contrary to the countdown on the chart, this one will only update when a feed update causes the script to execute another iteration:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="nx">true</span><span class="p">)</span><span class="w"></span>
+
+<span class="nx">printTable</span><span class="p">(</span><span class="nx">txt</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"></span>
+<span class="w">    </span><span class="k">var table </span><span class="nx">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">table.new</span><span class="p">(</span><span class="ni">position.middle_right</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="ni">table.cell</span><span class="p">(</span><span class="nx">t</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nx">txt</span><span class="p">,</span><span class="w"> </span><span class="nx">text_halign</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">text.align_right</span><span class="p">,</span><span class="w"> </span><span class="ni">bgcolor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">color.yellow</span><span class="p">)</span><span class="w"></span>
+
+<span class="nx">printTable</span><span class="p">(</span><span class="ni">str.format</span><span class="p">(</span><span class="s2">"{0,time,HH:mm:ss.SSS}"</span><span class="p">,</span><span class="w"> </span><span class="ni">time_close</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="ni">timenow</span><span class="p">))</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="calendar-dates-and-times">
+<h3><a class="toc-backref" href="#id12">Calendar dates and times</a><a class="headerlink" href="#calendar-dates-and-times" title="Permalink to this headline">¶</a></h3>
+<p>Calendar date and time variables such as
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_year">year</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_month">month</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_weekofyear">weekofyear</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_dayofmonth">dayofmonth</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_dayofweek">dayofweek</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_hour">hour</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_minute">minute</a> and
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_second">second</a>
+can be useful to test for specific dates or times, and as arguments to
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_timestamp">timestamp()</a>.</p>
+<p>When testing for specific dates or times, ones needs to account for the possibility that the script will be executing on timeframes
+where the tested condition cannot be detected, or for cases where a bar with the specific requirement will not exist.
+Suppose, for example, we wanted to detect the first trading day of the month.
+This script shows how using only <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_dayofmonth">dayofmonth</a>
+will not work when a weekly chart is used or when no trading occurs on the 1st of the month:</p>
+<img alt="../_images/Time-CalendarDatesAndTimes-01.png" src="../_images/Time-CalendarDatesAndTimes-01.png"/>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="nx">true</span><span class="p">)</span><span class="w"></span>
+<span class="nx">firstDayIncorrect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">dayofmonth</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="w"></span>
+<span class="nx">firstDay</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">ta.change</span><span class="p">(</span><span class="no">time</span><span class="p">(</span><span class="s2">"M"</span><span class="p">))</span><span class="w"></span>
+<span class="ni">plotchar</span><span class="p">(</span><span class="nx">firstDayIncorrect</span><span class="p">,</span><span class="w"> </span><span class="s2">"firstDayIncorrect"</span><span class="p">,</span><span class="w"> </span><span class="s2">"•"</span><span class="p">,</span><span class="w"> </span><span class="ni">location.top</span><span class="p">,</span><span class="w"> </span><span class="nx">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">size.small</span><span class="p">)</span><span class="w"></span>
+<span class="ni">bgcolor</span><span class="p">(</span><span class="nx">firstDay</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="ni">color.silver</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="no">na</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Note that:</p>
+<ul class="simple">
+<li>Using <code class="docutils literal notranslate"><span class="pre">ta.change(time("M"))</span></code> is more robust as it works on all months (#1 and #2), displayed as the silver background,
+whereas the blue dot detected using <code class="docutils literal notranslate"><span class="pre">dayofmonth</span> <span class="pre">==</span> <span class="pre">1</span></code> does not work (#1) when the first trading day of September occurs on the 2nd.</li>
+<li>The <code class="docutils literal notranslate"><span class="pre">dayofmonth</span> <span class="pre">==</span> <span class="pre">1</span></code> condition will be <code class="docutils literal notranslate"><span class="pre">true</span></code> on all intrabars of the first day of the month,
+but <code class="docutils literal notranslate"><span class="pre">ta.change(time("M"))</span></code> will only be <code class="docutils literal notranslate"><span class="pre">true</span></code> on the first.</li>
+</ul>
+<p>If you wanted your script to only display for years 2020 and later, you could use:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="nx">true</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="ni">year</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">2020</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="no">close</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="no">na</span><span class="p">,</span><span class="w"> </span><span class="nx">linewidth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="syminfo-timezone">
+<h3><a class="toc-backref" href="#id13">`syminfo.timezone()`</a><a class="headerlink" href="#syminfo-timezone" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_syminfo{dot}timezone">syminfo.timezone</a>
+returns the time zone of the chart symbol’s exchange.
+It can be useful when a <code class="docutils literal notranslate"><span class="pre">timezone</span></code> parameter is available in a function
+and you want to explicitly mention that you are using the exchange’s timezone.
+It is usually redundant because when no argument is supplied to <code class="docutils literal notranslate"><span class="pre">timezone</span></code>,
+the exchange’s time zone is assumed.</p>
+</div>
+</div>
+<div class="section" id="time-functions">
+<h2><a class="toc-backref" href="#id14">Time functions</a><a class="headerlink" href="#time-functions" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3><a class="toc-backref" href="#id15">`time()` and `time_close()`</a><a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>The <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_time">time()</a> and
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_time_close">time_close()</a>
+functions have the following signature:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>time(timeframe, session, timezone) → series int
+time_close(timeframe, session, timezone) → series int
+</pre></div>
+</div>
+<p>They accept three arguments:</p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">timeframe</span></code></dt>
+<dd>A string in <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_timeframe{dot}period">timeframe.period</a> format.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">session</span></code></dt>
+<dd>An optional string in session specification format: <code class="docutils literal notranslate"><span class="pre">"hhmm-hhmm[:days]"</span></code>, where the <code class="docutils literal notranslate"><span class="pre">[:days]</span></code> part is optional.
+See the page on <a class="reference internal" href="Sessions.html#pagesessions"><span class="std std-ref">sessions</span></a> for more information.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">timezone</span></code></dt>
+<dd>An optional value that qualifies the argument for <code class="docutils literal notranslate"><span class="pre">session</span></code> when one is used.</dd>
+</dl>
+<p>See the <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_time">time()</a> and
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_time_close">time_close()</a> entries in the Reference Manual for more information.</p>
+<p>The <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_time">time()</a> function is most often used to:</p>
+<ol class="arabic simple">
+<li>Test if a bar is in a specific time period, which will require using the <code class="docutils literal notranslate"><span class="pre">session</span></code> parameter.
+In those cases, <code class="docutils literal notranslate"><span class="pre">timeframe.period</span></code>, i.e., the chart’s timeframe, will often be used for the first parameter.
+When using the function this way, we are relying on the fact that it will return
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_na">na</a> when the bar is not part of the period specified
+in the <code class="docutils literal notranslate"><span class="pre">session</span></code> argument.</li>
+<li>Detecting changes in higher timeframes than the chart’s by using the higher timeframe for the <code class="docutils literal notranslate"><span class="pre">timeframe</span></code> argument.
+When using the function for this purpose, we are looking for changes in the returned value, which means the higher timeframe bar has changed.
+This will usually require using <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_ta{dot}change">ta.change()</a> to test,
+e.g., <code class="docutils literal notranslate"><span class="pre">ta.change(time("D"))</span></code> will return the change in time when a new higher timeframe bar comes in,
+so the expression’s result will cast to a “bool” value when used in a conditional expression.
+The “bool” result will be <code class="docutils literal notranslate"><span class="pre">true</span></code> when there is a change, and <code class="docutils literal notranslate"><span class="pre">false</span></code> when there is no change.</li>
+</ol>
+<div class="section" id="testing-for-sessions">
+<h4><a class="toc-backref" href="#id16">Testing for sessions</a><a class="headerlink" href="#testing-for-sessions" title="Permalink to this headline">¶</a></h4>
+<p>Let’s look at an example of the first case where we want to determine if a bar’s starting time is part of a period between 11:00 and 13:00:</p>
+<img alt="../_images/Time-Time()AndTimeclose()-01.png" src="../_images/Time-Time()AndTimeclose()-01.png"/>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"Session bars"</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="nx">true</span><span class="p">)</span><span class="w"></span>
+<span class="nx">inSession</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">not</span><span class="w"> </span><span class="no">na</span><span class="p">(</span><span class="no">time</span><span class="p">(</span><span class="ni">timeframe.period</span><span class="p">,</span><span class="w"> </span><span class="s2">"1100-1300"</span><span class="p">))</span><span class="w"></span>
+<span class="ni">bgcolor</span><span class="p">(</span><span class="nx">inSession</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="ni">color.silver</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="no">na</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Note that:</p>
+<ul class="simple">
+<li>We use <code class="docutils literal notranslate"><span class="pre">time(timeframe.period,</span> <span class="pre">"1100-1300")</span></code>, which says:
+“Check at the chart’s timeframe if the current bar’s opening time is situated between 11:00 and 13:00 inclusively”.
+If the bar is in the session, the function returns its opening time. If it is <strong>not</strong>, the function returns
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_na">na</a>.</li>
+<li>We are interested in identifying the instances when <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_time">time()</a>
+does not return <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_na">na</a>
+because that means the bar is in the session, so we test for <code class="docutils literal notranslate"><span class="pre">not</span> <span class="pre">na(...)</span></code>.
+We do not use the actual return value of <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_time">time()</a> when it is not
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_na">na</a>;
+we are only interested in whether it returns <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_na">na</a> or not.</li>
+</ul>
+</div>
+<div class="section" id="testing-for-changes-in-higher-timeframes">
+<span id="pagetime-testingforchangesinhighertimeframes"></span><h4><a class="toc-backref" href="#id17">Testing for changes in higher timeframes</a><a class="headerlink" href="#testing-for-changes-in-higher-timeframes" title="Permalink to this headline">¶</a></h4>
+<p>It is often helpful to detect changes in a higher timeframe.
+You may, for example, want to detect changes in trading days while on intraday charts.
+For these cases, you can use the fact that <code class="docutils literal notranslate"><span class="pre">time("D")</span></code> returns the opening time of the 1D bar,
+even if the chart is at an intraday timeframe such as 1H:</p>
+<img alt="../_images/Time-TestingForChangesInHTF-01.png" src="../_images/Time-TestingForChangesInHTF-01.png"/>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="nx">true</span><span class="p">)</span><span class="w"></span>
+<span class="k">bool </span><span class="nx">newDay</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">ta.change</span><span class="p">(</span><span class="no">time</span><span class="p">(</span><span class="s2">"D"</span><span class="p">))</span><span class="w"></span>
+<span class="ni">bgcolor</span><span class="p">(</span><span class="nx">newDay</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="ni">color.silver</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="no">na</span><span class="p">)</span><span class="w"></span>
+
+<span class="nx">newExchangeDay</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">ta.change</span><span class="p">(</span><span class="ni">dayofmonth</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plotchar</span><span class="p">(</span><span class="nx">newExchangeDay</span><span class="p">,</span><span class="w"> </span><span class="s2">"newExchangeDay"</span><span class="p">,</span><span class="w"> </span><span class="s2">"🠇"</span><span class="p">,</span><span class="w"> </span><span class="ni">location.top</span><span class="p">,</span><span class="w"> </span><span class="nx">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">size.small</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Note that:</p>
+<ul class="simple">
+<li>The <code class="docutils literal notranslate"><span class="pre">newDay</span></code> variable detects changes in the opening time of 1D bars, so it follows the conventions for the chart’s symbol,
+which uses overnight sessions of 17:00 to 17:00. It changes values when a new session comes in.</li>
+<li>Because <code class="docutils literal notranslate"><span class="pre">newExchangeDay</span></code> detects change in <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_dayofmonth">dayofmonth</a>
+in the calendar day, it changes when the day changes on the chart.</li>
+<li>The two change detection methods do not coincide on the chart, except when there are days without trading.
+On Sundays here, for example, both detection methods will detect a change because the calendar day changes from the last trading day (Friday)
+to the first calendar day of the new week, Sunday, which is when the Monday’s overnight session begins at 17:00.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id2">
+<h3><a class="toc-backref" href="#id18">Calendar dates and times</a><a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<p>Calendar date and time functions such as
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_year">year()</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_month">month()</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_weekofyear">weekofyear()</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_dayofmonth">dayofmonth()</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_dayofweek">dayofweek()</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_hour">hour()</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_minute">minute()</a> and
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_second">second()</a>
+can be useful to test for specific dates or times. They all have signatures similar to the ones shown here for
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_dayofmonth">dayofmonth()</a>:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>dayofmonth(time) → series int
+dayofmonth(time, timezone) → series int
+</pre></div>
+</div>
+<p>This will plot the day of the opening of the bar where the January 1st, 2021 at 00:00 time falls between its
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_time_close">time</a> and
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_time_close">time_close</a> values:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span><span class="w"></span>
+<span class="nx">exchangeDay</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">dayofmonth</span><span class="p">(</span><span class="ni">timestamp</span><span class="p">(</span><span class="s2">"2021-01-01"</span><span class="p">))</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="nx">exchangeDay</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>The value will be the 31st or the 1st, depending on the calendar day of session opens on the chart’s symbol.
+For symbols traded 24x7 at exchanges using the UTC time zone, the date will be the 1st.
+For symbols trading on exchanges at UTC-4, for example, the date will be the 31st.</p>
+</div>
+<div class="section" id="timestamp">
+<h3><a class="toc-backref" href="#id19">`timestamp()`</a><a class="headerlink" href="#timestamp" title="Permalink to this headline">¶</a></h3>
+<p>The <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_timestamp">timestamp()</a> function has a few different signatures:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>timestamp(year, month, day, hour, minute, second) → simple/series int
+timestamp(timezone, year, month, day, hour, minute, second) → simple/series int
+timestamp(dateString) → const int
+</pre></div>
+</div>
+<p>The only difference between the first two is the <code class="docutils literal notranslate"><span class="pre">timezone</span></code> parameter.
+Its default value is <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_syminfo{dot}timezone">syminfo.timezone</a>.
+See the <a class="reference internal" href="#pagetime-timezonestrings"><span class="std std-ref">Time zone strings</span></a> section of this page for valid values.</p>
+<p>The third form is used as a <code class="docutils literal notranslate"><span class="pre">defval</span></code> value in <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_input{dot}time">input.time()</a>.
+See the <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_timestamp">timestamp()</a> entry in the Reference Manual for more information.</p>
+<p><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_timestamp">timestamp()</a>
+is useful to generate a timestamp for a specific date.
+To generate a timestamp for Jan 1, 2021, use either one of these methods:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span><span class="w"></span>
+<span class="nx">yearBeginning1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">timestamp</span><span class="p">(</span><span class="s2">"2021-01-01"</span><span class="p">)</span><span class="w"></span>
+<span class="nx">yearBeginning2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">timestamp</span><span class="p">(</span><span class="mi">2021</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="nx">printTable</span><span class="p">(</span><span class="nx">txt</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="k">var table </span><span class="nx">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">table.new</span><span class="p">(</span><span class="ni">position.middle_right</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">),</span><span class="w"> </span><span class="ni">table.cell</span><span class="p">(</span><span class="nx">t</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nx">txt</span><span class="p">,</span><span class="w"> </span><span class="ni">bgcolor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">color.yellow</span><span class="p">)</span><span class="w"></span>
+<span class="nx">printTable</span><span class="p">(</span><span class="ni">str.format</span><span class="p">(</span><span class="s2">"yearBeginning1: {0,date,yyyy.MM.dd hh:mm}\nyearBeginning2: {1,date,yyyy.MM.dd hh:mm}"</span><span class="p">,</span><span class="w"> </span><span class="nx">yearBeginning1</span><span class="p">,</span><span class="w"> </span><span class="nx">yearBeginning1</span><span class="p">))</span><span class="w"></span>
+</pre></div>
+</div>
+<p>You can use offsets in <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_timestamp">timestamp()</a> arguments.
+Here, we subtract 2 from the value supplied for its <code class="docutils literal notranslate"><span class="pre">day</span></code> parameter to get the date/time two days ago from the chart’s last bar.
+Note that because of different bar alignments on different instruments,
+the bar identified on the chart may not always be exactly 48 hours away,
+although the function’s return value is correct:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span><span class="w"></span>
+<span class="nx">twoDaysAgo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">timestamp</span><span class="p">(</span><span class="ni">year</span><span class="p">,</span><span class="w"> </span><span class="ni">month</span><span class="p">,</span><span class="w"> </span><span class="ni">dayofmonth</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="ni">hour</span><span class="p">,</span><span class="w"> </span><span class="ni">minute</span><span class="p">)</span><span class="w"></span>
+<span class="nx">printTable</span><span class="p">(</span><span class="nx">txt</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="k">var table </span><span class="nx">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">table.new</span><span class="p">(</span><span class="ni">position.middle_right</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">),</span><span class="w"> </span><span class="ni">table.cell</span><span class="p">(</span><span class="nx">t</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nx">txt</span><span class="p">,</span><span class="w"> </span><span class="ni">bgcolor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">color.yellow</span><span class="p">)</span><span class="w"></span>
+<span class="nx">printTable</span><span class="p">(</span><span class="ni">str.format</span><span class="p">(</span><span class="s2">"{0,date,yyyy.MM.dd hh:mm}"</span><span class="p">,</span><span class="w"> </span><span class="nx">twoDaysAgo</span><span class="p">))</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="formatting-dates-and-time">
+<h2><a class="toc-backref" href="#id20">Formatting dates and time</a><a class="headerlink" href="#formatting-dates-and-time" title="Permalink to this headline">¶</a></h2>
+<p>Timestamps can be formatted using <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_str{dot}format">str.format()</a>.
+These are examples of various formats:</p>
+<img alt="../_images/Time-FormattingDatesAndTime-01.png" src="../_images/Time-FormattingDatesAndTime-01.png"/>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="nx">true</span><span class="p">)</span><span class="w"></span>
+
+<span class="nx">print</span><span class="p">(</span><span class="nx">txt</span><span class="p">,</span><span class="w"> </span><span class="nx">styl</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"></span>
+<span class="w">    </span><span class="k">var </span><span class="nx">alignment</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">styl</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="ni">label.style_label_right</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="ni">text.align_right</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="ni">text.align_left</span><span class="w"></span>
+<span class="w">    </span><span class="k">var </span><span class="nx">lbl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">label.new</span><span class="p">(</span><span class="no">na</span><span class="p">,</span><span class="w"> </span><span class="no">na</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="ni">xloc.bar_index</span><span class="p">,</span><span class="w"> </span><span class="ni">yloc.price</span><span class="p">,</span><span class="w"> </span><span class="ni">color</span><span class="p">(</span><span class="no">na</span><span class="p">),</span><span class="w"> </span><span class="nx">styl</span><span class="p">,</span><span class="w"> </span><span class="ni">color.black</span><span class="p">,</span><span class="w"> </span><span class="ni">size.large</span><span class="p">,</span><span class="w"> </span><span class="nx">alignment</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="k">if </span><span class="ni">barstate.islast</span><span class="w"></span>
+<span class="w">        </span><span class="ni">label.set_xy</span><span class="p">(</span><span class="nx">lbl</span><span class="p">,</span><span class="w"> </span><span class="ni">bar_index</span><span class="p">,</span><span class="w"> </span><span class="no">hl2</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="ni">label.set_text</span><span class="p">(</span><span class="nx">lbl</span><span class="p">,</span><span class="w"> </span><span class="nx">txt</span><span class="p">)</span><span class="w"></span>
+
+<span class="k">var string </span><span class="nx">format</span><span class="w"> </span><span class="o">=</span><span class="w"></span>
+<span class="w">  </span><span class="s2">"{0,date,yyyy.MM.dd hh:mm:ss}\n"</span><span class="w"> </span><span class="o">+</span><span class="w"></span>
+<span class="w">  </span><span class="s2">"{1,date,short}\n"</span><span class="w"> </span><span class="o">+</span><span class="w"></span>
+<span class="w">  </span><span class="s2">"{2,date,medium}\n"</span><span class="w"> </span><span class="o">+</span><span class="w"></span>
+<span class="w">  </span><span class="s2">"{3,date,long}\n"</span><span class="w"> </span><span class="o">+</span><span class="w"></span>
+<span class="w">  </span><span class="s2">"{4,date,full}\n"</span><span class="w"> </span><span class="o">+</span><span class="w"></span>
+<span class="w">  </span><span class="s2">"{5,date,h a z (zzzz)}\n"</span><span class="w"> </span><span class="o">+</span><span class="w"></span>
+<span class="w">  </span><span class="s2">"{6,time,short}\n"</span><span class="w"> </span><span class="o">+</span><span class="w"></span>
+<span class="w">  </span><span class="s2">"{7,time,medium}\n"</span><span class="w"> </span><span class="o">+</span><span class="w"></span>
+<span class="w">  </span><span class="s2">"{8,date,'Month 'MM, 'Week' ww, 'Day 'DD}\n"</span><span class="w"> </span><span class="o">+</span><span class="w"></span>
+<span class="w">  </span><span class="s2">"{9,time,full}\n"</span><span class="w"> </span><span class="o">+</span><span class="w"></span>
+<span class="w">  </span><span class="s2">"{10,time,hh:mm:ss}\n"</span><span class="w"> </span><span class="o">+</span><span class="w"></span>
+<span class="w">  </span><span class="s2">"{11,time,HH:mm:ss}\n"</span><span class="w"> </span><span class="o">+</span><span class="w"></span>
+<span class="w">  </span><span class="s2">"{12,time,HH:mm:ss} Left in bar\n"</span><span class="w"></span>
+
+<span class="nx">print</span><span class="p">(</span><span class="nx">format</span><span class="p">,</span><span class="w"> </span><span class="ni">label.style_label_right</span><span class="p">)</span><span class="w"></span>
+<span class="nx">print</span><span class="p">(</span><span class="ni">str.format</span><span class="p">(</span><span class="nx">format</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="no">time</span><span class="p">,</span><span class="w"> </span><span class="no">time</span><span class="p">,</span><span class="w"> </span><span class="no">time</span><span class="p">,</span><span class="w"> </span><span class="no">time</span><span class="p">,</span><span class="w"> </span><span class="no">time</span><span class="p">,</span><span class="w"> </span><span class="no">time</span><span class="p">,</span><span class="w"> </span><span class="no">time</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="ni">timenow</span><span class="p">,</span><span class="w"> </span><span class="ni">timenow</span><span class="p">,</span><span class="w"> </span><span class="ni">timenow</span><span class="p">,</span><span class="w"> </span><span class="ni">timenow</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="ni">timenow</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="no">time</span><span class="p">,</span><span class="w"> </span><span class="ni">time_close</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="ni">timenow</span><span class="p">),</span><span class="w"> </span><span class="ni">label.style_label_left</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<a class="reference external image-reference" href="https://www.tradingview.com/"><div align="center" class="align-center"><img alt="../_images/TradingView-Logo-Block.svg" src="../_images/TradingView-Logo-Block.svg" width="200px"/></div>
+</a>
+</div>
+</div>
+</div>
+<div class="footer-relations">
+<div class="pull-left">
+<a class="btn btn-default" href="Text_and_shapes.html" title="previous chapter (use the left arrow)">Text and shapes</a>
+</div>
+<div class="pull-right">
+<a class="btn btn-default" href="Timeframes.html" title="next chapter (use the right arrow)">Timeframes</a>
+</div>
+</div>
+<div class="clearer"></div>
+</div>

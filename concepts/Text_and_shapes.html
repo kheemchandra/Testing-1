@@ -1,0 +1,786 @@
+<div id="right-column">
+<div aria-label="breadcrumbs navigation" role="navigation">
+<ol class="breadcrumb">
+<li><a href="../index.html">User Manual</a></li>
+<li><a href="index.html">Concepts</a></li>
+<li>Text and shapes</li>
+</ol>
+</div>
+<div class="document clearer body">
+<a class="reference external image-reference" href="https://www.tradingview.com/pine-script-docs/en/v5/Introduction.html"><div align="right" class="align-right"><img alt="Pine Script™ logo" height="100" src="../_images/Pine_Script_logo.svg" width="100"/></div>
+</a>
+<div class="section" id="text-and-shapes">
+<span id="pagetextandshapes"></span><h1>Text and shapes<a class="headerlink" href="#text-and-shapes" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><a class="reference internal" href="#introduction" id="id5">Introduction</a></li>
+<li><a class="reference internal" href="#plotchar" id="id6">`plotchar()`</a></li>
+<li><a class="reference internal" href="#plotshape" id="id7">`plotshape()`</a></li>
+<li><a class="reference internal" href="#plotarrow" id="id8">`plotarrow()`</a></li>
+<li><a class="reference internal" href="#labels" id="id9">Labels</a><ul>
+<li><a class="reference internal" href="#creating-and-modifying-labels" id="id10">Creating and modifying labels</a></li>
+<li><a class="reference internal" href="#positioning-labels" id="id11">Positioning labels</a></li>
+<li><a class="reference internal" href="#reading-label-properties" id="id12">Reading label properties</a></li>
+<li><a class="reference internal" href="#cloning-labels" id="id13">Cloning labels</a></li>
+<li><a class="reference internal" href="#deleting-labels" id="id14">Deleting labels</a></li>
+<li><a class="reference internal" href="#realtime-behavior" id="id15">Realtime behavior</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="introduction">
+<h2><a class="toc-backref" href="#id5">Introduction</a><a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>You may display text or shapes using five different ways with Pine Script™:</p>
+<ul class="simple">
+<li><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plotchar">plotchar()</a></li>
+<li><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plotshape">plotshape()</a></li>
+<li><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plotarrow">plotarrow()</a></li>
+<li>Labels created with <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_label{dot}new">label.new()</a></li>
+<li>Tables created with <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_table{dot}new">table.new()</a>
+(see <a class="reference internal" href="Tables.html#pagetables"><span class="std std-ref">Tables</span></a>)</li>
+</ul>
+<p>Which one to use depends on your needs:</p>
+<ul class="simple">
+<li>Tables can display text in various relative positions on charts that will not move as users scroll of zoom the chart horizontally.
+Their content is not tethered to bars. In contrast, text displayed with
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plotchar">plotchar()</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plotshape">plotshape()</a> or
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_label{dot}new">label.new()</a> is always tethered to a specific bar,
+so it will move with the bar’s position on the chart.
+See the page on <a class="reference internal" href="Tables.html#pagetables"><span class="std std-ref">Tables</span></a> for more information on them.</li>
+<li>Three function include are able to display pre-defined shapes:
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plotshape">plotshape()</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plotarrow">plotarrow()</a> and
+Labels created with <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_label{dot}new">label.new()</a>.</li>
+<li><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plotarrow">plotarrow()</a> cannot display text, only up or down arrows.</li>
+<li><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plotchar">plotchar()</a> and
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plotshape">plotshape()</a>
+can display non-dynamic (not of “series” form) text on any bar or all bars of the chart.</li>
+<li><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plotchar">plotchar()</a>
+can only display one character while <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plotshape">plotshape()</a>
+can display strings, including line breaks.</li>
+<li><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_label{dot}new">label.new()</a>
+can display a maximum of 500 labels on the chart. Its text <strong>can</strong> contain dynamic text, or “series strings”.
+Line breaks are also supported in label text.</li>
+<li>While <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plotchar">plotchar()</a> and
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plotshape">plotshape()</a>
+can display text at a fixed offset in the past or the future, which cannot change during the script’s execution,
+each <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_label{dot}new">label.new()</a> call
+can use a “series” offset that can be calculated on the fly.</li>
+</ul>
+<p>These are a few things to keep in mind concerning Pine Script™ strings:</p>
+<ul class="simple">
+<li>Since the <code class="docutils literal notranslate"><span class="pre">text</span></code> parameter in both
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plotchar">plotchar()</a> and
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plotshape">plotshape()</a>
+require a “const string” argument, it cannot contain values such as prices that can only be known on the bar (“series string”).</li>
+<li>To include “series” values in text displayed using <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_label{dot}new">label.new()</a>,
+they will first need to be converted to strings using
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_str{dot}tostring">str.tostring()</a>.</li>
+<li>The concatenation operator for strings in Pine Script™ is <code class="docutils literal notranslate"><span class="pre">+</span></code>. It is used to join string components into one string, e.g.,
+<code class="docutils literal notranslate"><span class="pre">msg</span> <span class="pre">=</span> <span class="pre">"Chart</span> <span class="pre">symbol:</span> <span class="pre">"</span> <span class="pre">+</span> <span class="pre">syminfo.tickerid</span></code>
+(where <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_syminfo{dot}tickerid">syminfo.tickerid</a>
+is a Pine Script™ built-in variable that returns the chart’s exchange and symbol information in string format).</li>
+<li>Characters displayed by all these functions can be Unicode characters, which may include Unicode symbols.
+See this <a class="reference external" href="https://www.tradingview.com/script/0rFQOCKf-Exploring-Unicode/">Exploring Unicode</a>
+script to get an idea of what can be done with Unicode characters.</li>
+<li>The color or size of text can sometimes be controlled using function parameters,
+but no inline formatting (bold, italics, monospace, etc.) is possible.</li>
+<li>Text from Pine scripts always displays on the chart in the Trebuchet MS font, which is used in many TradingView texts,
+including this one.</li>
+</ul>
+<p>This script displays text using the four methods available in Pine Script™:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"Four displays of text"</span><span class="p">,</span><span class="w"> </span><span class="nx">overlay</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">true</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plotchar</span><span class="p">(</span><span class="ni">ta.rising</span><span class="p">(</span><span class="no">close</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">),</span><span class="w"> </span><span class="s2">"`plotchar()`"</span><span class="p">,</span><span class="w"> </span><span class="s2">"🠅"</span><span class="p">,</span><span class="w"> </span><span class="ni">location.belowbar</span><span class="p">,</span><span class="w"> </span><span class="ni">color.lime</span><span class="p">,</span><span class="w"> </span><span class="nx">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">size.small</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plotshape</span><span class="p">(</span><span class="ni">ta.falling</span><span class="p">(</span><span class="no">close</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">),</span><span class="w"> </span><span class="s2">"`plotchar()`"</span><span class="p">,</span><span class="w"> </span><span class="nx">location</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">location.abovebar</span><span class="p">,</span><span class="w"> </span><span class="k">color </span><span class="o">=</span><span class="w"> </span><span class="no">na</span><span class="p">,</span><span class="w"> </span><span class="nx">text</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"•`plotshape()•`\n🠇"</span><span class="p">,</span><span class="w"> </span><span class="nx">textcolor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">color.fuchsia</span><span class="p">,</span><span class="w"> </span><span class="nx">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">size.huge</span><span class="p">)</span><span class="w"></span>
+
+<span class="k">if </span><span class="ni">bar_index</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">25</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="w"></span>
+<span class="w">    </span><span class="ni">label.new</span><span class="p">(</span><span class="ni">bar_index</span><span class="p">,</span><span class="w"> </span><span class="no">na</span><span class="p">,</span><span class="w"> </span><span class="s2">"•LABEL•\nHigh = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="ni">str.tostring</span><span class="p">(</span><span class="no">high</span><span class="p">,</span><span class="w"> </span><span class="ni">format.mintick</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">"\n🠇"</span><span class="p">,</span><span class="w"> </span><span class="nx">yloc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">yloc.abovebar</span><span class="p">,</span><span class="w"> </span><span class="nx">style</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">label.style_none</span><span class="p">,</span><span class="w"> </span><span class="nx">textcolor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">color.black</span><span class="p">,</span><span class="w"> </span><span class="nx">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">size.normal</span><span class="p">)</span><span class="w"></span>
+
+<span class="nx">printTable</span><span class="p">(</span><span class="nx">txt</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="k">var table </span><span class="nx">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">table.new</span><span class="p">(</span><span class="ni">position.middle_right</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">),</span><span class="w"> </span><span class="ni">table.cell</span><span class="p">(</span><span class="nx">t</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nx">txt</span><span class="p">,</span><span class="w"> </span><span class="ni">bgcolor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">color.yellow</span><span class="p">)</span><span class="w"></span>
+<span class="nx">printTable</span><span class="p">(</span><span class="s2">"•TABLE•\n"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="ni">str.tostring</span><span class="p">(</span><span class="ni">bar_index</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">" bars\nin the dataset"</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<img alt="../_images/TextAndShapes-Introduction-01.png" src="../_images/TextAndShapes-Introduction-01.png"/>
+<p>Note that:</p>
+<ul class="simple">
+<li>The method used to display each text string is shown with the text, except for the lime up arrows displayed using
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plotchar">plotchar()</a>, as it can only display one character.</li>
+<li>Label and table calls can be inserted in conditional structures to control when their are executed,
+whereas <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plotchar">plotchar()</a> and
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plotshape">plotshape()</a> cannot.
+Their conditional plotting must be controlled using their first argument,
+which is a “series bool” whose <code class="docutils literal notranslate"><span class="pre">true</span></code> or <code class="docutils literal notranslate"><span class="pre">false</span></code> value determines when the text is displayed.</li>
+<li>Numeric values displayed in the table and labels is first converted to a string using
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_str{dot}tostring">str.tostring()</a>.</li>
+<li>We use the <code class="docutils literal notranslate"><span class="pre">+</span></code> operator to concatenate string components.</li>
+<li><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plotshape">plotshape()</a> is designed to display a shape
+with accompanying text. Its <code class="docutils literal notranslate"><span class="pre">size</span></code> parameter controls the size of the shape, not of the text.
+We use <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_na">na</a> for its <code class="docutils literal notranslate"><span class="pre">color</span></code> argument
+so that the shape is not visible.</li>
+<li>Contrary to other texts, the table text will not move as you scroll or scale the chart.</li>
+<li>Some text strings contain the 🠇 Unicode arrow (U+1F807).</li>
+<li>Some text strings contain the <code class="docutils literal notranslate"><span class="pre">\n</span></code> sequence that represents a new line.</li>
+</ul>
+</div>
+<div class="section" id="plotchar">
+<h2><a class="toc-backref" href="#id6">`plotchar()`</a><a class="headerlink" href="#plotchar" title="Permalink to this headline">¶</a></h2>
+<p>This function is useful to display a single character on bars. It has the following syntax:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>plotchar(series, title, char, location, color, offset, text, textcolor, editable, size, show_last, display) → void
+</pre></div>
+</div>
+<p>See the <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plotchar">Reference Manual entry for plotchar()</a>
+for details on its parameters.</p>
+<p>As explained in the <a class="reference internal" href="../writing/Debugging.html#pagedebugging-whenthescriptsscalemustbepreserved"><span class="std std-ref">When the script’s scale must be preserved</span></a>
+section of our page on <a class="reference internal" href="../writing/Debugging.html#pagedebugging"><span class="std std-ref">Debugging</span></a>,
+the function can be used to display and inspect values in the Data Window or in the indicator values displayed to the right of the script’s name on the chart:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="nx">true</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plotchar</span><span class="p">(</span><span class="ni">bar_index</span><span class="p">,</span><span class="w"> </span><span class="s2">"Bar index"</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="ni">location.top</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<img alt="../_images/TextAndShapes-Plotchar-01.png" src="../_images/TextAndShapes-Plotchar-01.png"/>
+<p>Note that:</p>
+<ul class="simple">
+<li>The cursor is on the chart’s last bar.</li>
+<li>The value of <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_bar_index">bar_index</a>
+on <strong>that</strong> bar is displayed in indicator values (1) and in the Data Window (2).</li>
+<li>We use <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_location{dot}top">location.top</a>
+because the default <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_location{dot}abovebar">location.abovebar</a>
+will put the price into play in the script’s scale, which will often interfere with other plots.</li>
+</ul>
+<p><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plotchar">plotchar()</a>
+also works well to identify specific points on the chart or to validate that conditions
+are <code class="docutils literal notranslate"><span class="pre">true</span></code> when we expect them to be. This example displays an up arrow under bars where
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_close">close</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_high">high</a> and
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_volume">volume</a>
+have all been rising for two bars:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="nx">true</span><span class="p">)</span><span class="w"></span>
+<span class="k">bool </span><span class="nx">longSignal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">ta.rising</span><span class="p">(</span><span class="no">close</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="nx">and</span><span class="w"> </span><span class="ni">ta.rising</span><span class="p">(</span><span class="no">high</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="nx">and</span><span class="w"> </span><span class="p">(</span><span class="no">na</span><span class="p">(</span><span class="no">volume</span><span class="p">)</span><span class="w"> </span><span class="nx">or</span><span class="w"> </span><span class="ni">ta.rising</span><span class="p">(</span><span class="no">volume</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">))</span><span class="w"></span>
+<span class="ni">plotchar</span><span class="p">(</span><span class="nx">longSignal</span><span class="p">,</span><span class="w"> </span><span class="s2">"Long"</span><span class="p">,</span><span class="w"> </span><span class="s2">"▲"</span><span class="p">,</span><span class="w"> </span><span class="ni">location.belowbar</span><span class="p">,</span><span class="w"> </span><span class="k">color </span><span class="o">=</span><span class="w"> </span><span class="no">na</span><span class="p">(</span><span class="no">volume</span><span class="p">)</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="ni">color.gray</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="ni">color.blue</span><span class="p">,</span><span class="w"> </span><span class="nx">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">size.tiny</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<img alt="../_images/TextAndShapes-Plotchar-02.png" src="../_images/TextAndShapes-Plotchar-02.png"/>
+<p>Note that:</p>
+<ul class="simple">
+<li>We use <code class="docutils literal notranslate"><span class="pre">(na(volume)</span> <span class="pre">or</span> <span class="pre">ta.rising(volume,</span> <span class="pre">2))</span></code> so our script will work on symbols without
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_volume">volume</a> data.
+If we did not make provisions for when there is no <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_volume">volume</a> data,
+which is what <code class="docutils literal notranslate"><span class="pre">na(volume)</span></code> does by being <code class="docutils literal notranslate"><span class="pre">true</span></code> when there is no volume,
+the <code class="docutils literal notranslate"><span class="pre">longSignal</span></code> variable’s value would never be <code class="docutils literal notranslate"><span class="pre">true</span></code> because <code class="docutils literal notranslate"><span class="pre">ta.rising(volume,</span> <span class="pre">2)</span></code> yields <code class="docutils literal notranslate"><span class="pre">false</span></code> in those cases.</li>
+<li>We display the arrow in gray when there is no volume, to remind us that all three base conditions are not being met.</li>
+<li>Because <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plotchar">plotchar()</a>
+is now displaying a character on the chart, we use <code class="docutils literal notranslate"><span class="pre">size</span> <span class="pre">=</span> <span class="pre">size.tiny</span></code> to control its size.</li>
+<li>We have adapted the <code class="docutils literal notranslate"><span class="pre">location</span></code> argument to display the character under bars.</li>
+</ul>
+<p>If you don’t mind plotting only circles, you could also use <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plot">plot()</a>
+to achieve a similar effect:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="nx">true</span><span class="p">)</span><span class="w"></span>
+<span class="nx">longSignal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">ta.rising</span><span class="p">(</span><span class="no">close</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="nx">and</span><span class="w"> </span><span class="ni">ta.rising</span><span class="p">(</span><span class="no">high</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="nx">and</span><span class="w"> </span><span class="p">(</span><span class="no">na</span><span class="p">(</span><span class="no">volume</span><span class="p">)</span><span class="w"> </span><span class="nx">or</span><span class="w"> </span><span class="ni">ta.rising</span><span class="p">(</span><span class="no">volume</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">))</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="nx">longSignal</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="no">low</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="ni">ta.tr</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="no">na</span><span class="p">,</span><span class="w"> </span><span class="s2">"Long"</span><span class="p">,</span><span class="w"> </span><span class="ni">color.blue</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="ni">plot.style_circles</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>This method has the inconvenience that, since there is no relative positioning mechanism with
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plot">plot()</a>
+one must shift the circles down using something like
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_ta{dot}tr">ta.tr</a>
+(the bar’s “True Range”):</p>
+<img alt="../_images/TextAndShapes-Plotchar-03.png" src="../_images/TextAndShapes-Plotchar-03.png"/>
+</div>
+<div class="section" id="plotshape">
+<h2><a class="toc-backref" href="#id7">`plotshape()`</a><a class="headerlink" href="#plotshape" title="Permalink to this headline">¶</a></h2>
+<p>This function is useful to display pre-defined shapes and/or text on bars. It has the following syntax:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>plotshape(series, title, style, location, color, offset, text, textcolor, editable, size, show_last, display) → void
+</pre></div>
+</div>
+<p>See the <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plotshape">Reference Manual entry for plotshape()</a>
+for details on its parameters.</p>
+<p>Let’s use the function to achieve more or less the same result as with our second example of the previous section:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="nx">true</span><span class="p">)</span><span class="w"></span>
+<span class="nx">longSignal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">ta.rising</span><span class="p">(</span><span class="no">close</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="nx">and</span><span class="w"> </span><span class="ni">ta.rising</span><span class="p">(</span><span class="no">high</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="nx">and</span><span class="w"> </span><span class="p">(</span><span class="no">na</span><span class="p">(</span><span class="no">volume</span><span class="p">)</span><span class="w"> </span><span class="nx">or</span><span class="w"> </span><span class="ni">ta.rising</span><span class="p">(</span><span class="no">volume</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">))</span><span class="w"></span>
+<span class="ni">plotshape</span><span class="p">(</span><span class="nx">longSignal</span><span class="p">,</span><span class="w"> </span><span class="s2">"Long"</span><span class="p">,</span><span class="w"> </span><span class="ni">shape.arrowup</span><span class="p">,</span><span class="w"> </span><span class="ni">location.belowbar</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Note that here, rather than using an arrow character, we are using the <code class="docutils literal notranslate"><span class="pre">shape.arrowup</span></code> argument
+for the <code class="docutils literal notranslate"><span class="pre">style</span></code> parameter.</p>
+<img alt="../_images/TextAndShapes-Plotshape-01.png" src="../_images/TextAndShapes-Plotshape-01.png"/>
+<p>It is possible to use different <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plotshape">plotshape()</a>
+calls to superimpose text on bars.
+You will need to use <code class="docutils literal notranslate"><span class="pre">\n</span></code> followed by a special non-printing character that doesn’t get stripped out to preserve the newline’s functionality.
+Here we’re using a Unicode Zero-width space (U+200E). While you don’t see it in the following code’s strings, it is there and can be copy/pasted.
+The special Unicode character needs to be the <strong>last</strong> one in the string for text going up,
+and the <strong>first</strong> one when you are plotting under the bar and text is going down:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"Lift text"</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="nx">true</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plotshape</span><span class="p">(</span><span class="nx">true</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="ni">shape.arrowup</span><span class="p">,</span><span class="w">   </span><span class="ni">location.abovebar</span><span class="p">,</span><span class="w"> </span><span class="ni">color.green</span><span class="p">,</span><span class="w">  </span><span class="nx">text</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"A"</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plotshape</span><span class="p">(</span><span class="nx">true</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="ni">shape.arrowup</span><span class="p">,</span><span class="w">   </span><span class="ni">location.abovebar</span><span class="p">,</span><span class="w"> </span><span class="ni">color.lime</span><span class="p">,</span><span class="w">   </span><span class="nx">text</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"B\n​"</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plotshape</span><span class="p">(</span><span class="nx">true</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="ni">shape.arrowdown</span><span class="p">,</span><span class="w"> </span><span class="ni">location.belowbar</span><span class="p">,</span><span class="w"> </span><span class="ni">color.red</span><span class="p">,</span><span class="w">    </span><span class="nx">text</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"C"</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plotshape</span><span class="p">(</span><span class="nx">true</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="ni">shape.arrowdown</span><span class="p">,</span><span class="w"> </span><span class="ni">location.belowbar</span><span class="p">,</span><span class="w"> </span><span class="ni">color.maroon</span><span class="p">,</span><span class="w"> </span><span class="nx">text</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"​\nD"</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<img alt="../_images/TextAndShapes-Plotshape-02.png" src="../_images/TextAndShapes-Plotshape-02.png"/>
+<p>The available shapes you can use with the <code class="docutils literal notranslate"><span class="pre">style</span></code> parameter are:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="16%"/>
+<col width="17%"/>
+<col width="17%"/>
+<col width="1%"/>
+<col width="16%"/>
+<col width="17%"/>
+<col width="17%"/>
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Argument</th>
+<th class="head">Shape</th>
+<th class="head">With Text</th>
+<th class="head"> </th>
+<th class="head">Argument</th>
+<th class="head">Shape</th>
+<th class="head">With Text</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">shape.xcross</span></code></td>
+<td><img alt="Plotshape_xcross" src="../_images/TextAndShapes-PlotshapeStyles-Xcross.png"/></td>
+<td><img alt="Xcross_with_text" src="../_images/TextAndShapes-PlotshapeStyles-Xcross_with_text.png"/></td>
+<td> </td>
+<td><code class="docutils literal notranslate"><span class="pre">shape.arrowup</span></code></td>
+<td><img alt="Plotshape_arrowup" src="../_images/TextAndShapes-PlotshapeStyles-Arrowup.png"/></td>
+<td><img alt="Arrowup_with_text" src="../_images/TextAndShapes-PlotshapeStyles-Arrowup_with_text.png"/></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">shape.cross</span></code></td>
+<td><img alt="Plotshape_cross" src="../_images/TextAndShapes-PlotshapeStyles-Cross.png"/></td>
+<td><img alt="Cross_with_text" src="../_images/TextAndShapes-PlotshapeStyles-Cross_with_text.png"/></td>
+<td> </td>
+<td><code class="docutils literal notranslate"><span class="pre">shape.arrowdown</span></code></td>
+<td><img alt="Plotshape_arrowdown" src="../_images/TextAndShapes-PlotshapeStyles-Arrowdown.png"/></td>
+<td><img alt="Arrowdown_with_text" src="../_images/TextAndShapes-PlotshapeStyles-Arrowdown_with_text.png"/></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">shape.circle</span></code></td>
+<td><img alt="Plotshape_circle" src="../_images/TextAndShapes-PlotshapeStyles-Circle.png"/></td>
+<td><img alt="Circle_with_text" src="../_images/TextAndShapes-PlotshapeStyles-Circle_with_text.png"/></td>
+<td> </td>
+<td><code class="docutils literal notranslate"><span class="pre">shape.square</span></code></td>
+<td><img alt="Plotshape_square" src="../_images/TextAndShapes-PlotshapeStyles-Square.png"/></td>
+<td><img alt="Square_with_text" src="../_images/TextAndShapes-PlotshapeStyles-Square_with_text.png"/></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">shape.triangleup</span></code></td>
+<td><img alt="Plotshape_triangleup" src="../_images/TextAndShapes-PlotshapeStyles-Triangleup.png"/></td>
+<td><img alt="Triangleup_with_text" src="../_images/TextAndShapes-PlotshapeStyles-Triangleup_with_text.png"/></td>
+<td> </td>
+<td><code class="docutils literal notranslate"><span class="pre">shape.diamond</span></code></td>
+<td><img alt="Plotshape_diamond" src="../_images/TextAndShapes-PlotshapeStyles-Diamond.png"/></td>
+<td><img alt="Diamond_with_text" src="../_images/TextAndShapes-PlotshapeStyles-Diamond_with_text.png"/></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">shape.triangledown</span></code></td>
+<td><img alt="Plotshape_triangledown" src="../_images/TextAndShapes-PlotshapeStyles-Triangledown.png"/></td>
+<td><img alt="Triangledown_with_text" src="../_images/TextAndShapes-PlotshapeStyles-Triangledown_with_text.png"/></td>
+<td> </td>
+<td><code class="docutils literal notranslate"><span class="pre">shape.labelup</span></code></td>
+<td><img alt="Plotshape_labelup" src="../_images/TextAndShapes-PlotshapeStyles-Labelup.png"/></td>
+<td><img alt="Labelup_with_text" src="../_images/TextAndShapes-PlotshapeStyles-Labelup_with_text.png"/></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">shape.flag</span></code></td>
+<td><img alt="Plotshape_flag" src="../_images/TextAndShapes-PlotshapeStyles-Flag.png"/></td>
+<td><img alt="Flag_with_text" src="../_images/TextAndShapes-PlotshapeStyles-Flag_with_text.png"/></td>
+<td> </td>
+<td><code class="docutils literal notranslate"><span class="pre">shape.labeldown</span></code></td>
+<td><img alt="Plotshape_labeldown" src="../_images/TextAndShapes-PlotshapeStyles-Labeldown.png"/></td>
+<td><img alt="Labeldown_with_text" src="../_images/TextAndShapes-PlotshapeStyles-Labeldown_with_text.png"/></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="plotarrow">
+<h2><a class="toc-backref" href="#id8">`plotarrow()`</a><a class="headerlink" href="#plotarrow" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plotarrow">plotarrow</a>
+function displays up or down arrows of variable length,
+based on the relative value of the series used in the function’s first argument.
+It has the following syntax:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>plotarrow(series, title, colorup, colordown, offset, minheight, maxheight, editable, show_last, display) → void
+</pre></div>
+</div>
+<p>See the <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plotarrow">Reference Manual entry for plotarrow()</a>
+for details on its parameters.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">series</span></code> parameter in <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plotarrow">plotarrow()</a>
+is not a “series bool” as in <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plotchar">plotchar()</a> and
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plotshape">plotshape()</a>;
+it is a “series int/float” and there’s more to it than a simple <code class="docutils literal notranslate"><span class="pre">true</span></code> or <code class="docutils literal notranslate"><span class="pre">false</span></code> value determining when the arrows are plotted.
+This is the logic governing how the argument supplied to <code class="docutils literal notranslate"><span class="pre">series</span></code>
+affects the behavior of <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plotarrow">plotarrow()</a>:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">series</span> <span class="pre">&gt;</span> <span class="pre">0</span></code>: An up arrow is displayed, the length of which will be proportional to the
+relative value of the series on that bar in relation to other series values.</li>
+<li><code class="docutils literal notranslate"><span class="pre">series</span> <span class="pre">&lt;</span> <span class="pre">0</span></code>: A down arrow is displayed, proportionally-sized using the same rules.</li>
+<li><code class="docutils literal notranslate"><span class="pre">series</span> <span class="pre">==</span> <span class="pre">0</span> <span class="pre">or</span> <span class="pre">na(series)</span></code>: No arrow is displayed.</li>
+</ul>
+<p>The maximum and minimum possible sizes for the arrows (in pixels)
+can be controlled using the <code class="docutils literal notranslate"><span class="pre">minheight</span></code> and <code class="docutils literal notranslate"><span class="pre">maxheight</span></code> parameters.</p>
+<p>Here is a simple script illustrating how <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plotarrow">plotarrow()</a> works:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="nx">true</span><span class="p">)</span><span class="w"></span>
+<span class="nx">body</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">close</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="no">open</span><span class="w"></span>
+<span class="ni">plotarrow</span><span class="p">(</span><span class="nx">body</span><span class="p">,</span><span class="w"> </span><span class="nx">colorup</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">color.teal</span><span class="p">,</span><span class="w"> </span><span class="nx">colordown</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">color.orange</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<img alt="../_images/TextAndShapes-Plotarrow-01.png" src="../_images/TextAndShapes-Plotarrow-01.png"/>
+<p>Note how the heigth of arrows is proportional to the relative size of the bar bodies.</p>
+<p>You can use any series to plot the arrows. Here we use the value of the
+“Chaikin Oscillator” to control the location and size of the arrows:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"Chaikin Oscillator Arrows"</span><span class="p">,</span><span class="w"> </span><span class="nx">overlay</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">true</span><span class="p">)</span><span class="w"></span>
+<span class="nx">fastLengthInput</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">input.int</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w">  </span><span class="nx">minval</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"></span>
+<span class="nx">slowLengthInput</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">input.int</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="nx">minval</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"></span>
+<span class="nx">osc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">ta.ema</span><span class="p">(</span><span class="ni">ta.accdist</span><span class="p">,</span><span class="w"> </span><span class="nx">fastLengthInput</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="ni">ta.ema</span><span class="p">(</span><span class="ni">ta.accdist</span><span class="p">,</span><span class="w"> </span><span class="nx">slowLengthInput</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plotarrow</span><span class="p">(</span><span class="nx">osc</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<img alt="../_images/TextAndShapes-Plotarrow-02.png" src="../_images/TextAndShapes-Plotarrow-02.png"/>
+<p>Note that we display the actual “Chaikin Oscillator” in a pane below the chart,
+so you can see what values are used to determine the position and size of the arrows.</p>
+</div>
+<div class="section" id="labels">
+<span id="pagetextandshapes-labels"></span><h2><a class="toc-backref" href="#id9">Labels</a><a class="headerlink" href="#labels" title="Permalink to this headline">¶</a></h2>
+<p>Labels are only available in v4 and higher versions of Pine Script™. They work very differently than
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plotchar">plotchar()</a> and
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plotshape">plotshape()</a>.</p>
+<p>Labels are objects, like <a class="reference internal" href="Lines_and_boxes.html#pagelinesandboxes"><span class="std std-ref">lines and boxes</span></a>, or <a class="reference internal" href="Tables.html#pagetables"><span class="std std-ref">tables</span></a>.
+Like them, they are referred to using an ID, which acts like a pointer. Label IDs are of “label” type.
+As with other Pine Script™ objects, labels IDs are “time series” and all the functions used to manage them accept “series” arguments,
+which makes them very flexible.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">On TradingView charts, a complete set of <em>Drawing Tools</em>
+allows users to create and modify drawings using mouse actions. While they may sometimes look similar to
+drawing objects created with Pine Script™ code, they are unrelated entities.
+Drawing objects created using Pine Script™ code cannot be modified with mouse actions,
+and hand-drawn drawings from the chart user interface are not visible from Pine scripts.</p>
+</div>
+<p>Labels are advantageous because:</p>
+<ul class="simple">
+<li>They allow “series” values to be converted to text and placed on charts.
+This means they are ideal to display values that cannot be known before time,
+such as price values, support and resistance levels, of any other values that your script calculates.</li>
+<li>Their positioning options are more flexible that those of the <code class="docutils literal notranslate"><span class="pre">plot*()</span></code> functions.</li>
+<li>They offer more display modes.</li>
+<li>Contrary to <code class="docutils literal notranslate"><span class="pre">plot*()</span></code> functions, label-handling functions can be inserted in conditional or loop structures,
+making it easier to control their behavior.</li>
+<li>You can add tooltips to labels.</li>
+</ul>
+<p>One drawback to using labels versus <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plotchar">plotchar()</a> and
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plotshape">plotshape()</a>
+is that you can only draw a limited quantity of them on the chart.
+The default is ~50, but you can use the <code class="docutils literal notranslate"><span class="pre">max_labels_count</span></code> parameter in your
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_indicator">indicator()</a> or
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_strategy">strategy()</a>
+declaration statement to specify up to 500. Labels, like <a class="reference internal" href="Lines_and_boxes.html#pagelinesandboxes"><span class="std std-ref">lines and boxes</span></a>,
+are managed using a garbage collection mechanism which deletes the oldest ones on the chart,
+such that only the most recently drawn labels are visible.</p>
+<p>Your toolbox of built-ins to manage labels are all in the <code class="docutils literal notranslate"><span class="pre">label</span></code> namespace. They include:</p>
+<ul class="simple">
+<li><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_label{dot}new">label.new()</a> to create labels.</li>
+<li><code class="docutils literal notranslate"><span class="pre">label.set_*()</span></code> functions to modify the properties of an existing label.</li>
+<li><code class="docutils literal notranslate"><span class="pre">label.get_*()</span></code> functions to read the properties of an existing label.</li>
+<li><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_label{dot}delete">label.delete()</a> to delete labels</li>
+<li>The <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_label{dot}all">label.all</a>
+array which always contains the IDs of all the visible labels on the chart.
+The array’s size will depend on the maximum label count for your script and how many of those you have drawn.
+<code class="docutils literal notranslate"><span class="pre">aray.size(label.all)</span></code> will return the array’s size.</li>
+</ul>
+<div class="section" id="creating-and-modifying-labels">
+<h3><a class="toc-backref" href="#id10">Creating and modifying labels</a><a class="headerlink" href="#creating-and-modifying-labels" title="Permalink to this headline">¶</a></h3>
+<p>The <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_label{dot}new">label.new()</a>
+function creates a new label. It has the following signature:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>label.new(x, y, text, xloc, yloc, color, style, textcolor, size, textalign, tooltip) → series label
+</pre></div>
+</div>
+<p>The <em>setter</em> functions allowing you to change a label’s properties are:</p>
+<ul class="simple">
+<li><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_label{dot}set_x">label.set_x()</a></li>
+<li><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_label{dot}set_y">label.set_y()</a></li>
+<li><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_label{dot}set_xy">label.set_xy()</a></li>
+<li><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_label{dot}set_text">label.set_text()</a></li>
+<li><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_label{dot}set_xloc">label.set_xloc()</a></li>
+<li><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_label{dot}set_yloc">label.set_yloc()</a></li>
+<li><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_label{dot}set_color">label.set_color()</a></li>
+<li><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_label{dot}set_style">label.set_style()</a></li>
+<li><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_label{dot}set_textcolor">label.set_textcolor()</a></li>
+<li><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_label{dot}set_size">label.set_size()</a></li>
+<li><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_label{dot}set_set_textalign">label.set_textalign()</a></li>
+<li><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_label{dot}set_tooltip">label.set_tooltip()</a></li>
+</ul>
+<p>They all have a similar signature.
+The one for <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_label{dot}set_color">label.set_color()</a> is:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>label.set_color(id, color) → void
+</pre></div>
+</div>
+<p>where:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">id</span></code> is the ID of the label whose property is to be modified.</li>
+<li>The next parameter is the property of the label to modify. It depends on the setter function used.
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_label{dot}set_xy">label.set_xy()</a> changes two properties, so it has two such parameters.</li>
+</ul>
+<p>This is how you can create labels in their simplest form:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="nx">true</span><span class="p">)</span><span class="w"></span>
+<span class="ni">label.new</span><span class="p">(</span><span class="ni">bar_index</span><span class="p">,</span><span class="w"> </span><span class="no">high</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<img alt="../_images/TextAndShapes-CreatingLabels-01.png" src="../_images/TextAndShapes-CreatingLabels-01.png"/>
+<p>Note that:</p>
+<ul class="simple">
+<li>The label is created with the parameters <code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">=</span> <span class="pre">bar_index</span></code> (the index of the current bar,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_bar_index">bar_index</a>) and <code class="docutils literal notranslate"><span class="pre">y</span> <span class="pre">=</span> <span class="pre">high</span></code>
+(the bar’s <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_high">high</a> value).</li>
+<li>We do not supply an argument for the function’s <code class="docutils literal notranslate"><span class="pre">text</span></code> parameter. Its default value being an empty string, no text is displayed.</li>
+<li>No logic controls our <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_label{dot}new">label.new()</a> call, so labels are created on every bar.</li>
+<li>Only the last 54 labels are displayed because our
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_indicator">indicator()</a> call does not use
+the <code class="docutils literal notranslate"><span class="pre">max_labels_count</span></code> parameter to specify a value other than the ~50 default.</li>
+<li>Labels persist on bars until your script deletes them using
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_label{dot}delete">label.delete()</a>, or garbage collection removes them.</li>
+</ul>
+<p>In the next example we display a label on the bar with the highest <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_high">high</a>
+value in the last 50 bars:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="nx">true</span><span class="p">)</span><span class="w"></span>
+
+<span class="c">// Find the highest `high` in last 50 bars and its offset. Change it's sign so it is positive.</span><span class="w"></span>
+<span class="nx">LOOKBACK</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">50</span><span class="w"></span>
+<span class="nx">hi</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">ta.highest</span><span class="p">(</span><span class="nx">LOOKBACK</span><span class="p">)</span><span class="w"></span>
+<span class="nx">highestBarOffset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="ni">ta.highestbars</span><span class="p">(</span><span class="nx">LOOKBACK</span><span class="p">)</span><span class="w"></span>
+
+<span class="c">// Create label on bar zero only.</span><span class="w"></span>
+<span class="k">var </span><span class="nx">lbl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">label.new</span><span class="p">(</span><span class="no">na</span><span class="p">,</span><span class="w"> </span><span class="no">na</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="k">color </span><span class="o">=</span><span class="w"> </span><span class="ni">color.orange</span><span class="p">,</span><span class="w"> </span><span class="nx">style</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">label.style_label_lower_left</span><span class="p">)</span><span class="w"></span>
+<span class="c">// When a new high is found, move the label there and update its text and tooltip.</span><span class="w"></span>
+<span class="k">if </span><span class="ni">ta.change</span><span class="p">(</span><span class="nx">hi</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="c">// Build label and tooltip strings.</span><span class="w"></span>
+<span class="w">    </span><span class="nx">labelText</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"High: "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="ni">str.tostring</span><span class="p">(</span><span class="nx">hi</span><span class="p">,</span><span class="w"> </span><span class="ni">format.mintick</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="nx">tooltipText</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"Offest in bars: "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="ni">str.tostring</span><span class="p">(</span><span class="nx">highestBarOffset</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">"\nLow: "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="ni">str.tostring</span><span class="p">(</span><span class="no">low</span><span class="o">[</span><span class="nx">highestBarOffset</span><span class="o">]</span><span class="p">,</span><span class="w"> </span><span class="ni">format.mintick</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="c">// Update the label's position, text and tooltip.</span><span class="w"></span>
+<span class="w">    </span><span class="ni">label.set_xy</span><span class="p">(</span><span class="nx">lbl</span><span class="p">,</span><span class="w"> </span><span class="ni">bar_index</span><span class="o">[</span><span class="nx">highestBarOffset</span><span class="o">]</span><span class="p">,</span><span class="w"> </span><span class="nx">hi</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="ni">label.set_text</span><span class="p">(</span><span class="nx">lbl</span><span class="p">,</span><span class="w"> </span><span class="nx">labelText</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="ni">label.set_tooltip</span><span class="p">(</span><span class="nx">lbl</span><span class="p">,</span><span class="w"> </span><span class="nx">tooltipText</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<img alt="../_images/TextAndShapes-CreatingLabels-02.png" src="../_images/TextAndShapes-CreatingLabels-02.png"/>
+<p>Note that:</p>
+<ul class="simple">
+<li>We create the label on the first bar only by using the <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#op_var">var</a>
+keyword to declare the <code class="docutils literal notranslate"><span class="pre">lbl</span></code> variable that contains the label’s ID. The <code class="docutils literal notranslate"><span class="pre">x</span></code>, <code class="docutils literal notranslate"><span class="pre">y</span></code> and <code class="docutils literal notranslate"><span class="pre">text</span></code> arguments in that
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_label{dot}new">label.new()</a> call are irrelevant,
+as the label will be updated on further bars. We do, however, take care to use the <code class="docutils literal notranslate"><span class="pre">color</span></code> and <code class="docutils literal notranslate"><span class="pre">style</span></code>
+we want for the labels, so they don’t need updating later.</li>
+<li>On every bar, we detect if a new high was found by testing for changes in the value of <code class="docutils literal notranslate"><span class="pre">hi</span></code></li>
+<li>When a change in the high value occurs, we update our label with new information.
+To do this, we use three <code class="docutils literal notranslate"><span class="pre">label.set*()</span></code> calls to change the label’s relevant information.
+We refer to our label using the <code class="docutils literal notranslate"><span class="pre">lbl</span></code> variable, which contains our label’s ID.
+The script is thus maintaining the same label throughout all bars,
+but moving it and updating its information when a new high is detected.</li>
+</ul>
+<p>Here we create a label on each bar, but we set its properties conditionally,
+depending on the bar’s polarity:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="nx">true</span><span class="p">)</span><span class="w"></span>
+<span class="nx">lbl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">label.new</span><span class="p">(</span><span class="ni">bar_index</span><span class="p">,</span><span class="w"> </span><span class="no">na</span><span class="p">)</span><span class="w"></span>
+<span class="k">if </span><span class="no">close</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="no">open</span><span class="w"></span>
+<span class="w">    </span><span class="ni">label.set_text</span><span class="p">(</span><span class="w"> </span><span class="nx">lbl</span><span class="p">,</span><span class="w"> </span><span class="s2">"green"</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="ni">label.set_color</span><span class="p">(</span><span class="nx">lbl</span><span class="p">,</span><span class="w"> </span><span class="ni">color.green</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="ni">label.set_yloc</span><span class="p">(</span><span class="w"> </span><span class="nx">lbl</span><span class="p">,</span><span class="w"> </span><span class="ni">yloc.belowbar</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="ni">label.set_style</span><span class="p">(</span><span class="nx">lbl</span><span class="p">,</span><span class="w"> </span><span class="ni">label.style_label_up</span><span class="p">)</span><span class="w"></span>
+<span class="k">else</span>
+<span class="w">    </span><span class="ni">label.set_text</span><span class="p">(</span><span class="w"> </span><span class="nx">lbl</span><span class="p">,</span><span class="w"> </span><span class="s2">"red"</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="ni">label.set_color</span><span class="p">(</span><span class="nx">lbl</span><span class="p">,</span><span class="w"> </span><span class="ni">color.red</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="ni">label.set_yloc</span><span class="p">(</span><span class="w"> </span><span class="nx">lbl</span><span class="p">,</span><span class="w"> </span><span class="ni">yloc.abovebar</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="ni">label.set_style</span><span class="p">(</span><span class="nx">lbl</span><span class="p">,</span><span class="w"> </span><span class="ni">label.style_label_down</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<img alt="../_images/TextAndShapes-CreatingLabels-03.png" src="../_images/TextAndShapes-CreatingLabels-03.png"/>
+</div>
+<div class="section" id="positioning-labels">
+<h3><a class="toc-backref" href="#id11">Positioning labels</a><a class="headerlink" href="#positioning-labels" title="Permalink to this headline">¶</a></h3>
+<p>Labels are positioned on the chart according to <em>x</em> (bars) and <em>y</em> (price) coordinates.
+Five parameters affect this behavior: <code class="docutils literal notranslate"><span class="pre">x</span></code>, <code class="docutils literal notranslate"><span class="pre">y</span></code>, <code class="docutils literal notranslate"><span class="pre">xloc</span></code>, <code class="docutils literal notranslate"><span class="pre">yloc</span></code> and <code class="docutils literal notranslate"><span class="pre">style</span></code>:</p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">x</span></code></dt>
+<dd>Is either a bar index or a time value. When a bar index is used, the value can be offset in the past or in the future (maximum of 500 bars in the future).
+Past or future offsets can also be calculated when using time values.
+The <code class="docutils literal notranslate"><span class="pre">x</span></code> value of an existing label can be modified using <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_label{dot}set_x">label.set_x()</a> or
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_label{dot}set_xy">label.set_xy()</a>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">xloc</span></code></dt>
+<dd>Is either <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_xloc{dot}bar_index">xloc.bar_index</a> (the default)
+or <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_xloc{dot}bar_time">xloc.bar_time</a>.
+It determines which type of argument must be used with <code class="docutils literal notranslate"><span class="pre">x</span></code>.
+With <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_xloc{dot}bar_index">xloc.bar_index</a>, <code class="docutils literal notranslate"><span class="pre">x</span></code> must be an absolute bar index.
+With <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_xloc{dot}bar_time">xloc.bar_time</a>, <code class="docutils literal notranslate"><span class="pre">x</span></code> must be a UNIX time in milliseconds
+corresponding to the <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_time">time</a> value of a bar’s <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_open">open</a>.
+The <code class="docutils literal notranslate"><span class="pre">xloc</span></code> value of an existing label can be modified using <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_label{dot}set_xloc">label.set_xloc()</a>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">y</span></code></dt>
+<dd>Is the price level where the label is positioned. It is only taken into account with the default <code class="docutils literal notranslate"><span class="pre">yloc</span></code> value of <code class="docutils literal notranslate"><span class="pre">yloc.price</span></code>.
+If <code class="docutils literal notranslate"><span class="pre">yloc</span></code> is <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_yloc{dot}abovebar">yloc.abovebar</a> or
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_yloc{dot}belowbar">yloc.belowbar</a>
+then the <code class="docutils literal notranslate"><span class="pre">y</span></code> argument is ignored.
+The <code class="docutils literal notranslate"><span class="pre">y</span></code> value of an existing label can be modified using <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_label{dot}set_y">label.set_y()</a> or
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_label{dot}set_xy">label.set_xy()</a>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">yloc</span></code></dt>
+<dd>Can be <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_yloc{dot}price">yloc.price</a> (the default),
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_yloc{dot}abovebar">yloc.abovebar</a> or
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_yloc{dot}belowbar">yloc.belowbar</a>.
+The argument used for <code class="docutils literal notranslate"><span class="pre">y</span></code> is only taken into account with <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_yloc{dot}price">yloc.price</a>.
+The <code class="docutils literal notranslate"><span class="pre">yloc</span></code> value of an existing label can be modified using <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_label{dot}set_yloc">label.set_yloc()</a>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">style</span></code></dt>
+<dd>The argument used has an impact on the visual appearance of the label and on its position relative to the reference point
+determined by either the <code class="docutils literal notranslate"><span class="pre">y</span></code> value or the top/bottom of the bar when
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_yloc{dot}abovebar">yloc.abovebar</a> or
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_yloc{dot}belowbar">yloc.belowbar</a> are used.
+The <code class="docutils literal notranslate"><span class="pre">style</span></code> of an existing label can be modified using <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_label{dot}set_style">label.set_style()</a>.</dd>
+</dl>
+<p>These are the available <code class="docutils literal notranslate"><span class="pre">style</span></code> arguments:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="16%"/>
+<col width="15%"/>
+<col width="16%"/>
+<col width="1%"/>
+<col width="18%"/>
+<col width="17%"/>
+<col width="18%"/>
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Argument</th>
+<th class="head">Label</th>
+<th class="head">Label with text</th>
+<th class="head"> </th>
+<th class="head">Argument</th>
+<th class="head">Label</th>
+<th class="head">Label with text</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">label.style_xcross</span></code></td>
+<td><img alt="label_style_xcross" src="../_images/TextAndShapes-LabelStyles-xcross.png"/></td>
+<td><img alt="label_style_xcross_t" src="../_images/TextAndShapes-LabelStyles-xcross_t.png"/></td>
+<td> </td>
+<td><code class="docutils literal notranslate"><span class="pre">label.style_label_up</span></code></td>
+<td><img alt="label_style_label_up" src="../_images/TextAndShapes-LabelStyles-labelup.png"/></td>
+<td><img alt="label_style_label_up_t" src="../_images/TextAndShapes-LabelStyles-labelup_t.png"/></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">label.style_cross</span></code></td>
+<td><img alt="label_style_cross" src="../_images/TextAndShapes-LabelStyles-cross.png"/></td>
+<td><img alt="label_style_cross_t" src="../_images/TextAndShapes-LabelStyles-cross_t.png"/></td>
+<td> </td>
+<td><code class="docutils literal notranslate"><span class="pre">label.style_label_down</span></code></td>
+<td><img alt="label_style_label_down" src="../_images/TextAndShapes-LabelStyles-labeldown.png"/></td>
+<td><img alt="label_style_label_down_t" src="../_images/TextAndShapes-LabelStyles-labeldown_t.png"/></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">label.style_flag</span></code></td>
+<td><img alt="label_style_flag" src="../_images/TextAndShapes-LabelStyles-flag.png"/></td>
+<td><img alt="label_style_flag_t" src="../_images/TextAndShapes-LabelStyles-flag_t.png"/></td>
+<td> </td>
+<td><code class="docutils literal notranslate"><span class="pre">label.style_label_left</span></code></td>
+<td><img alt="label_style_label_left" src="../_images/TextAndShapes-LabelStyles-labelleft.png"/></td>
+<td><img alt="label_style_label_left_t" src="../_images/TextAndShapes-LabelStyles-labelleft_t.png"/></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">label.style_circle</span></code></td>
+<td><img alt="label_style_circle" src="../_images/TextAndShapes-LabelStyles-circle.png"/></td>
+<td><img alt="label_style_circle_t" src="../_images/TextAndShapes-LabelStyles-circle_t.png"/></td>
+<td> </td>
+<td><code class="docutils literal notranslate"><span class="pre">label.style_label_right</span></code></td>
+<td><img alt="label_style_label_right" src="../_images/TextAndShapes-LabelStyles-labelright.png"/></td>
+<td><img alt="label_style_label_right_t" src="../_images/TextAndShapes-LabelStyles-labelright_t.png"/></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">label.style_square</span></code></td>
+<td><img alt="label_style_square" src="../_images/TextAndShapes-LabelStyles-square.png"/></td>
+<td><img alt="label_style_square_t" src="../_images/TextAndShapes-LabelStyles-square_t.png"/></td>
+<td> </td>
+<td><code class="docutils literal notranslate"><span class="pre">label.style_label_lower_left</span></code></td>
+<td><img alt="label_style_label_lower_left" src="../_images/TextAndShapes-LabelStyles-labellowerleft.png"/></td>
+<td><img alt="label_style_label_lower_left_t" src="../_images/TextAndShapes-LabelStyles-labellowerleft_t.png"/></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">label.style_diamond</span></code></td>
+<td><img alt="label_style_diamond" src="../_images/TextAndShapes-LabelStyles-diamond.png"/></td>
+<td><img alt="label_style_diamond_t" src="../_images/TextAndShapes-LabelStyles-diamond_t.png"/></td>
+<td> </td>
+<td><code class="docutils literal notranslate"><span class="pre">label.style_label_lower_right</span></code></td>
+<td><img alt="label_style_label_lower_right" src="../_images/TextAndShapes-LabelStyles-labellowerright.png"/></td>
+<td><img alt="label_style_label_lower_right_t" src="../_images/TextAndShapes-LabelStyles-labellowerright_t.png"/></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">label.style_triangleup</span></code></td>
+<td><img alt="label_style_triangleup" src="../_images/TextAndShapes-LabelStyles-triangleup.png"/></td>
+<td><img alt="label_style_triangleup_t" src="../_images/TextAndShapes-LabelStyles-triangleup_t.png"/></td>
+<td> </td>
+<td><code class="docutils literal notranslate"><span class="pre">label.style_label_upper_left</span></code></td>
+<td><img alt="label_style_label_upper_left" src="../_images/TextAndShapes-LabelStyles-labelupperleft.png"/></td>
+<td><img alt="label_style_label_upper_left_t" src="../_images/TextAndShapes-LabelStyles-labelupperleft_t.png"/></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">label.style_triangledown</span></code></td>
+<td><img alt="label_style_triangledown" src="../_images/TextAndShapes-LabelStyles-triangledown.png"/></td>
+<td><img alt="label_style_triangledown_t" src="../_images/TextAndShapes-LabelStyles-triangledown_t.png"/></td>
+<td> </td>
+<td><code class="docutils literal notranslate"><span class="pre">label.style_label_upper_right</span></code></td>
+<td><img alt="label_style_label_upper_right" src="../_images/TextAndShapes-LabelStyles-labelupperright.png"/></td>
+<td><img alt="label_style_label_upper_right_t" src="../_images/TextAndShapes-LabelStyles-labelupperright_t.png"/></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">label.style_arrowup</span></code></td>
+<td><img alt="label_style_arrowup" src="../_images/TextAndShapes-LabelStyles-arrowup.png"/></td>
+<td><img alt="label_style_arrowup_t" src="../_images/TextAndShapes-LabelStyles-arrowup_t.png"/></td>
+<td> </td>
+<td><code class="docutils literal notranslate"><span class="pre">label.style_label_center</span></code></td>
+<td><img alt="label_style_label_center" src="../_images/TextAndShapes-LabelStyles-labelcenter.png"/></td>
+<td><img alt="label_style_label_center_t" src="../_images/TextAndShapes-LabelStyles-labelcenter_t.png"/></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">label.style_arrowdown</span></code></td>
+<td><img alt="label_style_arrowdown" src="../_images/TextAndShapes-LabelStyles-arrowdown.png"/></td>
+<td><img alt="label_style_arrowdown_t" src="../_images/TextAndShapes-LabelStyles-arrowdown_t.png"/></td>
+<td> </td>
+<td><code class="docutils literal notranslate"><span class="pre">label.style_none</span></code></td>
+<td> </td>
+<td><img alt="label_style_none_t" src="../_images/TextAndShapes-LabelStyles-none_t.png"/></td>
+</tr>
+</tbody>
+</table>
+<p>When using <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_xloc{dot}bar_time">xloc.bar_time</a>,
+the <code class="docutils literal notranslate"><span class="pre">x</span></code> value must be a UNIX timestamp in milliseconds. See the page on <a class="reference internal" href="Time.html#pagetime"><span class="std std-ref">Time</span></a> for more information.
+The start time of the current bar can be obtained from the
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_time">time</a> built-in variable.
+The bar time of previous bars is <code class="docutils literal notranslate"><span class="pre">time[1]</span></code>, <code class="docutils literal notranslate"><span class="pre">time[2]</span></code> and so on. Time can also be set to an absolute value with the
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_timestamp">timestamp</a> function.
+You may add or subtract periods of time to achieve relative time offset.</p>
+<p>Let’s position a label one day ago from the date on the last bar:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span><span class="w"></span>
+<span class="nx">daysAgoInput</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">input.int</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="nx">tooltip</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"Use negative values to offset in the future"</span><span class="p">)</span><span class="w"></span>
+<span class="k">if </span><span class="ni">barstate.islast</span><span class="w"></span>
+<span class="w">    </span><span class="nx">MS_IN_ONE_DAY</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">24</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">60</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">60</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1000</span><span class="w"></span>
+<span class="w">    </span><span class="nx">oneDayAgo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">time</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="p">(</span><span class="nx">daysAgoInput</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nx">MS_IN_ONE_DAY</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="ni">label.new</span><span class="p">(</span><span class="nx">oneDayAgo</span><span class="p">,</span><span class="w"> </span><span class="no">high</span><span class="p">,</span><span class="w"> </span><span class="nx">xloc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">xloc.bar_time</span><span class="p">,</span><span class="w"> </span><span class="nx">style</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">label.style_label_right</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Note that because of varying time gaps and missing bars when markets are closed,
+the positioning of the label may not always be exact.
+Time offsets of the sort tend to be more reliable on 24x7 markets.</p>
+<p>You can also offset using a bar index for the <code class="docutils literal notranslate"><span class="pre">x</span></code> value, e.g.:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="ni">label.new</span><span class="p">(</span><span class="ni">bar_index</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="no">high</span><span class="p">)</span><span class="w"></span>
+<span class="ni">label.new</span><span class="p">(</span><span class="ni">bar_index</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="no">high</span><span class="o">[</span><span class="mi">10</span><span class="o">]</span><span class="p">)</span><span class="w"></span>
+<span class="ni">label.new</span><span class="p">(</span><span class="ni">bar_index</span><span class="o">[</span><span class="mi">10</span><span class="o">]</span><span class="p">,</span><span class="w"> </span><span class="no">high</span><span class="o">[</span><span class="mi">10</span><span class="o">]</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="reading-label-properties">
+<h3><a class="toc-backref" href="#id12">Reading label properties</a><a class="headerlink" href="#reading-label-properties" title="Permalink to this headline">¶</a></h3>
+<p>The following <em>getter</em> functions are available for labels:</p>
+<ul class="simple">
+<li><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_label{dot}get_x">label.get_x()</a></li>
+<li><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_label{dot}get_y">label.get_y()</a></li>
+<li><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_label{dot}get_text">label.get_text()</a></li>
+</ul>
+<p>They all have a similar signature.
+The one for <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_label{dot}get_text">label.get_text()</a> is:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>label.get_text(id) → series string
+</pre></div>
+</div>
+<p>where <code class="docutils literal notranslate"><span class="pre">id</span></code> is the label whose text is to be retrieved.</p>
+</div>
+<div class="section" id="cloning-labels">
+<h3><a class="toc-backref" href="#id13">Cloning labels</a><a class="headerlink" href="#cloning-labels" title="Permalink to this headline">¶</a></h3>
+<p>The <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_label{dot}copy">label.copy()</a>
+function is used to clone labels. Its syntax is:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>label.copy(id) → void
+</pre></div>
+</div>
+</div>
+<div class="section" id="deleting-labels">
+<h3><a class="toc-backref" href="#id14">Deleting labels</a><a class="headerlink" href="#deleting-labels" title="Permalink to this headline">¶</a></h3>
+<p>The <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_label{dot}delete">label.delete()</a>
+function is used to delete labels. Its syntax is:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>label.delete(id) → void
+</pre></div>
+</div>
+<p>To keep only a user-defined quantity of labels on the chart, one could use code like this:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="nx">MAX_LABELS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">500</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="nx">max_labels_count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">MAX_LABELS</span><span class="p">)</span><span class="w"></span>
+<span class="nx">qtyLabelsInput</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">input.int</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="s2">"Labels to keep"</span><span class="p">,</span><span class="w"> </span><span class="nx">minval</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nx">maxval</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">MAX_LABELS</span><span class="p">)</span><span class="w"></span>
+<span class="nx">myRSI</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">ta.rsi</span><span class="p">(</span><span class="no">close</span><span class="p">,</span><span class="w"> </span><span class="mi">20</span><span class="p">)</span><span class="w"></span>
+<span class="k">if </span><span class="nx">myRSI</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="ni">ta.highest</span><span class="p">(</span><span class="nx">myRSI</span><span class="p">,</span><span class="w"> </span><span class="mi">20</span><span class="p">)</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="w"></span>
+<span class="w">    </span><span class="ni">label.new</span><span class="p">(</span><span class="ni">bar_index</span><span class="p">,</span><span class="w"> </span><span class="nx">myRSI</span><span class="p">,</span><span class="w"> </span><span class="ni">str.tostring</span><span class="p">(</span><span class="nx">myRSI</span><span class="p">,</span><span class="w"> </span><span class="s2">"#.00"</span><span class="p">),</span><span class="w"> </span><span class="nx">style</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">label.style_none</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="k">if </span><span class="ni">array.size</span><span class="p">(</span><span class="ni">label.all</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="nx">qtyLabelsInput</span><span class="w"></span>
+<span class="w">        </span><span class="ni">label.delete</span><span class="p">(</span><span class="ni">array.get</span><span class="p">(</span><span class="ni">label.all</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">))</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="nx">myRSI</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<img alt="../_images/TextAndShapes-DeletingLabels-01.png" src="../_images/TextAndShapes-DeletingLabels-01.png"/>
+<p>Note that:</p>
+<ul class="simple">
+<li>We define a <code class="docutils literal notranslate"><span class="pre">MAX_LABELS</span></code> constant to hold the maximum quantity of labels a script can accommodate.
+We use that value to set the <code class="docutils literal notranslate"><span class="pre">max_labels_count</span></code> parameter’s value in our <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_indicator">indicator()</a> call,
+and also as the <code class="docutils literal notranslate"><span class="pre">maxval</span></code> value in our <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_input{dot}int">input.int()</a> call to cap the user value.</li>
+<li>We create a new label when our RSI breaches its highest value of the last 20 bars.
+Note the offset of <code class="docutils literal notranslate"><span class="pre">[1]</span></code> we use in <code class="docutils literal notranslate"><span class="pre">if</span> <span class="pre">myRSI</span> <span class="pre">&gt;</span> <span class="pre">ta.highest(myRSI,</span> <span class="pre">20)[1]</span></code>.
+This is necessary. Without it, the value returned by <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_ta{dot}highest">ta.highest()</a>
+would always include the current value of <code class="docutils literal notranslate"><span class="pre">myRSI</span></code>, so <code class="docutils literal notranslate"><span class="pre">myRSI</span></code> would never be higher than the function’s return value.</li>
+<li>After that, we delete the oldest label in the <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_label{dot}all">label.all</a>
+array that is automatically maintained by the Pine Script™ runtime and contains the ID of all the visible labels drawn by our script.
+We use the <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}get">array.get()</a>
+function to retrieve the array element at index zero (the oldest visible label ID).
+We then use <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_label{dot}delete">label.delete()</a>
+to delete the label linked with that ID.</li>
+</ul>
+<p>Note that if one wants to position a label on the last bar only,
+it is unnecessary and inefficent to create and delete the label as the script executes on all bars,
+so that only the last label remains:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">// INEFFICENT!</span><span class="w"></span>
+<span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="nx">true</span><span class="p">)</span><span class="w"></span>
+<span class="nx">lbl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">label.new</span><span class="p">(</span><span class="ni">bar_index</span><span class="p">,</span><span class="w"> </span><span class="no">high</span><span class="p">,</span><span class="w"> </span><span class="ni">str.tostring</span><span class="p">(</span><span class="no">high</span><span class="p">,</span><span class="w"> </span><span class="ni">format.mintick</span><span class="p">))</span><span class="w"></span>
+<span class="ni">label.delete</span><span class="p">(</span><span class="nx">lbl</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>This is the efficient way to realize the same task:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="nx">true</span><span class="p">)</span><span class="w"></span>
+<span class="k">if </span><span class="ni">barstate.islast</span><span class="w"></span>
+<span class="w">    </span><span class="c">// Create the label once, the first time the block executes on the last bar.</span><span class="w"></span>
+<span class="w">    </span><span class="k">var </span><span class="nx">lbl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">label.new</span><span class="p">(</span><span class="no">na</span><span class="p">,</span><span class="w"> </span><span class="no">na</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="c">// On all iterations of the script on the last bar, update the label's information.</span><span class="w"></span>
+<span class="w">    </span><span class="ni">label.set_xy</span><span class="p">(</span><span class="nx">lbl</span><span class="p">,</span><span class="w"> </span><span class="ni">bar_index</span><span class="p">,</span><span class="w"> </span><span class="no">high</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="ni">label.set_text</span><span class="p">(</span><span class="nx">lbl</span><span class="p">,</span><span class="w"> </span><span class="ni">str.tostring</span><span class="p">(</span><span class="no">high</span><span class="p">,</span><span class="w"> </span><span class="ni">format.mintick</span><span class="p">))</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="realtime-behavior">
+<h3><a class="toc-backref" href="#id15">Realtime behavior</a><a class="headerlink" href="#realtime-behavior" title="Permalink to this headline">¶</a></h3>
+<p>Labels are subject to both <em>commit</em> and <em>rollback</em> actions, which affect the behavior of a script when it executes
+in the realtime bar. See the page on Pine Script™’s <span class="xref std std-ref">Execution model</span>.</p>
+<p>This script demonstrates the effect of rollback when running in the realtime bar:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="nx">true</span><span class="p">)</span><span class="w"></span>
+<span class="ni">label.new</span><span class="p">(</span><span class="ni">bar_index</span><span class="p">,</span><span class="w"> </span><span class="no">high</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>On realtime bars, <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_label{dot}new">label.new()</a>
+creates a new label on every script update, but because of the rollback process,
+the label created on the previous update on the same bar is deleted.
+Only the last label created before the realtime bar’s close will be committed, and thus persist.</p>
+<a class="reference external image-reference" href="https://www.tradingview.com/"><div align="center" class="align-center"><img alt="../_images/TradingView-Logo-Block.svg" src="../_images/TradingView-Logo-Block.svg" width="200px"/></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="footer-relations">
+<div class="pull-left">
+<a class="btn btn-default" href="Tables.html" title="previous chapter (use the left arrow)">Tables</a>
+</div>
+<div class="pull-right">
+<a class="btn btn-default" href="Time.html" title="next chapter (use the right arrow)">Time</a>
+</div>
+</div>
+<div class="clearer"></div>
+</div>

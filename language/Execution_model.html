@@ -1,0 +1,254 @@
+<div id="right-column">
+<div aria-label="breadcrumbs navigation" role="navigation">
+<ol class="breadcrumb">
+<li><a href="../index.html">User Manual</a></li>
+<li><a href="index.html">Language</a></li>
+<li>Execution model</li>
+</ol>
+</div>
+<div class="document clearer body">
+<a class="reference external image-reference" href="https://www.tradingview.com/pine-script-docs/en/v5/Introduction.html"><div align="right" class="align-right"><img alt="Pine Script™ logo" height="100" src="../_images/Pine_Script_logo.svg" width="100"/></div>
+</a>
+<div class="section" id="execution-model">
+<span id="pageexecutionmodel"></span><h1>Execution model<a class="headerlink" href="#execution-model" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><a class="reference internal" href="#calculation-based-on-historical-bars" id="id2">Calculation based on historical bars</a></li>
+<li><a class="reference internal" href="#calculation-based-on-realtime-bars" id="id3">Calculation based on realtime bars</a></li>
+<li><a class="reference internal" href="#events-triggering-the-execution-of-a-script" id="id4">Events triggering the execution of a script</a></li>
+<li><a class="reference internal" href="#more-information" id="id5">More information</a></li>
+<li><a class="reference internal" href="#execution-of-pine-script-functions-and-historical-context-inside-function-blocks" id="id6">Execution of Pine Script™ functions and historical context inside function blocks</a><ul>
+<li><a class="reference internal" href="#why-this-behavior" id="id7">Why this behavior?</a></li>
+<li><a class="reference internal" href="#exceptions" id="id8">Exceptions</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>The execution model of the Pine Script™ runtime is intimately linked to Pine Script™’s <a class="reference internal" href="Time_series.html#pagetimeseries"><span class="std std-ref">time series</span></a> and <a class="reference internal" href="Type_system.html#pagetypesystem"><span class="std std-ref">type system</span></a>.
+Understanding all three is key to making the most of the power of Pine Script™.</p>
+<p>The execution model determines how your script is executed on charts, and thus how the code you write in scripts works.
+Your Pine Script™ code would do nothing were it not for Pine Script™’s runtime, which kicks in after your code has compiled and it is executed on your chart
+because one of the <a class="reference internal" href="#pageexecutionmodel-events"><span class="std std-ref">events triggering the execution of a script</span></a> has occurred.</p>
+<p>When a Pine Script™ is loaded on a chart it executes once on each historical bar using the available OHLCV (open, high, low, close, volume) values for each bar.
+Once the script’s execution reaches the rightmost bar in the dataset, if trading is currently active on the chart’s symbol,
+then Pine Script™ <em>indicators</em> will execute once every time an <em>update</em> occurs, i.e., price or volume changes.
+Pine Script™ <em>strategies</em> will by default only execute when the rightmost bar closes, but they can also be configured to execute on every update, like indicators do.</p>
+<p>All symbol/timeframe pairs have a dataset comprising a limited number of bars.
+When you scroll a chart to the left to see the dataset’s earlier bars, the corresponding bars are loaded on the chart.
+The loading process stops when there are no more bars for that particular symbol/timeframe pair or the maximum number of bars your account type permits has been loaded <a class="footnote-reference" href="#all-available-bars" id="id1">[1]</a>.
+You can scroll the chart to the left until the very first bar of the dataset, which has an index value of 0
+(see <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_bar_index">bar_index</a>).</p>
+<p>When the script first runs on a chart, all bars in a dataset are <em>historical bars</em>, except the rightmost one if a trading session is active.
+When trading is active on the rightmost bar, it is called the <em>realtime bar</em>. The realtime bar updates when a price or volume change is detected.
+When the realtime bar closes, it becomes an <em>elapsed realtime bar</em> and a new realtime bar opens.</p>
+<div class="section" id="calculation-based-on-historical-bars">
+<h2><a class="toc-backref" href="#id2">Calculation based on historical bars</a><a class="headerlink" href="#calculation-based-on-historical-bars" title="Permalink to this headline">¶</a></h2>
+<p>Let’s take a simple script and follow its execution on historical bars:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"My Script"</span><span class="p">,</span><span class="w"> </span><span class="nx">overlay</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">true</span><span class="p">)</span><span class="w"></span>
+<span class="nx">src</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">close</span><span class="w"></span>
+<span class="nx">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">ta.sma</span><span class="p">(</span><span class="nx">src</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">)</span><span class="w"></span>
+<span class="nx">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">ta.sma</span><span class="p">(</span><span class="nx">src</span><span class="p">,</span><span class="w"> </span><span class="mi">50</span><span class="p">)</span><span class="w"></span>
+<span class="nx">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">ta.cross</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="nx">b</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="k">color </span><span class="o">=</span><span class="w"> </span><span class="ni">color.blue</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="nx">b</span><span class="p">,</span><span class="w"> </span><span class="k">color </span><span class="o">=</span><span class="w"> </span><span class="ni">color.black</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plotshape</span><span class="p">(</span><span class="nx">c</span><span class="p">,</span><span class="w"> </span><span class="k">color </span><span class="o">=</span><span class="w"> </span><span class="ni">color.red</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>On historical bars, a script executes at the equivalent of the bar’s close, when the OHLCV values are all known for that bar.
+Prior to execution of the script on a bar, the built-in variables such as
+<code class="docutils literal notranslate"><span class="pre">open</span></code>, <code class="docutils literal notranslate"><span class="pre">high</span></code>, <code class="docutils literal notranslate"><span class="pre">low</span></code>, <code class="docutils literal notranslate"><span class="pre">close</span></code>, <code class="docutils literal notranslate"><span class="pre">volume</span></code> and <code class="docutils literal notranslate"><span class="pre">time</span></code> are set to values corresponding to those from that bar.
+A script executes <strong>once per historical bar</strong>.</p>
+<p>Our example script is first executed on the very first bar of the dataset at index 0.
+Each statement is executed using the values for the current bar. Accordingly, on the first bar of the dataset, the following statement:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="nx">src</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">close</span><span class="w"></span>
+</pre></div>
+</div>
+<p>initializes the variable <code class="docutils literal notranslate"><span class="pre">src</span></code> with the <code class="docutils literal notranslate"><span class="pre">close</span></code> value for that first bar, and each of the next lines is executed in turn.
+Because the script only executes once for each historical bar, the script will always calculate using the same <code class="docutils literal notranslate"><span class="pre">close</span></code> value for a specific historical bar.</p>
+<p>The execution of each line in the script produces calculations which in turn generate the indicator’s output values,
+which can then be plotted on the chart. Our example uses the <code class="docutils literal notranslate"><span class="pre">plot</span></code> and <code class="docutils literal notranslate"><span class="pre">plotshape</span></code> calls at the end of the script to output some values.
+In the case of a strategy, the outcome of the calculations can be used to plot values or dictate the orders to be placed.</p>
+<p>After execution and plotting on the first bar, the script is executed on the dataset’s second bar, which has an index of 1.
+The process then repeats until all historical bars in the dataset are processed and the script reaches the rightmost bar on the chart.</p>
+<img alt="../_images/execution_model_calculation_on_history.png" src="../_images/execution_model_calculation_on_history.png"/>
+</div>
+<div class="section" id="calculation-based-on-realtime-bars">
+<h2><a class="toc-backref" href="#id3">Calculation based on realtime bars</a><a class="headerlink" href="#calculation-based-on-realtime-bars" title="Permalink to this headline">¶</a></h2>
+<p>The behavior of a Pine Script™ on the realtime bar is very different than on historical bars.
+Recall that the realtime bar is the rightmost bar on the chart when trading is active on the chart’s symbol.
+Also, recall that strategies can behave in two different ways in the realtime bar.
+By default, they only execute when the realtime bar closes, but the <code class="docutils literal notranslate"><span class="pre">calc_on_every_tick</span></code> parameter of the
+<code class="docutils literal notranslate"><span class="pre">strategy</span></code> declaration statement can be set to true to modify the strategy’s behavior so that it executes each time the realtime bar updates, as indicators do.
+The behavior described here for indicators will thus only apply to strategies using <code class="docutils literal notranslate"><span class="pre">calc_on_every_tick=true</span></code>.</p>
+<p>The most important difference between execution of scripts on historical and realtime bars is that while they execute only once on historical bars,
+scripts execute every time an update occurs during a realtime bar. This entails that built-in variables such as <code class="docutils literal notranslate"><span class="pre">high</span></code>, <code class="docutils literal notranslate"><span class="pre">low</span></code> and <code class="docutils literal notranslate"><span class="pre">close</span></code> which never change on a historical bar, <strong>can</strong> change at each of a script’s iteration in the realtime bar. Changes in the built-in variables used in the script’s calculations will, in turn, induce changes in the results of those calculations. This is required for the script to follow the realtime price action. As a result, the same script may produce different results every time it executes during the realtime bar.</p>
+<p><strong>Note:</strong> In the realtime bar, the <code class="docutils literal notranslate"><span class="pre">close</span></code> variable always represents the <strong>current price</strong>.
+Similarly, the <code class="docutils literal notranslate"><span class="pre">high</span></code> and <code class="docutils literal notranslate"><span class="pre">low</span></code> built-in variables represent the highest high and lowest low reached since the realtime bar’s beginning.
+The Pine Script™ built-in variables will only represent the realtime bar’s final values on the bar’s last update.</p>
+<p>Let’s follow our script example in the realtime bar.</p>
+<p>When the script arrives on the realtime bar it executes a first time.
+It uses the current values of the built-in variables to produce a set of results and plots them if required.
+Before the script executes another time when the next update happens,
+its user-defined variables are reset to a known state corresponding to that of the last <em>commit</em> at the close of the previous bar.
+If no commit was made on the variables because they are initialized every bar, then they are reinitialized.
+In both cases their last calculated state is lost. The state of plotted labels and lines is also reset.
+This resetting of the script’s user-defined variables and drawings prior to each new iteration of the script in the realtime bar is called <em>rollback</em>.
+Its effect is to reset the script to the same known state it was in when the realtime bar opened,
+so calculations in the realtime bar are always performed from a clean state.</p>
+<p>The constant recalculation of a script’s values as price or volume changes in the realtime bar
+can lead to a situation where variable <code class="docutils literal notranslate"><span class="pre">c</span></code> in our example becomes true because a cross has occurred,
+and so the red marker plotted by the script’s last line would appear on the chart.
+If on the next price update the price has moved in such a way that the <code class="docutils literal notranslate"><span class="pre">close</span></code> value
+no longer produces calculations making <code class="docutils literal notranslate"><span class="pre">c</span></code> true because there is no longer a cross, then the marker previously plotted will disappear.</p>
+<p>When the realtime bar closes, the script executes a last time. As usual, variables are rolled back prior to execution.
+However, since this iteration is the last one on the realtime bar, variables are committed to their final values for the bar when calculations are completed.</p>
+<p>To summarize the realtime bar process:</p>
+<blockquote>
+<div><ul class="simple">
+<li>A script executes <strong>at the open of the realtime bar and then once per update</strong>.</li>
+<li>Variables are rolled back <strong>before every realtime update</strong>.</li>
+<li>Variables are committed <strong>once at the closing bar update</strong>.</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="events-triggering-the-execution-of-a-script">
+<span id="pageexecutionmodel-events"></span><h2><a class="toc-backref" href="#id4">Events triggering the execution of a script</a><a class="headerlink" href="#events-triggering-the-execution-of-a-script" title="Permalink to this headline">¶</a></h2>
+<p>A script is executed on the complete set of bars on the chart when one of the following events occurs:</p>
+<blockquote>
+<div><ul class="simple">
+<li>A new symbol or timeframe is loaded on a chart.</li>
+<li>A script is saved or added to the chart, from the Pine Script™ Editor or the chart’s “Indicators &amp; strategies” dialog box.</li>
+<li>A value is modified in the script’s “Settings/Inputs” dialog box.</li>
+<li>A value is modified in a strategy’s “Settings/Properties” dialog box.</li>
+<li>A browser refresh event is detected.</li>
+</ul>
+</div></blockquote>
+<p>A script is executed on the realtime bar when trading is active and:</p>
+<blockquote>
+<div><ul class="simple">
+<li>One of the above conditions occurs, causing the script to execute on the open of the realtime bar, or</li>
+<li>The realtime bar updates because a price or volume change was detected.</li>
+</ul>
+</div></blockquote>
+<p>Note that when a chart is left untouched when the market is active,
+a succession of realtime bars which have been opened and then closed will trail the current realtime bar.
+While these <em>elapsed realtime bars</em> will have been <em>confirmed</em> because their variables have all been committed,
+the script will not yet have executed on them in their <em>historical</em> state, since they did not exist when the script was last run on the chart’s dataset.</p>
+<p>When an event triggers the execution of the script on the chart and causes it to run on those bars which have now become historical bars,
+the script’s calculation can sometimes vary from what they were when calculated on the last closing update of the same bars when they were realtime bars.
+This can be caused by slight variations between the OHLCV values saved at the close of realtime bars and those fetched from data feeds
+when the same bars have become historical bars. This behavior is one of the possible causes of <em>repainting</em>.</p>
+</div>
+<div class="section" id="more-information">
+<h2><a class="toc-backref" href="#id5">More information</a><a class="headerlink" href="#more-information" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>The Pine Script™ built-in <code class="docutils literal notranslate"><span class="pre">barstate.*</span></code> variables that provide information on <a class="reference internal" href="../concepts/Bar_states.html#pagebarstates"><span class="std std-ref">the type of bar or the event</span></a>
+where the script is executing. The page where they are documented also contains a script that allows you to visualize
+the difference between elapsed realtime and historical bars, for example.</li>
+<li>The <a class="reference internal" href="../concepts/Strategies.html#pagestrategies"><span class="std std-ref">Strategies</span></a> page explains the details of strategy calculations, which are not identical to those of indicators.</li>
+</ul>
+</div>
+<div class="section" id="execution-of-pine-script-functions-and-historical-context-inside-function-blocks">
+<h2><a class="toc-backref" href="#id6">Execution of Pine Script™ functions and historical context inside function blocks</a><a class="headerlink" href="#execution-of-pine-script-functions-and-historical-context-inside-function-blocks" title="Permalink to this headline">¶</a></h2>
+<p>The history of series variables used inside Pine Script™ functions is created through each successive call to the function.
+If the function is not called on each bar the script runs on,
+this will result in disparities between the historic values of series inside vs outside the function’s local block.
+Hence, series referenced inside and outside the function using the same index value will not refer to the same point in history if the function is not called on each bar.</p>
+<p>Let’s look at this example script where the <code class="docutils literal notranslate"><span class="pre">f()</span></code> and <code class="docutils literal notranslate"><span class="pre">f2()</span></code> functions are called every second bar:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"My Script"</span><span class="p">,</span><span class="w"> </span><span class="nx">overlay</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">true</span><span class="p">)</span><span class="w"></span>
+
+<span class="c">// Returns the value of "a" the last time the function was called 2 bars ago.</span><span class="w"></span>
+<span class="nx">f</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="nx">a</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="w"></span>
+<span class="c">// Returns the value of last bar's "close", as expected.</span><span class="w"></span>
+<span class="nx">f2</span><span class="p">()</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="no">close</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="w"></span>
+
+<span class="nx">oneBarInTwo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">bar_index</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="nx">oneBarInTwo</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="nx">f</span><span class="p">(</span><span class="no">close</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="no">na</span><span class="p">,</span><span class="w"> </span><span class="k">color </span><span class="o">=</span><span class="w"> </span><span class="ni">color.maroon</span><span class="p">,</span><span class="w"> </span><span class="nx">linewidth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">6</span><span class="p">,</span><span class="w"> </span><span class="nx">style</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">plot.style_cross</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="nx">oneBarInTwo</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="nx">f2</span><span class="p">()</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="no">na</span><span class="p">,</span><span class="w"> </span><span class="k">color </span><span class="o">=</span><span class="w"> </span><span class="ni">color.lime</span><span class="p">,</span><span class="w"> </span><span class="nx">linewidth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">6</span><span class="p">,</span><span class="w"> </span><span class="nx">style</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">plot.style_circles</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="no">close</span><span class="o">[</span><span class="mi">2</span><span class="o">]</span><span class="p">,</span><span class="w"> </span><span class="k">color </span><span class="o">=</span><span class="w"> </span><span class="ni">color.maroon</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="no">close</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="p">,</span><span class="w"> </span><span class="k">color </span><span class="o">=</span><span class="w"> </span><span class="ni">color.lime</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<img alt="../_images/Function_historical_context_1.png" src="../_images/Function_historical_context_1.png"/>
+<p>As can be seen with the resulting plots, <code class="docutils literal notranslate"><span class="pre">a[1]</span></code> returns the previous value of a in the function’s context,
+so the last time <code class="docutils literal notranslate"><span class="pre">f()</span></code> was called two bars ago — not the close of the previous bar, as <code class="docutils literal notranslate"><span class="pre">close[1]</span></code> does in <code class="docutils literal notranslate"><span class="pre">f2()</span></code>.
+This results in <code class="docutils literal notranslate"><span class="pre">a[1]</span></code> in the function block referring to a different past value than <code class="docutils literal notranslate"><span class="pre">close[1]</span></code> even though they use the same index of 1.</p>
+<div class="section" id="why-this-behavior">
+<h3><a class="toc-backref" href="#id7">Why this behavior?</a><a class="headerlink" href="#why-this-behavior" title="Permalink to this headline">¶</a></h3>
+<p>This behavior is required because forcing execution of functions on each bar would lead to unexpected results,
+as would be the case for a <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_label{dot}new">label.new()</a> function call inside an if branch,
+which must not execute unless the <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#op_if">if</a> condition requires it.</p>
+<p>On the other hand, this behavior leads to unexpected results with certain built-in functions
+which require being executed each bar to correctly calculate their results.
+Such functions will not return expected results if they are placed in contexts where they are not executed every bar, such as
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#op_if">if</a> branches.</p>
+<p>The solution in these cases is to take those function calls outside their context so they can be executed on every bar.</p>
+<p>In this script, <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_ta{dot}barssince">ta.barssince()</a>
+is not called on every bar because it is inside a ternary operator’s conditional branch:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"Barssince"</span><span class="p">,</span><span class="w"> </span><span class="nx">overlay</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">false</span><span class="p">)</span><span class="w"></span>
+<span class="nx">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">close</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="no">close</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="ni">ta.barssince</span><span class="p">(</span><span class="no">close</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="no">close</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="nx">res</span><span class="p">,</span><span class="w"> </span><span class="nx">style</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">plot.style_histogram</span><span class="p">,</span><span class="w"> </span><span class="ni">color</span><span class="o">=</span><span class="nx">res</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="ni">color.red</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="ni">color.blue</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>This leads to incorrect results because <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_ta{dot}barssince">ta.barssince()</a> is not executed on every bar:</p>
+<img alt="../_images/Function_historical_context_2.png" src="../_images/Function_historical_context_2.png"/>
+<p>The solution is to take the <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_ta{dot}barssince">ta.barssince()</a>
+call outside the conditional branch to force its execution on every bar:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"Barssince"</span><span class="p">,</span><span class="w"> </span><span class="nx">overlay</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">false</span><span class="p">)</span><span class="w"></span>
+<span class="nx">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">ta.barssince</span><span class="p">(</span><span class="no">close</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="no">close</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="p">)</span><span class="w"></span>
+<span class="nx">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">close</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="no">close</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="nx">b</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="nx">res</span><span class="p">,</span><span class="w"> </span><span class="nx">style</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">plot.style_histogram</span><span class="p">,</span><span class="w"> </span><span class="k">color </span><span class="o">=</span><span class="w"> </span><span class="nx">res</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="ni">color.red</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="ni">color.blue</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Using this technique we get the expected output:</p>
+<img alt="../_images/Function_historical_context_3.png" src="../_images/Function_historical_context_3.png"/>
+</div>
+<div class="section" id="exceptions">
+<h3><a class="toc-backref" href="#id8">Exceptions</a><a class="headerlink" href="#exceptions" title="Permalink to this headline">¶</a></h3>
+<p>Not all built-in functions need to be executed every bar. These are the functions which do not require it, and so do not need special treatment:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="ni">dayofmonth</span><span class="p">,</span><span class="w"> </span><span class="ni">dayofweek</span><span class="p">,</span><span class="w"> </span><span class="ni">hour</span><span class="p">,</span><span class="w"> </span><span class="nx">linebreak</span><span class="p">,</span><span class="w"> </span><span class="ni">math.abs</span><span class="p">,</span><span class="w"> </span><span class="ni">math.acos</span><span class="p">,</span><span class="w"> </span><span class="ni">math.asin</span><span class="p">,</span><span class="w"> </span><span class="ni">math.atan</span><span class="p">,</span><span class="w"> </span><span class="ni">math.ceil</span><span class="p">,</span><span class="w"></span>
+<span class="ni">math.cos</span><span class="p">,</span><span class="w"> </span><span class="ni">math.exp</span><span class="p">,</span><span class="w"> </span><span class="ni">math.floor</span><span class="p">,</span><span class="w"> </span><span class="ni">math.log</span><span class="p">,</span><span class="w"> </span><span class="ni">math.log10</span><span class="p">,</span><span class="w"> </span><span class="ni">math.max</span><span class="p">,</span><span class="w"> </span><span class="ni">math.min</span><span class="p">,</span><span class="w"> </span><span class="ni">math.pow</span><span class="p">,</span><span class="w"> </span><span class="ni">math.round</span><span class="p">,</span><span class="w"></span>
+<span class="ni">math.sign</span><span class="p">,</span><span class="w"> </span><span class="ni">math.sin</span><span class="p">,</span><span class="w"> </span><span class="ni">math.sqrt</span><span class="p">,</span><span class="w"> </span><span class="ni">math.tan</span><span class="p">,</span><span class="w"> </span><span class="ni">minute</span><span class="p">,</span><span class="w"> </span><span class="ni">month</span><span class="p">,</span><span class="w"> </span><span class="no">na</span><span class="p">,</span><span class="w"> </span><span class="ni">nz</span><span class="p">,</span><span class="w"> </span><span class="ni">second</span><span class="p">,</span><span class="w"> </span><span class="ni">str.tostring</span><span class="p">,</span><span class="w"></span>
+<span class="ni">ticker.heikinashi</span><span class="p">,</span><span class="w"> </span><span class="ni">ticker.kagi</span><span class="p">,</span><span class="w"> </span><span class="ni">ticker.new</span><span class="p">,</span><span class="w"> </span><span class="ni">ticker.renko</span><span class="p">,</span><span class="w"> </span><span class="no">time</span><span class="p">,</span><span class="w"> </span><span class="ni">timestamp</span><span class="p">,</span><span class="w"> </span><span class="ni">weekofyear</span><span class="p">,</span><span class="w"> </span><span class="ni">year</span><span class="w"></span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Functions called from within a <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#op_for">for</a> loop use the same context in each of the loop’s iterations. In the example below, each <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_ta{dot}lowest">ta.lowest()</a> call on the same bar uses the value that was passed to it, i.e., <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_bar_index">bar_index</a>, so function calls used in loops do not require special treatment.</p>
+</div>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"My Script"</span><span class="p">)</span><span class="w"></span>
+<span class="nx">va</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="mf">.0</span><span class="w"></span>
+<span class="k">for </span><span class="nx">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="nx">to</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="nx">by</span><span class="w"> </span><span class="mi">1</span><span class="w"></span>
+<span class="w">    </span><span class="k">if </span><span class="p">(</span><span class="nx">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="ni">bar_index</span><span class="p">)</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="w"></span>
+<span class="w">        </span><span class="nx">va</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="ni">ta.lowest</span><span class="p">(</span><span class="ni">bar_index</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">)</span><span class="w">  </span><span class="c">// same context on each call</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="nx">va</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p class="rubric">Footnotes</p>
+<table class="docutils footnote" frame="void" id="all-available-bars" rules="none">
+<colgroup><col class="label"/><col/></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>The upper limit for the total number of historical bars is about 10000 for <em>Pro/Pro+</em> users and about 20000 for <em>Premium</em> users. <em>Free</em> users are able to see about 5000 bars.</td></tr>
+</tbody>
+</table>
+<a class="reference external image-reference" href="https://www.tradingview.com/"><div align="center" class="align-center"><img alt="../_images/TradingView-Logo-Block.svg" src="../_images/TradingView-Logo-Block.svg" width="200px"/></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="footer-relations">
+<div class="pull-left">
+<a class="btn btn-default" href="index.html" title="previous chapter (use the left arrow)">Language</a>
+</div>
+<div class="pull-right">
+<a class="btn btn-default" href="Time_series.html" title="next chapter (use the right arrow)">Time series</a>
+</div>
+</div>
+<div class="clearer"></div>
+</div>

@@ -1,0 +1,150 @@
+<div id="right-column">
+<div aria-label="breadcrumbs navigation" role="navigation">
+<ol class="breadcrumb">
+<li><a href="../index.html">User Manual</a></li>
+<li><a href="index.html">Concepts</a></li>
+<li>Timeframes</li>
+</ol>
+</div>
+<div class="document clearer body">
+<a class="reference external image-reference" href="https://www.tradingview.com/pine-script-docs/en/v5/Introduction.html"><div align="right" class="align-right"><img alt="Pine Script™ logo" height="100" src="../_images/Pine_Script_logo.svg" width="100"/></div>
+</a>
+<div class="section" id="timeframes">
+<span id="pagetimeframes"></span><h1>Timeframes<a class="headerlink" href="#timeframes" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><a class="reference internal" href="#introduction" id="id1">Introduction</a></li>
+<li><a class="reference internal" href="#timeframe-string-specifications" id="id2">Timeframe string specifications</a></li>
+<li><a class="reference internal" href="#comparing-timeframes" id="id3">Comparing timeframes</a></li>
+</ul>
+</div>
+<div class="section" id="introduction">
+<h2><a class="toc-backref" href="#id1">Introduction</a><a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>The <em>timeframe</em> of a chart is sometimes also referred to as its <em>interval</em> or <em>resolution</em>.
+It is the unit of time represented by one bar on the chart.
+All standard chart types use a timeframe: “Bars”, “Candles”, “Hollow Candles”, “Line”, “Area” and “Baseline”.
+One non-standard chart type also uses timeframes: “Heikin Ashi”.</p>
+<p>Programmers interested in accessing data from multiple timeframes will need to become familiar with how
+timeframes are expressed in Pine Script™, and how to use them.</p>
+<p><strong>Timeframe strings</strong> come into play in different contexts:</p>
+<ul class="simple">
+<li>They must be used in <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_request{dot}security">request.security()</a>
+when requesting data from another symbol and/or timeframe.
+See the page on <a class="reference internal" href="Other_timeframes_and_data.html#pageothertimeframesanddata"><span class="std std-ref">Other timeframes and data</span></a> to explore the use of
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_request{dot}security">request.security()</a>.</li>
+<li>They can be used as an argument to <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_time">time()</a> and
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_time_close">time_close()</a>
+functions, to return the time of a higher timeframe bar.
+This, in turn, can be used to detect changes in higher timeframes from the chart’s timeframe
+without using <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_request{dot}security">request.security()</a>.
+See the <a class="reference internal" href="Time.html#pagetime-testingforchangesinhighertimeframes"><span class="std std-ref">Testing for changes in higher timeframes</span></a> section to see how to do this.</li>
+<li>The <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_input{dot}session">input.timeframe()</a> function
+provides a way to allow script users to define a timeframe through a script’s “Inputs” tab
+(see the <a class="reference internal" href="Inputs.html#pageinputs-timeframeinput"><span class="std std-ref">Timeframe input</span></a> section for more information).</li>
+<li>The <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_indicator">indicator()</a>
+declaration statement has an optional <code class="docutils literal notranslate"><span class="pre">timeframe</span></code> parameter that can be used to provide
+multi-timeframe capabilities to simple scripts without using
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_request{dot}security">request.security()</a>.</li>
+<li>Many built-in variables provide information on the timeframe used by the chart the script is running on.
+See the <a class="reference internal" href="Chart_information.html#pagechartinformation-charttimeframe"><span class="std std-ref">Chart timeframe</span></a> section for more information on them,
+including <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_timeframe{dot}period">timeframe.period</a>
+which returns a string in Pine Script™’s timeframe specification format.</li>
+</ul>
+</div>
+<div class="section" id="timeframe-string-specifications">
+<h2><a class="toc-backref" href="#id2">Timeframe string specifications</a><a class="headerlink" href="#timeframe-string-specifications" title="Permalink to this headline">¶</a></h2>
+<p>Timeframe strings follow these rules:</p>
+<ul>
+<li><p class="first">They are composed of the multiplier and the timeframe unit, e.g., “1S”, “30” (30 minutes), “1D” (one day), “3M” (three months).</p>
+</li>
+<li><p class="first">The unit is represented by a single letter, with no letter used for minutes: “S” for seconds, “D” for days, “W” for weeks and “M” for months.</p>
+</li>
+<li><p class="first">When no multiplier is used, 1 is assumed: “S” is equivalent to “1S”, “D” to “1D, etc. If only “1” is used, it is interpreted as “1min”,
+since no unit letter identifier is used for minutes.</p>
+</li>
+<li><p class="first">There is no “hour” unit; “1H” is <strong>not</strong> valid. The correct format for one hour is “60” (remember no unit letter is specified for minutes).</p>
+</li>
+<li><p class="first">The valid multipliers vary for each timeframe unit:</p>
+<blockquote>
+<div><ul class="simple">
+<li>For seconds, only the discrete 1, 5, 10, 15 and 30 multipliers are valid.</li>
+<li>For minutes, 1 to 1440.</li>
+<li>For days, 1 to 365.</li>
+<li>For weeks, 1 to 52.</li>
+<li>For months, 1 to 12.</li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div>
+<div class="section" id="comparing-timeframes">
+<span id="pagetimeframes-comparingtimeframes"></span><h2><a class="toc-backref" href="#id3">Comparing timeframes</a><a class="headerlink" href="#comparing-timeframes" title="Permalink to this headline">¶</a></h2>
+<p>It can be useful to compare different timeframe strings to determine,
+for example, if the timeframe used on the chart is lower than the higher timeframes used in the script,
+as using timeframes lower than the chart is usually not a good idea.
+See the <a class="reference internal" href="Other_timeframes_and_data.html#pageothertimeframesanddata-requestingdatafromalowertimeframe"><span class="std std-ref">Requesting data of a lower timeframe</span></a> section
+for more information on the subject.</p>
+<p>Converting timeframe strings to a representation in fractional minutes provides a way to compare them
+using a universal unit. This script uses the <code class="docutils literal notranslate"><span class="pre">tfInMinutes()</span></code> function to convert a timeframe into float minutes:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="nx">true</span><span class="p">)</span><span class="w"></span>
+<span class="k">string </span><span class="nx">tfInput</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">input.timeframe</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span><span class="w"></span>
+
+<span class="nx">tfInMinutes</span><span class="p">(</span><span class="k">simple string </span><span class="nx">tf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">""</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"></span>
+<span class="w">    </span><span class="k">float </span><span class="nx">chartTf</span><span class="w"> </span><span class="o">=</span><span class="w"></span>
+<span class="w">      </span><span class="ni">timeframe.multiplier</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="w"></span>
+<span class="w">      </span><span class="ni">timeframe.isseconds</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="mi">1</span><span class="nx">.</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">60</span><span class="w">             </span><span class="o">:</span><span class="w"></span>
+<span class="w">      </span><span class="ni">timeframe.isminutes</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="mi">1</span><span class="nx">.</span><span class="w">                  </span><span class="o">:</span><span class="w"></span>
+<span class="w">      </span><span class="ni">timeframe.isdaily</span><span class="w">   </span><span class="o">?</span><span class="w"> </span><span class="mi">60</span><span class="nx">.</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">24</span><span class="w">            </span><span class="o">:</span><span class="w"></span>
+<span class="w">      </span><span class="ni">timeframe.isweekly</span><span class="w">  </span><span class="o">?</span><span class="w"> </span><span class="mi">60</span><span class="nx">.</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">24</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">7</span><span class="w">        </span><span class="o">:</span><span class="w"></span>
+<span class="w">      </span><span class="ni">timeframe.ismonthly</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="mi">60</span><span class="nx">.</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">24</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">30</span><span class="mf">.4375</span><span class="w">  </span><span class="o">:</span><span class="w"> </span><span class="no">na</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="k">float </span><span class="nx">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">tf</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">""</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="nx">chartTf</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="ni">request.security</span><span class="p">(</span><span class="ni">syminfo.tickerid</span><span class="p">,</span><span class="w"> </span><span class="nx">tf</span><span class="p">,</span><span class="w"> </span><span class="nx">chartTf</span><span class="p">)</span><span class="w"></span>
+
+<span class="k">float </span><span class="nx">chartTFInMinutes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">tfInMinutes</span><span class="p">()</span><span class="w"></span>
+<span class="k">float </span><span class="nx">inputTFInMinutes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">tfInMinutes</span><span class="p">(</span><span class="nx">tfInput</span><span class="p">)</span><span class="w"></span>
+
+<span class="nx">printTable</span><span class="p">(</span><span class="nx">txt</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="k">var table </span><span class="nx">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">table.new</span><span class="p">(</span><span class="ni">position.middle_right</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">),</span><span class="w"> </span><span class="ni">table.cell</span><span class="p">(</span><span class="nx">t</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nx">txt</span><span class="p">,</span><span class="w"> </span><span class="ni">bgcolor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">color.yellow</span><span class="p">)</span><span class="w"></span>
+<span class="nx">printTable</span><span class="p">(</span><span class="w"></span>
+<span class="w">  </span><span class="s2">"Chart TF: "</span><span class="w">    </span><span class="o">+</span><span class="w"> </span><span class="ni">str.tostring</span><span class="p">(</span><span class="nx">chartTFInMinutes</span><span class="p">,</span><span class="w"> </span><span class="s2">"#.##### minutes"</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"></span>
+<span class="w">  </span><span class="s2">"\n`tfInput`: "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="ni">str.tostring</span><span class="p">(</span><span class="nx">inputTFInMinutes</span><span class="p">,</span><span class="w"> </span><span class="s2">"#.##### minutes"</span><span class="p">))</span><span class="w"></span>
+
+<span class="k">if </span><span class="nx">chartTFInMinutes</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="nx">inputTFInMinutes</span><span class="w"></span>
+<span class="w">    </span><span class="nx">runtime.error</span><span class="p">(</span><span class="s2">"The chart's timeframe nust not be higher than the input's timeframe."</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Note that:</p>
+<ul class="simple">
+<li>We define the single parameter of our <code class="docutils literal notranslate"><span class="pre">tfInMinutes()</span></code> function using <code class="docutils literal notranslate"><span class="pre">simple</span> <span class="pre">string</span> <span class="pre">tf</span> <span class="pre">=</span> <span class="pre">""</span></code>.
+This allows the compiler to restrict its argument to the “simple string” form-type,
+which ensures it will work as an argument for the <code class="docutils literal notranslate"><span class="pre">timeframe</span></code> parameter in our
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_request{dot}security">request.security()</a> call.
+It also says that if no argument is supplied for our <code class="docutils literal notranslate"><span class="pre">tf</span></code> parameter, an empty string will be used as its default value.
+This will cause the function’s logic to return the chart’s timeframe in minutes.</li>
+<li>We use two calls to <code class="docutils literal notranslate"><span class="pre">tfInMinutes()</span></code> in the initialization of the <code class="docutils literal notranslate"><span class="pre">chartTFInMinutes</span></code> and <code class="docutils literal notranslate"><span class="pre">inputTFInMinutes</span></code> variables.
+In the first instance we do not supply an argument for its <code class="docutils literal notranslate"><span class="pre">tf</span></code> parameter, so the function returns the chart’s timeframe in minutes.
+In the second call we supply the timeframe selected by the script’s user through the call to
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_input{dot}session">input.timeframe()</a>.</li>
+<li>The <code class="docutils literal notranslate"><span class="pre">tfInMinutes()</span></code> function produces a “series float” value,
+which entails its result cannot be transformed in a timeframe string for use with
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_request{dot}security">request.security()</a>,
+as its <code class="docutils literal notranslate"><span class="pre">timeframe</span></code> parameter requires a “simple string”.
+See the page on Pine Script™’s <a class="reference internal" href="../language/Type_system.html#pagetypesystem"><span class="std std-ref">Type system</span></a> for more information on Pine Script™ forms and types.</li>
+<li>Next, we validate the timeframes to ensure that the input timeframe is equal to or higher than the chart’s timeframe.
+If it is not, we generate a runtime error.</li>
+<li>We finally print the two timeframe values converted to minutes.</li>
+</ul>
+<a class="reference external image-reference" href="https://www.tradingview.com/"><div align="center" class="align-center"><img alt="../_images/TradingView-Logo-Block.svg" src="../_images/TradingView-Logo-Block.svg" width="200px"/></div>
+</a>
+</div>
+</div>
+</div>
+<div class="footer-relations">
+<div class="pull-left">
+<a class="btn btn-default" href="Time.html" title="previous chapter (use the left arrow)">Time</a>
+</div>
+<div class="pull-right">
+<a class="btn btn-default" href="../writing/index.html" title="next chapter (use the right arrow)">Writing scripts</a>
+</div>
+</div>
+<div class="clearer"></div>
+</div>

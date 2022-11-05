@@ -1,0 +1,165 @@
+<div id="right-column">
+<div aria-label="breadcrumbs navigation" role="navigation">
+<ol class="breadcrumb">
+<li><a href="../index.html">User Manual</a></li>
+<li><a href="index.html">Migration guides</a></li>
+<li>To Pine Script™ version 3</li>
+</ol>
+</div>
+<div class="document clearer body">
+<a class="reference external image-reference" href="https://www.tradingview.com/pine-script-docs/en/v5/Introduction.html"><img alt="Pine Script™" class="align-right" src="../_images/Pine_Script_logo_small.png" style="width: 50px; height: 50px;"/></a>
+<div class="section" id="to-pine-script-version-3">
+<span id="pagetopineversion3"></span><h1>To Pine Script™ version 3<a class="headerlink" href="#to-pine-script-version-3" title="Permalink to this headline">¶</a></h1>
+<p>This document helps to migrate Pine Script™ code from <code class="docutils literal notranslate"><span class="pre">@version=2</span></code> to
+<code class="docutils literal notranslate"><span class="pre">@version=3</span></code>.</p>
+<div class="section" id="default-behaviour-of-security-function-has-changed">
+<h2>Default behaviour of security function has changed<a class="headerlink" href="#default-behaviour-of-security-function-has-changed" title="Permalink to this headline">¶</a></h2>
+<p>Let’s look at the simple <code class="docutils literal notranslate"><span class="pre">security</span></code> function use case. Add this
+indicator on an intraday chart:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">// Add this indicator on an intraday (e.g., 30 minutes) chart</span><span class="w"></span>
+<span class="c">//@version=2</span><span class="w"></span>
+<span class="nx">study</span><span class="p">(</span><span class="s2">"My Script"</span><span class="p">,</span><span class="w"> </span><span class="nx">overlay</span><span class="o">=</span><span class="nx">true</span><span class="p">)</span><span class="w"></span>
+<span class="nx">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">security</span><span class="p">(</span><span class="nx">tickerid</span><span class="p">,</span><span class="w"> </span><span class="s1">'D'</span><span class="p">,</span><span class="w"> </span><span class="no">high</span><span class="p">,</span><span class="w"> </span><span class="nx">false</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>This indicator is calculated based on historical data and looks somewhat
+<em>into the future</em>. At the first bar of every session an indicator plots
+the high price of the entire day. This could be useful in some cases for
+analysis, but doesn’t work for backtesting strategies.</p>
+<p>We worked on this and made changes in Pine Script™ version 3. If this indicator is
+compiled with <code class="docutils literal notranslate"><span class="pre">//@version=3</span></code> directive, we get a completely different
+picture: <img alt="images/V3.png" src="../_images/V3.png"/></p>
+<p>The old behaviour is still available though. We added a parameter to the
+<code class="docutils literal notranslate"><span class="pre">security</span></code> function (the fifth one) called <code class="docutils literal notranslate"><span class="pre">lookahead</span></code>.</p>
+<p>It can take on the form of two different values:
+<code class="docutils literal notranslate"><span class="pre">barmerge.lookahead_off</span></code> (and this is the default for Pine Script™ version 3) or
+<code class="docutils literal notranslate"><span class="pre">barmerge.lookahead_on</span></code> (which is the default for Pine Script™ version 2).</p>
+</div>
+<div class="section" id="self-referenced-variables-are-removed">
+<h2>Self-referenced variables are removed<a class="headerlink" href="#self-referenced-variables-are-removed" title="Permalink to this headline">¶</a></h2>
+<p>Pine Script™ version 2 pieces of code, containing a self-referencing variable:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=2</span><span class="w"></span>
+<span class="c">//...</span><span class="w"></span>
+<span class="nx">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">nz</span><span class="p">(</span><span class="nx">s</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="no">close</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Compiling this piece of code with Pine Script™ version 3 will give you an
+<code class="docutils literal notranslate"><span class="pre">Undeclared</span> <span class="pre">identifier</span> <span class="pre">'s'</span></code> error. It should be rewritten as:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=3</span><span class="w"></span>
+<span class="c">//...</span><span class="w"></span>
+<span class="nx">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="mf">.0</span><span class="w"></span>
+<span class="nx">s</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="ni">nz</span><span class="p">(</span><span class="nx">s</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="no">close</span><span class="w"></span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">s</span></code> is now a <em>mutable variable</em> that is initialized at line 3. At line 3
+the initial value gives the Pine Script™ compiler the information about the
+variable type. It’s a float in this example.</p>
+<p>In some cases you may initialize that mutable variable (like <code class="docutils literal notranslate"><span class="pre">s</span></code>) with
+a <code class="docutils literal notranslate"><span class="pre">na</span></code> value. But in complex cases that won’t work.</p>
+</div>
+<div class="section" id="forward-referenced-variables-are-removed">
+<h2>Forward-referenced variables are removed<a class="headerlink" href="#forward-referenced-variables-are-removed" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=2</span><span class="w"></span>
+<span class="c">//...</span><span class="w"></span>
+<span class="nx">d</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">nz</span><span class="p">(</span><span class="nx">f</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="p">)</span><span class="w"></span>
+<span class="nx">e</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">d</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="w"></span>
+<span class="nx">f</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">e</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="no">close</span><span class="w"></span>
+</pre></div>
+</div>
+<p>In this example <code class="docutils literal notranslate"><span class="pre">f</span></code> is a forward-referencing variable, because it’s
+referenced at line 3 before it was declared and initialized. In Pine Script™ version 3
+this will give you an error <code class="docutils literal notranslate"><span class="pre">Undeclared</span> <span class="pre">identifier</span> <span class="pre">'f'</span></code>. This example
+should be rewritten in Pine Script™ version 3 as follows:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=3</span><span class="w"></span>
+<span class="c">//...</span><span class="w"></span>
+<span class="nx">f</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="mf">.0</span><span class="w"></span>
+<span class="nx">d</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">nz</span><span class="p">(</span><span class="nx">f</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="p">)</span><span class="w"></span>
+<span class="nx">e</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">d</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="w"></span>
+<span class="nx">f</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">e</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="no">close</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="resolving-a-problem-with-a-mutable-variable-in-a-security-expression">
+<h2>Resolving a problem with a mutable variable in a security expression<a class="headerlink" href="#resolving-a-problem-with-a-mutable-variable-in-a-security-expression" title="Permalink to this headline">¶</a></h2>
+<p>When you migrate script to version 3 it’s possible that after removing
+self-referencing and forward-referencing variables the Pine Script™ compiler
+will give you an error:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=3</span><span class="w"></span>
+<span class="c">//...</span><span class="w"></span>
+<span class="nx">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="mf">.0</span><span class="w"></span>
+<span class="nx">s</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="ni">nz</span><span class="p">(</span><span class="nx">s</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="no">close</span><span class="w"></span>
+<span class="nx">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">security</span><span class="p">(</span><span class="nx">tickerid</span><span class="p">,</span><span class="w"> </span><span class="nx">period</span><span class="p">,</span><span class="w"> </span><span class="nx">s</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Cannot</span> <span class="pre">use</span> <span class="pre">mutable</span> <span class="pre">variable</span> <span class="pre">as</span> <span class="pre">an</span> <span class="pre">argument</span> <span class="pre">for</span> <span class="pre">security</span> <span class="pre">function!</span></code></p>
+<p>This limitation exists since mutable variables were introduced in Pine Script™,
+i.e., in version 2. It can be resolved as before: wrap the code with a mutable
+variable in a function:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=3</span><span class="w"></span>
+<span class="c">//...</span><span class="w"></span>
+<span class="nx">calcS</span><span class="p">()</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"></span>
+<span class="w">    </span><span class="nx">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="mf">.0</span><span class="w"></span>
+<span class="w">    </span><span class="nx">s</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="ni">nz</span><span class="p">(</span><span class="nx">s</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="no">close</span><span class="w"></span>
+<span class="nx">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">security</span><span class="p">(</span><span class="nx">tickerid</span><span class="p">,</span><span class="w"> </span><span class="nx">period</span><span class="p">,</span><span class="w"> </span><span class="nx">calcS</span><span class="p">())</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="math-operations-with-booleans-are-forbidden">
+<h2>Math operations with booleans are forbidden<a class="headerlink" href="#math-operations-with-booleans-are-forbidden" title="Permalink to this headline">¶</a></h2>
+<p>In Pine Script™ v2 there were rules of implicit conversion of booleans
+into numeric types. In v3 this is forbidden. There is a conversion of
+numeric types into booleans instead (0 and <code class="docutils literal notranslate"><span class="pre">na</span></code> values are <code class="docutils literal notranslate"><span class="pre">false</span></code>, all
+the other numbers are <code class="docutils literal notranslate"><span class="pre">true</span></code>). Example (In v2 this code compiles fine):</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=2</span><span class="w"></span>
+<span class="nx">study</span><span class="p">(</span><span class="s2">"My Script"</span><span class="p">)</span><span class="w"></span>
+<span class="nx">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">close</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="no">open</span><span class="w"></span>
+<span class="nx">s1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">close</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="no">open</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="w"></span>
+<span class="nx">s2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">close</span><span class="o">[</span><span class="mi">2</span><span class="o">]</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="no">open</span><span class="o">[</span><span class="mi">2</span><span class="o">]</span><span class="w"></span>
+<span class="nx">sum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">s</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">s1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">s2</span><span class="w"></span>
+<span class="nx">col</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">sum</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="nx">white</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="nx">sum</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="nx">blue</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="nx">sum</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">3</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="nx">red</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="no">na</span><span class="w"></span>
+<span class="ni">bgcolor</span><span class="p">(</span><span class="nx">col</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Variables <code class="docutils literal notranslate"><span class="pre">s</span></code>, <code class="docutils literal notranslate"><span class="pre">s1</span></code> and <code class="docutils literal notranslate"><span class="pre">s2</span></code> are of <em>bool</em> type. But at line 6 we
+add three of them and store the result in a variable <code class="docutils literal notranslate"><span class="pre">sum</span></code>. <code class="docutils literal notranslate"><span class="pre">sum</span></code> is
+a number, since we cannot add booleans. Booleans were implicitly
+converted to numbers (<code class="docutils literal notranslate"><span class="pre">true</span></code> values to <code class="docutils literal notranslate"><span class="pre">1.0</span></code> and <code class="docutils literal notranslate"><span class="pre">false</span></code> to <code class="docutils literal notranslate"><span class="pre">0.0</span></code>) and then they
+were added.</p>
+<p>This approach leads to unintentional errors in more complicated scripts.
+That’s why we no longer allow implicit conversion of booleans to
+numbers.</p>
+<p>If you try to compile this example as a Pine Script™ v3 code, you’ll get an
+error:
+<code class="docutils literal notranslate"><span class="pre">Cannot</span> <span class="pre">call</span> <span class="pre">`operator</span> <span class="pre">+`</span> <span class="pre">with</span> <span class="pre">arguments</span> <span class="pre">(series__bool,</span> <span class="pre">series__bool);</span> <span class="pre">&lt;...&gt;</span></code>
+It means that you cannot use the addition operator with boolean values.
+To make this example work in Pine Script™ v3 you can do the following:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=3</span><span class="w"></span>
+<span class="nx">study</span><span class="p">(</span><span class="s2">"My Script"</span><span class="p">)</span><span class="w"></span>
+<span class="nx">bton</span><span class="p">(</span><span class="nx">b</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"></span>
+<span class="w">    </span><span class="nx">b</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mi">0</span><span class="w"></span>
+<span class="nx">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">close</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="no">open</span><span class="w"></span>
+<span class="nx">s1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">close</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="no">open</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="w"></span>
+<span class="nx">s2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">close</span><span class="o">[</span><span class="mi">2</span><span class="o">]</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="no">open</span><span class="o">[</span><span class="mi">2</span><span class="o">]</span><span class="w"></span>
+<span class="nx">sum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">bton</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">bton</span><span class="p">(</span><span class="nx">s1</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">bton</span><span class="p">(</span><span class="nx">s2</span><span class="p">)</span><span class="w"></span>
+<span class="nx">col</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">sum</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="nx">white</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="nx">sum</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="nx">blue</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="nx">sum</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">3</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="nx">red</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="no">na</span><span class="w"></span>
+<span class="ni">bgcolor</span><span class="p">(</span><span class="nx">col</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Function <code class="docutils literal notranslate"><span class="pre">bton</span></code> (abbreviation of boolean-to-number) explicitly
+converts any boolean value to a number if you really need this.</p>
+<a class="reference external image-reference" href="https://www.tradingview.com/"><div align="center" class="align-center"><img alt="../_images/TradingView-Logo-Block.svg" src="../_images/TradingView-Logo-Block.svg" width="200px"/></div>
+</a>
+</div>
+</div>
+</div>
+<div class="footer-relations">
+<div class="pull-left">
+<a class="btn btn-default" href="To_Pine_version_4.html" title="previous chapter (use the left arrow)">To Pine Script™ version 4</a>
+</div>
+<div class="pull-right">
+<a class="btn btn-default" href="../Where_can_I_get_more_information.html" title="next chapter (use the right arrow)">Where can I get more information?</a>
+</div>
+</div>
+<div class="clearer"></div>
+</div>

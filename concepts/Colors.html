@@ -1,0 +1,645 @@
+<div id="right-column">
+<div aria-label="breadcrumbs navigation" role="navigation">
+<ol class="breadcrumb">
+<li><a href="../index.html">User Manual</a></li>
+<li><a href="index.html">Concepts</a></li>
+<li>Colors</li>
+</ol>
+</div>
+<div class="document clearer body">
+<a class="reference external image-reference" href="https://www.tradingview.com/pine-script-docs/en/v5/Introduction.html"><div align="right" class="align-right"><img alt="Pine Script™ logo" height="100" src="../_images/Pine_Script_logo.svg" width="100"/></div>
+</a>
+<div class="section" id="colors">
+<span id="pagecolors"></span><h1>Colors<a class="headerlink" href="#colors" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><a class="reference internal" href="#introduction" id="id1">Introduction</a><ul>
+<li><a class="reference internal" href="#transparency" id="id2">Transparency</a></li>
+<li><a class="reference internal" href="#z-index" id="id3">Z-index</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#constant-colors" id="id4">Constant colors</a></li>
+<li><a class="reference internal" href="#conditional-coloring" id="id5">Conditional coloring</a></li>
+<li><a class="reference internal" href="#calculated-colors" id="id6">Calculated colors</a><ul>
+<li><a class="reference internal" href="#color-new" id="id7">color.new()</a></li>
+<li><a class="reference internal" href="#color-rgb" id="id8">color.rgb()</a></li>
+<li><a class="reference internal" href="#color-from-gradient" id="id9">color.from_gradient()</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#mixing-transparencies" id="id10">Mixing transparencies</a></li>
+<li><a class="reference internal" href="#tips" id="id11">Tips</a><ul>
+<li><a class="reference internal" href="#designing-usable-colors-schemes" id="id12">Designing usable colors schemes</a></li>
+<li><a class="reference internal" href="#plot-crisp-lines" id="id13">Plot crisp lines</a></li>
+<li><a class="reference internal" href="#customize-gradients" id="id14">Customize gradients</a></li>
+<li><a class="reference internal" href="#color-selection-through-script-settings" id="id15">Color selection through script settings</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="introduction">
+<h2><a class="toc-backref" href="#id1">Introduction</a><a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>Script visuals can play a critical role in the usability of the indicators we write in Pine Script™.
+Well-designed plots and drawings make indicators easier to use and understand.
+Good visual designs establish a visual hierarchy that allows the more important information to stand out, and the less important one to not get in the way.</p>
+<p>Using colors in Pine Script™ can be as simple as you want, or as involved as your concept requires.
+The 4,294,967,296 possible assemblies of color and transparency available in Pine Script™ can be applied to:</p>
+<ul class="simple">
+<li>Any element you can plot or draw in an indicator’s visual space, be it lines, fills, text or candles.</li>
+<li>The background of a script’s visual space, whether the script is running in its own pane, or in overlay mode on the chart.</li>
+<li>The color of bars or the body of candles appearing on a chart.</li>
+</ul>
+<p>A script can only color the elements it places in its own visual space. The only exception to this rule is that a pane indicator can color chart bars or candles.</p>
+<p>Pine Script™ has built-in colors such as <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_color{dot}green">color.green</a>,
+as well as functions like <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_color{dot}rgb">color.rgb()</a> which allow you to dynamically generate any color in the RGBA color space.</p>
+<div class="section" id="transparency">
+<h3><a class="toc-backref" href="#id2">Transparency</a><a class="headerlink" href="#transparency" title="Permalink to this headline">¶</a></h3>
+<p>Each color in Pine Script™ is defined by four values:</p>
+<ul class="simple">
+<li>Its red, green and blue components (0-255), following the <a class="reference external" href="https://en.wikipedia.org/wiki/RGB_color_space" rel="nofollow">RGB color model</a>.</li>
+<li>Its transparency (0-100), often referred to as the Alpha channel outside Pine Script™, as defined in the <a class="reference external" href="https://en.wikipedia.org/wiki/RGB_color_space" rel="nofollow">RGBA color model</a>.
+Even though transparency in Pine Script™ is expressed in the 0-100 range, its value can be a “float” when used in functions, which gives you access to the 256 underlying values of the alpha channel.</li>
+</ul>
+<p>The transparency of a color defines how opaque it is: zero is fully opaque, 100 makes the color—whichever it is—invisible.
+Modulating transparency can be crucial in more involved color visuals or when using backgrounds, to control which colors dominate the others, and how they mix together when superimposed.</p>
+</div>
+<div class="section" id="z-index">
+<span id="pagecolors-zindex"></span><h3><a class="toc-backref" href="#id3">Z-index</a><a class="headerlink" href="#z-index" title="Permalink to this headline">¶</a></h3>
+<p>When you place elements in a script’s visual space, they have relative depth on the <em>z</em> axis; some will appear on top of others.
+The <em>z-index</em> is a value that represents the position of elements on the <em>z</em> axis. Elements with the highest z-index appear on top.</p>
+<p>Elements drawn in Pine Script™ are divided in groups. Each group has its own position in the <em>z</em> space, and <strong>within the same group</strong>,
+elements created last in the script’s logic will appear on top of other elements from the same group.
+An element of one group cannot be placed outside the region of the <em>z</em> space attributed to its group,
+so a plot can never appear on top of a table, for example, because tables have the highest z-index.</p>
+<p>This lists the groups of visual elements in Pine Script™, ordered by increasing z-index,
+so background colors are always at the bottom of <em>z</em> space, and tables will always appear on top of all other elements:</p>
+<ul class="simple">
+<li>Background colors</li>
+<li>Plots</li>
+<li>Hlines</li>
+<li>Fills</li>
+<li>Boxes</li>
+<li>Labels</li>
+<li>Lines</li>
+<li>Tables</li>
+</ul>
+<p>Note that by using <code class="docutils literal notranslate"><span class="pre">explicit_plot_zorder</span> <span class="pre">=</span> <span class="pre">true</span></code> in <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_indicator">indicator()</a> or
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_strategy">strategy()</a>, you can control the relative z-index of <code class="docutils literal notranslate"><span class="pre">plot*()</span></code>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_hline">hline()</a> and
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_fill">fill()</a> visuals using their sequential order in the script.</p>
+</div>
+</div>
+<div class="section" id="constant-colors">
+<span id="pagecolors-constantcolors"></span><h2><a class="toc-backref" href="#id4">Constant colors</a><a class="headerlink" href="#constant-colors" title="Permalink to this headline">¶</a></h2>
+<p>There are 17 built-in colors in Pine Script™. This table lists their names, hexadecimal equivalent,
+and RGB values as arguments to <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_color{dot}rgb">color.rgb()</a>:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="30%"/>
+<col width="18%"/>
+<col width="52%"/>
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Hex</th>
+<th class="head">RGB values</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>color.aqua</td>
+<td>#00BCD4</td>
+<td>color.rgb(0, 188, 212)</td>
+</tr>
+<tr class="row-odd"><td>color.black</td>
+<td>#363A45</td>
+<td>color.rgb(54, 58, 69)</td>
+</tr>
+<tr class="row-even"><td>color.blue</td>
+<td>#2196F3</td>
+<td>color.rgb(33, 150, 243)</td>
+</tr>
+<tr class="row-odd"><td>color.fuchsia</td>
+<td>#E040FB</td>
+<td>color.rgb(224, 64, 251)</td>
+</tr>
+<tr class="row-even"><td>color.gray</td>
+<td>#787B86</td>
+<td>color.rgb(120, 123, 134)</td>
+</tr>
+<tr class="row-odd"><td>color.green</td>
+<td>#4CAF50</td>
+<td>color.rgb(76, 175, 80)</td>
+</tr>
+<tr class="row-even"><td>color.lime</td>
+<td>#00E676</td>
+<td>color.rgb(0, 230, 118)</td>
+</tr>
+<tr class="row-odd"><td>color.maroon</td>
+<td>#880E4F</td>
+<td>color.rgb(136,  14, 79)</td>
+</tr>
+<tr class="row-even"><td>color.navy</td>
+<td>#311B92</td>
+<td>color.rgb(49, 27, 146)</td>
+</tr>
+<tr class="row-odd"><td>color.olive</td>
+<td>#808000</td>
+<td>color.rgb(128, 128, 0)</td>
+</tr>
+<tr class="row-even"><td>color.orange</td>
+<td>#FF9800</td>
+<td>color.rgb(255, 152, 0)</td>
+</tr>
+<tr class="row-odd"><td>color.purple</td>
+<td>#9C27B0</td>
+<td>color.rgb(156, 39, 176)</td>
+</tr>
+<tr class="row-even"><td>color.red</td>
+<td>#FF5252</td>
+<td>color.rgb(255, 82, 82)</td>
+</tr>
+<tr class="row-odd"><td>color.silver</td>
+<td>#B2B5BE</td>
+<td>color.rgb(178, 181, 190)</td>
+</tr>
+<tr class="row-even"><td>color.teal</td>
+<td>#00897B</td>
+<td>color.rgb(0, 137, 123)</td>
+</tr>
+<tr class="row-odd"><td>color.white</td>
+<td>#FFFFFF</td>
+<td>color.rgb(255, 255, 255)</td>
+</tr>
+<tr class="row-even"><td>color.yellow</td>
+<td>#FFEB3B</td>
+<td>color.rgb(255, 235, 59)</td>
+</tr>
+</tbody>
+</table>
+<p>In the following script, all plots use the same <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_color{dot}olive">color.olive</a>
+color with a transparency of 40, but expressed in different ways. All five methods are functionally equivalent:</p>
+<img alt="../_images/Colors-UsingColors-1.png" src="../_images/Colors-UsingColors-1.png"/>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="nx">true</span><span class="p">)</span><span class="w"></span>
+<span class="c">// ————  Transparency (#99) is included in the hex value.</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="ni">ta.sma</span><span class="p">(</span><span class="no">close</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">),</span><span class="w"> </span><span class="s2">"10"</span><span class="p">,</span><span class="w"> </span><span class="l">#80800099</span><span class="p">)</span><span class="w"></span>
+<span class="c">// ————  Transparency is included in the color-generating function's arguments.</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="ni">ta.sma</span><span class="p">(</span><span class="no">close</span><span class="p">,</span><span class="w"> </span><span class="mi">30</span><span class="p">),</span><span class="w"> </span><span class="s2">"30"</span><span class="p">,</span><span class="w"> </span><span class="ni">color.new</span><span class="p">(</span><span class="ni">color.olive</span><span class="p">,</span><span class="w"> </span><span class="mi">40</span><span class="p">))</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="ni">ta.sma</span><span class="p">(</span><span class="no">close</span><span class="p">,</span><span class="w"> </span><span class="mi">50</span><span class="p">),</span><span class="w"> </span><span class="s2">"50"</span><span class="p">,</span><span class="w"> </span><span class="ni">color.rgb</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span><span class="w"> </span><span class="mi">128</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">40</span><span class="p">))</span><span class="w"></span>
+<span class="w">      </span><span class="c">// ————  Use `transp` parameter (deprecated and advised against)</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="ni">ta.sma</span><span class="p">(</span><span class="no">close</span><span class="p">,</span><span class="w"> </span><span class="mi">70</span><span class="p">),</span><span class="w"> </span><span class="s2">"70"</span><span class="p">,</span><span class="w"> </span><span class="ni">color.olive</span><span class="p">,</span><span class="w"> </span><span class="nx">transp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">40</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="ni">ta.sma</span><span class="p">(</span><span class="no">close</span><span class="p">,</span><span class="w"> </span><span class="mi">90</span><span class="p">),</span><span class="w"> </span><span class="s2">"90"</span><span class="p">,</span><span class="w"> </span><span class="l">#808000</span><span class="p">,</span><span class="w"> </span><span class="nx">transp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">40</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The last two <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plot">plot()</a> calls specify transparency using the <code class="docutils literal notranslate"><span class="pre">transp</span></code> parameter.
+This use should be avoided as the <code class="docutils literal notranslate"><span class="pre">transp</span></code> is deprecated in Pine Script™ v5.
+Using the <code class="docutils literal notranslate"><span class="pre">transp</span></code> parameter to define transparency is not as flexible because it requires an argument of <em>input integer</em> type,
+which entails it must be known before the script is executed, and so cannot be calculated dynamically, as your script executes bar to bar.
+Additionally, if you use a <code class="docutils literal notranslate"><span class="pre">color</span></code> argument that already includes transparency information,
+as is done in the next three <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plot">plot()</a> calls,
+any argument used for the <code class="docutils literal notranslate"><span class="pre">transp</span></code> parameter would have no effect. This is also true for other functions with a <code class="docutils literal notranslate"><span class="pre">transp</span></code> parameter.</p>
+</div>
+<p>The colors in the previous script do not vary as the script executes bar to bar.
+Sometimes, however, colors need to be created as the script executes on each bar because they depend on conditions that are unknown at compile time,
+or when the script begins execution on bar zero. For those cases, Pine Script™ programmers have two options:</p>
+<ol class="arabic simple">
+<li>Use conditional statements to select colors from a few pre-determined base colors.</li>
+<li>Build new colors dynamically, by calculating them as the script executes bar to bar, to implement color gradients, for example.</li>
+</ol>
+</div>
+<div class="section" id="conditional-coloring">
+<span id="pagecolors-conditionalcoloring"></span><h2><a class="toc-backref" href="#id5">Conditional coloring</a><a class="headerlink" href="#conditional-coloring" title="Permalink to this headline">¶</a></h2>
+<p>Let’s say you want to color a moving average in different colors, depending on some conditions you define.
+To do so, you can use a conditional statement that will select a different color for each of your states.
+Let’s start by coloring a moving average in a bull color when it’s rising, and in a bear color when it’s not:</p>
+<img alt="../_images/Colors-ConditionalColors-1.png" src="../_images/Colors-ConditionalColors-1.png"/>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"Conditional colors"</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="nx">true</span><span class="p">)</span><span class="w"></span>
+<span class="k">int </span><span class="w">  </span><span class="nx">lengthInput</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">input.int</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="s2">"Length"</span><span class="p">,</span><span class="w"> </span><span class="nx">minval</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"></span>
+<span class="k">color </span><span class="nx">maBullColorInput</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">input.color</span><span class="p">(</span><span class="ni">color.green</span><span class="p">,</span><span class="w"> </span><span class="s2">"Bull"</span><span class="p">)</span><span class="w"></span>
+<span class="k">color </span><span class="nx">maBearColorInput</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">input.color</span><span class="p">(</span><span class="ni">color.maroon</span><span class="p">,</span><span class="w"> </span><span class="s2">"Bear"</span><span class="p">)</span><span class="w"></span>
+<span class="k">float </span><span class="nx">ma</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">ta.sma</span><span class="p">(</span><span class="no">close</span><span class="p">,</span><span class="w"> </span><span class="nx">lengthInput</span><span class="p">)</span><span class="w"></span>
+<span class="c">// Define our states.</span><span class="w"></span>
+<span class="k">bool </span><span class="nx">maRising</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="ni">ta.rising</span><span class="p">(</span><span class="nx">ma</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"></span>
+<span class="c">// Build our color.</span><span class="w"></span>
+<span class="k">color </span><span class="nx">c_ma</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">maRising</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="nx">maBullColorInput</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="nx">maBearColorInput</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="nx">ma</span><span class="p">,</span><span class="w"> </span><span class="s2">"MA"</span><span class="p">,</span><span class="w"> </span><span class="nx">c_ma</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Note that:</p>
+<ul class="simple">
+<li>We provide users of our script a selection of colors for our bull/bear colors.</li>
+<li>We define an <code class="docutils literal notranslate"><span class="pre">maRising</span></code> boolean variable which will hold <code class="docutils literal notranslate"><span class="pre">true</span></code> when the moving average is higher on the current bar than it was on the last.</li>
+<li>We define a <code class="docutils literal notranslate"><span class="pre">c_ma</span></code> color variable that is assigned one of our two colors, depending on the value of the <code class="docutils literal notranslate"><span class="pre">maRising</span></code> boolean. We use the <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#op_{question}{colon}">? : ternary operator</a> to write our conditional statement.</li>
+</ul>
+<p>You can also use conditional colors to avoid plotting under certain conditions.
+Here, we plot high and low pivots using a line, but we do not want to plot anything when a new pivot comes in,
+to avoid the joints that would otherwise appear in pivot transitions.
+To do so, we test for pivot changes and use <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_na">na</a>
+as the color value when a change is detected, so that no line is plotted on that bar:</p>
+<img alt="../_images/Colors-ConditionalColors-2.png" src="../_images/Colors-ConditionalColors-2.png"/>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"Conditional colors"</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="nx">true</span><span class="p">)</span><span class="w"></span>
+<span class="k">int </span><span class="nx">legsInput</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">input.int</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="s2">"Pivot Legs"</span><span class="p">,</span><span class="w"> </span><span class="nx">minval</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"></span>
+<span class="k">color </span><span class="nx">pHiColorInput</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">input.color</span><span class="p">(</span><span class="ni">color.olive</span><span class="p">,</span><span class="w"> </span><span class="s2">"High pivots"</span><span class="p">)</span><span class="w"></span>
+<span class="k">color </span><span class="nx">pLoColorInput</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">input.color</span><span class="p">(</span><span class="ni">color.orange</span><span class="p">,</span><span class="w"> </span><span class="s2">"Low pivots"</span><span class="p">)</span><span class="w"></span>
+<span class="c">// Intialize the pivot level variables.</span><span class="w"></span>
+<span class="k">var float </span><span class="nx">pHi</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">na</span><span class="w"></span>
+<span class="k">var float </span><span class="nx">pLo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">na</span><span class="w"></span>
+<span class="c">// When a new pivot is detected, save its value.</span><span class="w"></span>
+<span class="nx">pHi</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="ni">nz</span><span class="p">(</span><span class="ni">ta.pivothigh</span><span class="p">(</span><span class="nx">legsInput</span><span class="p">,</span><span class="w"> </span><span class="nx">legsInput</span><span class="p">),</span><span class="w"> </span><span class="nx">pHi</span><span class="p">)</span><span class="w"></span>
+<span class="nx">pLo</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="ni">nz</span><span class="p">(</span><span class="ni">ta.pivotlow</span><span class="p">(</span><span class="w"> </span><span class="nx">legsInput</span><span class="p">,</span><span class="w"> </span><span class="nx">legsInput</span><span class="p">),</span><span class="w"> </span><span class="nx">pLo</span><span class="p">)</span><span class="w"></span>
+<span class="c">// When a new pivot is detected, do not plot a color.</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="nx">pHi</span><span class="p">,</span><span class="w"> </span><span class="s2">"High"</span><span class="p">,</span><span class="w"> </span><span class="ni">ta.change</span><span class="p">(</span><span class="nx">pHi</span><span class="p">)</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="no">na</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="nx">pHiColorInput</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="ni">plot.style_line</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="nx">pLo</span><span class="p">,</span><span class="w"> </span><span class="s2">"Low"</span><span class="p">,</span><span class="w">  </span><span class="ni">ta.change</span><span class="p">(</span><span class="nx">pLo</span><span class="p">)</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="no">na</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="nx">pLoColorInput</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="ni">plot.style_line</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>To undertand how this code works, one must first know that <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_ta{dot}pivothigh">ta.pivothigh()</a> and
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_ta{dot}pivotlow">ta.pivotlow()</a>,
+used as they are here without an argument to the <code class="docutils literal notranslate"><span class="pre">source</span></code> parameter,
+will return a value when they find a
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_high">high</a>/<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_low">low</a> pivot,
+otherwise they return <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_na">na</a>.</p>
+<p>When we test the value returned by the pivot function for <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_na">na</a>
+using the <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_nz">nz()</a> function,
+we allow the value returned to be assigned to the <code class="docutils literal notranslate"><span class="pre">pHi</span></code> or <code class="docutils literal notranslate"><span class="pre">pLo</span></code> variables only when it is not <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_na">na</a>,
+otherwise the previous value of the variable is simply reassigned to it, which has no impact on its value.
+Keep in mind that previous values of <code class="docutils literal notranslate"><span class="pre">pHi</span></code> and <code class="docutils literal notranslate"><span class="pre">pLo</span></code> are preserved bar to bar because we use the
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#op_var">var</a> keyword when initializing them, which causes the initialization to only occur on the first bar.</p>
+<p>All that’s left to do next is, when we plot our lines, to insert a ternary conditional statement that will yield
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_na">na</a> for the color when the pivot value changes,
+or the color selected in the script’s inputs when the pivot level does not change.</p>
+</div>
+<div class="section" id="calculated-colors">
+<h2><a class="toc-backref" href="#id6">Calculated colors</a><a class="headerlink" href="#calculated-colors" title="Permalink to this headline">¶</a></h2>
+<p>Using functions like <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_color{dot}new">color.new()</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_color{dot}rgb">color.rgb()</a> and
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_color{dot}from_gradient">color.from_gradient()</a>, one can build colors on the fly, as the script executes bar to bar.</p>
+<p><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_color{dot}new">color.new()</a> is most useful when you need to generate different transparency levels from a base color.</p>
+<p><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_color{dot}rgb">color.rgb()</a> is useful when you need to build colors dynamically from red, green, blue, or tranparency components.
+While <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_color{dot}rgb">color.rgb()</a> creates a color,
+its sister functions <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_color{dot}r">color.r()</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_color{dot}g">color.g()</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_color{dot}b">color.b()</a> and
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_color{dot}t">color.t()</a>
+can be used to extract the red, green, blue or transparency values from a color, which can in turn be used to generate a variant.</p>
+<p><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_color{dot}from_gradient">color.from_gradient()</a>
+is useful to create linear gradients between two base colors. It determines which intermediary color to use by evaluating a source value against minimum and maximum values.</p>
+<div class="section" id="color-new">
+<h3><a class="toc-backref" href="#id7">color.new()</a><a class="headerlink" href="#color-new" title="Permalink to this headline">¶</a></h3>
+<p>Let’s put <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_color{dot}new">color.new(color, transp)</a>
+to use to create different transparencies for volume columns using one of two bull/bear base colors:</p>
+<img alt="../_images/Colors-CalculatingColors-1.png" src="../_images/Colors-CalculatingColors-1.png"/>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"Volume"</span><span class="p">)</span><span class="w"></span>
+<span class="c">// We name our color constants to make them more readable.</span><span class="w"></span>
+<span class="k">var color </span><span class="nx">GOLD_COLOR</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="l">#CCCC00ff</span><span class="w"></span>
+<span class="k">var color </span><span class="nx">VIOLET_COLOR</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="l">#AA00FFff</span><span class="w"></span>
+<span class="k">color </span><span class="nx">bullColorInput</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">input.color</span><span class="p">(</span><span class="nx">GOLD_COLOR</span><span class="p">,</span><span class="w">   </span><span class="s2">"Bull"</span><span class="p">)</span><span class="w"></span>
+<span class="k">color </span><span class="nx">bearColorInput</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">input.color</span><span class="p">(</span><span class="nx">VIOLET_COLOR</span><span class="p">,</span><span class="w"> </span><span class="s2">"Bear"</span><span class="p">)</span><span class="w"></span>
+<span class="k">int </span><span class="nx">levelsInput</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">input.int</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="s2">"Gradient levels"</span><span class="p">,</span><span class="w"> </span><span class="nx">minval</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"></span>
+<span class="c">// We initialize only once on bar zero with `var`, otherwise the count would reset to zero on each bar.</span><span class="w"></span>
+<span class="k">var float </span><span class="nx">riseFallCnt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="w"></span>
+<span class="c">// Count the rises/falls, clamping the range to: 1 to `i_levels`.</span><span class="w"></span>
+<span class="nx">riseFallCnt</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="ni">math.max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="ni">math.min</span><span class="p">(</span><span class="nx">levelsInput</span><span class="p">,</span><span class="w"> </span><span class="nx">riseFallCnt</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="ni">math.sign</span><span class="p">(</span><span class="no">volume</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="ni">nz</span><span class="p">(</span><span class="no">volume</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="p">))))</span><span class="w"></span>
+<span class="c">// Rescale the count on a scale of 80, reverse it and cap transparency to &lt;80 so that colors remains visible.</span><span class="w"></span>
+<span class="k">float </span><span class="nx">transparency</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">80</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="ni">math.abs</span><span class="p">(</span><span class="mi">80</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nx">riseFallCnt</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="nx">levelsInput</span><span class="p">)</span><span class="w"></span>
+<span class="c">// Build the correct transparency of either the bull or bear color.</span><span class="w"></span>
+<span class="k">color </span><span class="nx">volumeColor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">color.new</span><span class="p">(</span><span class="no">close</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="no">open</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="nx">bullColorInput</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="nx">bearColorInput</span><span class="p">,</span><span class="w"> </span><span class="nx">transparency</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="no">volume</span><span class="p">,</span><span class="w"> </span><span class="s2">"Volume"</span><span class="p">,</span><span class="w"> </span><span class="nx">volumeColor</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="ni">plot.style_columns</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Note that:</p>
+<ul class="simple">
+<li>In the next to last line of our script, we dynamically calculate the column color by varying both the base color used,
+depending on whether the bar is up or down, <strong>and</strong> the transparency level, which is calculated from the cumulative rises or falls of volume.</li>
+<li>We offer the script user control over not only the base bull/bear colors used, but also on the number of brightness levels we use.
+We use this value to determine the maximum number of rises or falls we will track. Giving users the possiblity to manage this value allows them to adapt the indicator’s visuals to the timeframe or market they use.</li>
+<li>We take care to control the maximum level of transparency we use so that it never goes higher than 80. This ensures our colors always retain some visibility.</li>
+<li>We also set the minimum value for the number of levels to 1 in the inputs. When the user selects 1, the volume columns will be either in bull or bear color of maximum brightness—or transparency zero.</li>
+</ul>
+</div>
+<div class="section" id="color-rgb">
+<h3><a class="toc-backref" href="#id8">color.rgb()</a><a class="headerlink" href="#color-rgb" title="Permalink to this headline">¶</a></h3>
+<p>In our next example we use <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_color{dot}rgb">color.rgb(red, green, blue, transp)</a>
+to build colors from RGBA values. We use the result in a holiday season gift for our friends, so they can bring their TradingView charts to parties:</p>
+<img alt="../_images/Colors-CalculatingColors-2.png" src="../_images/Colors-CalculatingColors-2.png"/>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"Holiday candles"</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="nx">true</span><span class="p">)</span><span class="w"></span>
+<span class="k">float </span><span class="nx">r</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">math.random</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">)</span><span class="w"></span>
+<span class="k">float </span><span class="nx">g</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">math.random</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">)</span><span class="w"></span>
+<span class="k">float </span><span class="nx">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">math.random</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">)</span><span class="w"></span>
+<span class="k">float </span><span class="nx">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">math.random</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">)</span><span class="w"></span>
+<span class="k">color </span><span class="nx">holidayColor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">color.rgb</span><span class="p">(</span><span class="nx">r</span><span class="p">,</span><span class="w"> </span><span class="nx">g</span><span class="p">,</span><span class="w"> </span><span class="nx">b</span><span class="p">,</span><span class="w"> </span><span class="nx">t</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plotcandle</span><span class="p">(</span><span class="no">open</span><span class="p">,</span><span class="w"> </span><span class="no">high</span><span class="p">,</span><span class="w"> </span><span class="no">low</span><span class="p">,</span><span class="w"> </span><span class="no">close</span><span class="p">,</span><span class="w"> </span><span class="k">color </span><span class="o">=</span><span class="w"> </span><span class="nx">c_holiday</span><span class="p">,</span><span class="w"> </span><span class="nx">wickcolor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">holidayColor</span><span class="p">,</span><span class="w"> </span><span class="nx">bordercolor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">c_holiday</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Note that:</p>
+<ul class="simple">
+<li>We generate values in the zero to 255 range for the red, green and blue channels, and in the zero to 100 range for transparency.
+Also note that because <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_math{dot}random">math.random()</a> returns float values,
+the float 0.0-100.0 range provides access to the full 0-255 transparency values of the underlying alpha channel.</li>
+<li>We use the <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_math{dot}random">math.random(min, max, seed)</a>
+function to generate pseudo-random values. We do not use an argument for the third parameter of the function: <code class="docutils literal notranslate"><span class="pre">seed</span></code>.
+Using it is handy when you want to ensure the repeatability of the function’s results. Called with the same seed, it will produce the same sequence of values.</li>
+</ul>
+</div>
+<div class="section" id="color-from-gradient">
+<h3><a class="toc-backref" href="#id9">color.from_gradient()</a><a class="headerlink" href="#color-from-gradient" title="Permalink to this headline">¶</a></h3>
+<p>Our last examples of color calculations will use
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_color{dot}from_gradient">color.from_gradient(value, bottom_value, top_value, bottom_color, top_color)</a>.
+Let’s first use it in its simplest form, to color a CCI signal in a version of the indicator that otherwise looks like the built-in:</p>
+<img alt="../_images/Colors-CalculatingColors-3.png" src="../_images/Colors-CalculatingColors-3.png"/>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="nx">title</span><span class="o">=</span><span class="s2">"CCI line gradient"</span><span class="p">,</span><span class="w"> </span><span class="nx">precision</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="nx">timeframe</span><span class="o">=</span><span class="s2">""</span><span class="p">)</span><span class="w"></span>
+<span class="k">var color </span><span class="nx">GOLD_COLOR</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="l">#CCCC00</span><span class="w"></span>
+<span class="k">var color </span><span class="nx">VIOLET_COLOR</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="l">#AA00FF</span><span class="w"></span>
+<span class="k">var color </span><span class="nx">BEIGE_COLOR</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="l">#9C6E1B</span><span class="w"></span>
+<span class="k">float </span><span class="nx">srcInput</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">input.source</span><span class="p">(</span><span class="no">close</span><span class="p">,</span><span class="w"> </span><span class="nx">title</span><span class="o">=</span><span class="s2">"Source"</span><span class="p">)</span><span class="w"></span>
+<span class="k">int </span><span class="w">  </span><span class="nx">lenInput</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">input.int</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="s2">"Length"</span><span class="p">,</span><span class="w"> </span><span class="nx">minval</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span><span class="p">)</span><span class="w"></span>
+<span class="k">color </span><span class="nx">bullColorInput</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">input.color</span><span class="p">(</span><span class="nx">GOLD_COLOR</span><span class="p">,</span><span class="w">   </span><span class="s2">"Bull"</span><span class="p">)</span><span class="w"></span>
+<span class="k">color </span><span class="nx">bearColorInput</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">input.color</span><span class="p">(</span><span class="nx">BEIGE_COLOR</span><span class="p">,</span><span class="w"> </span><span class="s2">"Bear"</span><span class="p">)</span><span class="w"></span>
+<span class="k">float </span><span class="nx">signal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">ta.cci</span><span class="p">(</span><span class="nx">srcInput</span><span class="p">,</span><span class="w"> </span><span class="nx">lenInput</span><span class="p">)</span><span class="w"></span>
+<span class="k">color </span><span class="nx">signalColor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">color.from_gradient</span><span class="p">(</span><span class="nx">signal</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mi">200</span><span class="p">,</span><span class="w"> </span><span class="mi">200</span><span class="p">,</span><span class="w"> </span><span class="nx">bearColorInput</span><span class="p">,</span><span class="w"> </span><span class="nx">bullColorInput</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="nx">signal</span><span class="p">,</span><span class="w"> </span><span class="s2">"CCI"</span><span class="p">,</span><span class="w"> </span><span class="nx">signalColor</span><span class="p">)</span><span class="w"></span>
+<span class="nx">bandTopPlotID</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">hline</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span><span class="w">  </span><span class="s2">"Upper Band"</span><span class="p">,</span><span class="w"> </span><span class="ni">color.silver</span><span class="p">,</span><span class="w"> </span><span class="ni">hline.style_dashed</span><span class="p">)</span><span class="w"></span>
+<span class="nx">bandBotPlotID</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">hline</span><span class="p">(</span><span class="o">-</span><span class="mi">100</span><span class="p">,</span><span class="w"> </span><span class="s2">"Lower Band"</span><span class="p">,</span><span class="w"> </span><span class="ni">color.silver</span><span class="p">,</span><span class="w"> </span><span class="ni">hline.style_dashed</span><span class="p">)</span><span class="w"></span>
+<span class="ni">fill</span><span class="p">(</span><span class="nx">bandTopPlotID</span><span class="p">,</span><span class="w"> </span><span class="nx">bandBotPlotID</span><span class="p">,</span><span class="w"> </span><span class="ni">color.new</span><span class="p">(</span><span class="nx">BEIGE_COLOR</span><span class="p">,</span><span class="w"> </span><span class="mi">90</span><span class="p">),</span><span class="w"> </span><span class="s2">"Background"</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Note that:</p>
+<ul class="simple">
+<li>To calculate the gradient, <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_color{dot}from_gradient">color.from_gradient()</a>
+requires minimum and maximum values against which the argument used for the <code class="docutils literal notranslate"><span class="pre">value</span></code> parameter will be compared.
+The fact that we want a gradient for an unbounded signal like CCI (i.e., without fixed boundaries such as RSI, which always oscillates between 0-100),
+does not entail we cannot use <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_color{dot}from_gradient">color.from_gradient()</a>.
+Here, we solve our conundrum by providing values of -200 and 200 as arguments. They do not represent the real minimum and maximum values for CCI,
+but they are at levels from which we do not mind the colors no longer changing,
+as whenever the series is outside the <code class="docutils literal notranslate"><span class="pre">bottom_value</span></code> and <code class="docutils literal notranslate"><span class="pre">top_value</span></code> limits, the colors used for <code class="docutils literal notranslate"><span class="pre">bottom_color</span></code> and <code class="docutils literal notranslate"><span class="pre">top_color</span></code> will apply.</li>
+<li>The color progression calculated by <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_color{dot}from_gradient">color.from_gradient()</a> is linear.
+If the value of the series is halfway between the <code class="docutils literal notranslate"><span class="pre">bottom_value</span></code> and <code class="docutils literal notranslate"><span class="pre">top_value</span></code> arguments,
+the generated color’s RGBA components will also be halfway between those of <code class="docutils literal notranslate"><span class="pre">bottom_color</span></code> and <code class="docutils literal notranslate"><span class="pre">top_color</span></code>.</li>
+<li>Many common indicator calculations are available in Pine Script™ as built-in functions.
+Here we use <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_ta{dot}cci">ta.cci()</a> instead of calculating it the long way.</li>
+</ul>
+<p>The argument used for <code class="docutils literal notranslate"><span class="pre">value</span></code> in <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_color{dot}from_gradient">color.from_gradient()</a>
+does not necessarily have to be the value of the line we are calculating. Anything we want can be used, as long as arguments for <code class="docutils literal notranslate"><span class="pre">bottom_value</span></code> and <code class="docutils literal notranslate"><span class="pre">top_value</span></code> can be supplied.
+Here, we enhance our CCI indicator by coloring the band using the number of bars since the signal has been above/below the centerline:</p>
+<img alt="../_images/Colors-CalculatingColors-4.png" src="../_images/Colors-CalculatingColors-4.png"/>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="nx">title</span><span class="o">=</span><span class="s2">"CCI line gradient"</span><span class="p">,</span><span class="w"> </span><span class="nx">precision</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="nx">timeframe</span><span class="o">=</span><span class="s2">""</span><span class="p">)</span><span class="w"></span>
+<span class="k">var color </span><span class="nx">GOLD_COLOR</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="l">#CCCC00</span><span class="w"></span>
+<span class="k">var color </span><span class="nx">VIOLET_COLOR</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="l">#AA00FF</span><span class="w"></span>
+<span class="k">var color </span><span class="nx">GREEN_BG_COLOR</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">color.new</span><span class="p">(</span><span class="ni">color.green</span><span class="p">,</span><span class="w"> </span><span class="mi">70</span><span class="p">)</span><span class="w"></span>
+<span class="k">var color </span><span class="nx">RED_BG_COLOR</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="ni">color.new</span><span class="p">(</span><span class="ni">color.maroon</span><span class="p">,</span><span class="w"> </span><span class="mi">70</span><span class="p">)</span><span class="w"></span>
+<span class="k">float </span><span class="nx">srcInput</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="ni">input.source</span><span class="p">(</span><span class="no">close</span><span class="p">,</span><span class="w"> </span><span class="s2">"Source"</span><span class="p">)</span><span class="w"></span>
+<span class="k">int </span><span class="w">  </span><span class="nx">lenInput</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="ni">input.int</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="s2">"Length"</span><span class="p">,</span><span class="w"> </span><span class="nx">minval</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span><span class="p">)</span><span class="w"></span>
+<span class="k">int </span><span class="w">  </span><span class="nx">stepsInput</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="ni">input.int</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span><span class="w"> </span><span class="s2">"Gradient levels"</span><span class="p">,</span><span class="w"> </span><span class="nx">minval</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"></span>
+<span class="k">color </span><span class="nx">bullColorInput</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="ni">input.color</span><span class="p">(</span><span class="nx">GOLD_COLOR</span><span class="p">,</span><span class="w"> </span><span class="s2">"Line: Bull"</span><span class="p">,</span><span class="w"> </span><span class="nx">inline</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"11"</span><span class="p">)</span><span class="w"></span>
+<span class="k">color </span><span class="nx">bearColorInput</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="ni">input.color</span><span class="p">(</span><span class="nx">VIOLET_COLOR</span><span class="p">,</span><span class="w"> </span><span class="s2">"Bear"</span><span class="p">,</span><span class="w"> </span><span class="nx">inline</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"11"</span><span class="p">)</span><span class="w"></span>
+<span class="k">color </span><span class="nx">bullBgColorInput</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">input.color</span><span class="p">(</span><span class="nx">GREEN_BG_COLOR</span><span class="p">,</span><span class="w"> </span><span class="s2">"Background: Bull"</span><span class="p">,</span><span class="w"> </span><span class="nx">inline</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"12"</span><span class="p">)</span><span class="w"></span>
+<span class="k">color </span><span class="nx">bearBgColorInput</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">input.color</span><span class="p">(</span><span class="nx">RED_BG_COLOR</span><span class="p">,</span><span class="w"> </span><span class="s2">"Bear"</span><span class="p">,</span><span class="w"> </span><span class="nx">inline</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"12"</span><span class="p">)</span><span class="w"></span>
+
+<span class="c">// Plot colored signal line.</span><span class="w"></span>
+<span class="k">float </span><span class="nx">signal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">ta.cci</span><span class="p">(</span><span class="nx">srcInput</span><span class="p">,</span><span class="w"> </span><span class="nx">lenInput</span><span class="p">)</span><span class="w"></span>
+<span class="k">color </span><span class="nx">signalColor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">color.from_gradient</span><span class="p">(</span><span class="nx">signal</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mi">200</span><span class="p">,</span><span class="w"> </span><span class="mi">200</span><span class="p">,</span><span class="w"> </span><span class="ni">color.new</span><span class="p">(</span><span class="nx">bearColorInput</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">),</span><span class="w"> </span><span class="ni">color.new</span><span class="p">(</span><span class="nx">bullColorInput</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">))</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="nx">signal</span><span class="p">,</span><span class="w"> </span><span class="s2">"CCI"</span><span class="p">,</span><span class="w"> </span><span class="nx">signalColor</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"></span>
+
+<span class="c">// Detect crosses of the centerline.</span><span class="w"></span>
+<span class="k">bool </span><span class="nx">signalX</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">ta.cross</span><span class="p">(</span><span class="nx">signal</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="c">// Count no of bars since cross. Capping it to the no of steps from inputs.</span><span class="w"></span>
+<span class="k">int </span><span class="nx">gradientStep</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">math.min</span><span class="p">(</span><span class="nx">stepsInput</span><span class="p">,</span><span class="w"> </span><span class="ni">nz</span><span class="p">(</span><span class="ni">ta.barssince</span><span class="p">(</span><span class="nx">signalX</span><span class="p">)))</span><span class="w"></span>
+<span class="c">// Choose bull/bear end color for the gradient.</span><span class="w"></span>
+<span class="k">color </span><span class="nx">endColor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">signal</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="nx">bullBgColorInput</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="nx">bearBgColorInput</span><span class="w"></span>
+<span class="c">// Get color from gradient going from no color to `c_endColor`</span><span class="w"></span>
+<span class="k">color </span><span class="nx">bandColor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">color.from_gradient</span><span class="p">(</span><span class="nx">gradientStep</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nx">stepsInput</span><span class="p">,</span><span class="w"> </span><span class="no">na</span><span class="p">,</span><span class="w"> </span><span class="nx">endColor</span><span class="p">)</span><span class="w"></span>
+<span class="nx">bandTopPlotID</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">hline</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span><span class="w">  </span><span class="s2">"Upper Band"</span><span class="p">,</span><span class="w"> </span><span class="ni">color.silver</span><span class="p">,</span><span class="w"> </span><span class="ni">hline.style_dashed</span><span class="p">)</span><span class="w"></span>
+<span class="nx">bandBotPlotID</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">hline</span><span class="p">(</span><span class="o">-</span><span class="mi">100</span><span class="p">,</span><span class="w"> </span><span class="s2">"Lower Band"</span><span class="p">,</span><span class="w"> </span><span class="ni">color.silver</span><span class="p">,</span><span class="w"> </span><span class="ni">hline.style_dashed</span><span class="p">)</span><span class="w"></span>
+<span class="ni">fill</span><span class="p">(</span><span class="nx">bandTopPlotID</span><span class="p">,</span><span class="w"> </span><span class="nx">bandBotPlotID</span><span class="p">,</span><span class="w"> </span><span class="nx">bandColor</span><span class="p">,</span><span class="w"> </span><span class="nx">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"Band"</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Note that:</p>
+<ul class="simple">
+<li>The signal plot uses the same base colors and gradient as in our previous example.
+We have however increased the width of the line from the default 1 to 2.
+It is the most important component of our visuals; increasing its width is a way to give it more prominence,
+and ensure users are not distracted by the band, which has become busier than it was in its original, flat beige color.</li>
+<li>The fill must remain unobtrusive for two reasons. First, it is of secondary importance to the visuals, as it provides complementary information, i.e.,
+the duration for which the signal has been in bull/bear territory. Second, since fills have a greater z-index than plots,
+the fill will cover the signal plot. For these reasons, we make the fill’s base colors fairly transparent, at 70, so they do not mask the plots.
+The gradient used for the band starts with no color at all
+(see the <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_na">na</a> used as the argument to <code class="docutils literal notranslate"><span class="pre">bottom_color</span></code> in the
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_color{dot}from_gradient">color.from_gradient()</a> call),
+and goes to the base bull/bear colors from the inputs, which the conditional, <code class="docutils literal notranslate"><span class="pre">c_endColor</span></code> color variable contains.</li>
+<li>We provide users with distinct bull/bear color selections for the line and the band.</li>
+<li>When we calculate the <code class="docutils literal notranslate"><span class="pre">gradientStep</span></code> variable, we use <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_nz">nz()</a> on
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_ta{dot}barssince">ta.barssince()</a> because in early bars of the dataset,
+when the condition tested has not occurred yet, <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_ta{dot}barssince">ta.barssince()</a>
+will return <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_na">na</a>.
+Because we use <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_nz">nz()</a>, the value returned is replaced with zero in those cases.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="mixing-transparencies">
+<h2><a class="toc-backref" href="#id10">Mixing transparencies</a><a class="headerlink" href="#mixing-transparencies" title="Permalink to this headline">¶</a></h2>
+<p>In this example we take our CCI indicator in another direction. We will build dynamically adjusting extremes zone buffers using a Donchian Channel (historical highs/lows) calculated from the CCI.
+We build the top/bottom bands by making them 1/4 the height of the DC. We will use a dynamically adjusting lookback to calculate the DC.
+To modulate the lookback, we will calculate a simple measure of volatility by keeping a ratio of a short-period ATR to a long one.
+When that ratio is higher than 50 of its last 100 values, we consider the volatility high. When the volatility is high/low, we decrease/increase the lookback.</p>
+<p>Our aim is to provide users of our indicator with:</p>
+<ul class="simple">
+<li>The CCI line colored using a bull/bear gradient, as we illustrated in our most recent examples.</li>
+<li>The top and bottom bands of the Donchian Channel, filled in such a way that their color darkens as a historical high/low becomes older and older.</li>
+<li>A way to appreciate the state of our volatility measure, which we will do by painting the background with one color whose intensity increases when volatility increases.</li>
+</ul>
+<p>This is what our indicator looks like using the light theme:</p>
+<img alt="../_images/Colors-MixingTransparencies-1.png" src="../_images/Colors-MixingTransparencies-1.png"/>
+<p>And with the dark theme:</p>
+<img alt="../_images/Colors-MixingTransparencies-2.png" src="../_images/Colors-MixingTransparencies-2.png"/>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"CCI DC"</span><span class="p">,</span><span class="w"> </span><span class="nx">precision</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">6</span><span class="p">)</span><span class="w"></span>
+<span class="k">color </span><span class="nx">GOLD_COLOR</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="l">#CCCC00ff</span><span class="w"></span>
+<span class="k">color </span><span class="nx">VIOLET_COLOR</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="l">#AA00FFff</span><span class="w"></span>
+<span class="k">int </span><span class="nx">lengthInput</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">input.int</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="s2">"Length"</span><span class="p">,</span><span class="w"> </span><span class="nx">minval</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span><span class="p">)</span><span class="w"></span>
+<span class="k">color </span><span class="nx">bullColorInput</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">input.color</span><span class="p">(</span><span class="nx">GOLD_COLOR</span><span class="p">,</span><span class="w">   </span><span class="s2">"Bull"</span><span class="p">)</span><span class="w"></span>
+<span class="k">color </span><span class="nx">bearColorInput</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">input.color</span><span class="p">(</span><span class="nx">VIOLET_COLOR</span><span class="p">,</span><span class="w"> </span><span class="s2">"Bear"</span><span class="p">)</span><span class="w"></span>
+
+<span class="c">// ————— Function clamps `val` between `min` and `max`.</span><span class="w"></span>
+<span class="nx">clamp</span><span class="p">(</span><span class="nx">val</span><span class="p">,</span><span class="w"> </span><span class="nx">min</span><span class="p">,</span><span class="w"> </span><span class="nx">max</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"></span>
+<span class="w">    </span><span class="ni">math.max</span><span class="p">(</span><span class="nx">min</span><span class="p">,</span><span class="w"> </span><span class="ni">math.min</span><span class="p">(</span><span class="nx">max</span><span class="p">,</span><span class="w"> </span><span class="nx">val</span><span class="p">))</span><span class="w"></span>
+
+<span class="c">// ————— Volatility expressed as 0-100 value.</span><span class="w"></span>
+<span class="k">float </span><span class="nx">v</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">ta.atr</span><span class="p">(</span><span class="nx">lengthInput</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">5</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="ni">ta.atr</span><span class="p">(</span><span class="nx">lengthInput</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">5</span><span class="p">)</span><span class="w"></span>
+<span class="k">float </span><span class="nx">vPct</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">ta.percentrank</span><span class="p">(</span><span class="nx">v</span><span class="p">,</span><span class="w"> </span><span class="nx">lengthInput</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">5</span><span class="p">)</span><span class="w"></span>
+
+<span class="c">// ————— Calculate dynamic lookback for DC. It increases/decreases on low/high volatility.</span><span class="w"></span>
+<span class="k">bool </span><span class="nx">highVolatility</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">vPct</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">50</span><span class="w"></span>
+<span class="k">var int </span><span class="nx">lookBackMin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">lengthInput</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">2</span><span class="w"></span>
+<span class="k">var int </span><span class="nx">lookBackMax</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">lengthInput</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">10</span><span class="w"></span>
+<span class="k">var float </span><span class="nx">lookBack</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">math.avg</span><span class="p">(</span><span class="nx">lookBackMin</span><span class="p">,</span><span class="w"> </span><span class="nx">lookBackMax</span><span class="p">)</span><span class="w"></span>
+<span class="nx">lookBack</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="nx">highVolatility</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="o">-</span><span class="mi">2</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mi">2</span><span class="w"></span>
+<span class="nx">lookBack</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">clamp</span><span class="p">(</span><span class="nx">lookBack</span><span class="p">,</span><span class="w"> </span><span class="nx">lookBackMin</span><span class="p">,</span><span class="w"> </span><span class="nx">lookBackMax</span><span class="p">)</span><span class="w"></span>
+
+<span class="c">// ————— Dynamic lookback length Donchian channel of signal.</span><span class="w"></span>
+<span class="k">float </span><span class="nx">signal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">ta.cci</span><span class="p">(</span><span class="no">close</span><span class="p">,</span><span class="w"> </span><span class="nx">lengthInput</span><span class="p">)</span><span class="w"></span>
+<span class="c">// `lookBack` is a float; need to cast it to int to be used a length.</span><span class="w"></span>
+<span class="k">float </span><span class="nx">hiTop</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="ni">ta.highest</span><span class="p">(</span><span class="nx">signal</span><span class="p">,</span><span class="w"> </span><span class="ni">int</span><span class="p">(</span><span class="nx">lookBack</span><span class="p">))</span><span class="w"></span>
+<span class="k">float </span><span class="nx">loBot</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="ni">ta.lowest</span><span class="p">(</span><span class="w"> </span><span class="nx">signal</span><span class="p">,</span><span class="w"> </span><span class="ni">int</span><span class="p">(</span><span class="nx">lookBack</span><span class="p">))</span><span class="w"></span>
+<span class="c">// Get margin of 25% of the DC height to build high and low bands.</span><span class="w"></span>
+<span class="k">float </span><span class="nx">margin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nx">hiTop</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nx">loBot</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">4</span><span class="w"></span>
+<span class="k">float </span><span class="nx">hiBot</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="nx">hiTop</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nx">margin</span><span class="w"></span>
+<span class="k">float </span><span class="nx">loTop</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="nx">loBot</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">margin</span><span class="w"></span>
+<span class="c">// Center of DC.</span><span class="w"></span>
+<span class="k">float </span><span class="nx">center</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">math.avg</span><span class="p">(</span><span class="nx">hiTop</span><span class="p">,</span><span class="w"> </span><span class="nx">loBot</span><span class="p">)</span><span class="w"></span>
+
+<span class="c">// ————— Create colors.</span><span class="w"></span>
+<span class="k">color </span><span class="nx">signalColor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">color.from_gradient</span><span class="p">(</span><span class="nx">signal</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mi">200</span><span class="p">,</span><span class="w"> </span><span class="mi">200</span><span class="p">,</span><span class="w"> </span><span class="nx">bearColorInput</span><span class="p">,</span><span class="w"> </span><span class="nx">bullColorInput</span><span class="p">)</span><span class="w"></span>
+<span class="c">// Bands: Calculate transparencies so the longer since the hi/lo has changed,</span><span class="w"></span>
+<span class="c">//        the darker the color becomes. Cap highest transparency to 90.</span><span class="w"></span>
+<span class="k">float </span><span class="nx">hiTransp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">clamp</span><span class="p">(</span><span class="mi">100</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="p">(</span><span class="mi">100</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="ni">math.max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="ni">nz</span><span class="p">(</span><span class="ni">ta.barssince</span><span class="p">(</span><span class="ni">ta.change</span><span class="p">(</span><span class="nx">hiTop</span><span class="p">))</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">))</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">255</span><span class="p">),</span><span class="w"> </span><span class="mi">60</span><span class="p">,</span><span class="w"> </span><span class="mi">90</span><span class="p">)</span><span class="w"></span>
+<span class="k">float </span><span class="nx">loTransp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">clamp</span><span class="p">(</span><span class="mi">100</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="p">(</span><span class="mi">100</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="ni">math.max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="ni">nz</span><span class="p">(</span><span class="ni">ta.barssince</span><span class="p">(</span><span class="ni">ta.change</span><span class="p">(</span><span class="nx">loBot</span><span class="p">))</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">))</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">255</span><span class="p">),</span><span class="w"> </span><span class="mi">60</span><span class="p">,</span><span class="w"> </span><span class="mi">90</span><span class="p">)</span><span class="w"></span>
+<span class="k">color </span><span class="nx">hiColor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">color.new</span><span class="p">(</span><span class="nx">bullColorInput</span><span class="p">,</span><span class="w"> </span><span class="nx">hiTransp</span><span class="p">)</span><span class="w"></span>
+<span class="k">color </span><span class="nx">loColor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">color.new</span><span class="p">(</span><span class="nx">bearColorInput</span><span class="p">,</span><span class="w"> </span><span class="nx">loTransp</span><span class="p">)</span><span class="w"></span>
+<span class="c">// Background: Rescale the 0-100 range of `vPct` to 0-25 to create 75-100 transparencies.</span><span class="w"></span>
+<span class="k">color </span><span class="nx">bgColor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">color.new</span><span class="p">(</span><span class="ni">color.gray</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="p">(</span><span class="nx">vPct</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">4</span><span class="p">))</span><span class="w"></span>
+
+<span class="c">// ————— Plots</span><span class="w"></span>
+<span class="c">// Invisible lines for band fills.</span><span class="w"></span>
+<span class="nx">hiTopPlotID</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">plot</span><span class="p">(</span><span class="nx">hiTop</span><span class="p">,</span><span class="w"> </span><span class="k">color </span><span class="o">=</span><span class="w"> </span><span class="no">na</span><span class="p">)</span><span class="w"></span>
+<span class="nx">hiBotPlotID</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">plot</span><span class="p">(</span><span class="nx">hiBot</span><span class="p">,</span><span class="w"> </span><span class="k">color </span><span class="o">=</span><span class="w"> </span><span class="no">na</span><span class="p">)</span><span class="w"></span>
+<span class="nx">loTopPlotID</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">plot</span><span class="p">(</span><span class="nx">loTop</span><span class="p">,</span><span class="w"> </span><span class="k">color </span><span class="o">=</span><span class="w"> </span><span class="no">na</span><span class="p">)</span><span class="w"></span>
+<span class="nx">loBotPlotID</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">plot</span><span class="p">(</span><span class="nx">loBot</span><span class="p">,</span><span class="w"> </span><span class="k">color </span><span class="o">=</span><span class="w"> </span><span class="no">na</span><span class="p">)</span><span class="w"></span>
+<span class="c">// Plot signal and centerline.</span><span class="w"></span>
+<span class="nx">p_signal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">plot</span><span class="p">(</span><span class="nx">signal</span><span class="p">,</span><span class="w"> </span><span class="s2">"CCI"</span><span class="p">,</span><span class="w"> </span><span class="nx">signalColor</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="nx">center</span><span class="p">,</span><span class="w"> </span><span class="s2">"Centerline"</span><span class="p">,</span><span class="w"> </span><span class="ni">color.silver</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"></span>
+
+<span class="c">// Fill the bands.</span><span class="w"></span>
+<span class="ni">fill</span><span class="p">(</span><span class="nx">hiTopPlotID</span><span class="p">,</span><span class="w"> </span><span class="nx">hiBotPlotID</span><span class="p">,</span><span class="w"> </span><span class="nx">hiColor</span><span class="p">)</span><span class="w"></span>
+<span class="ni">fill</span><span class="p">(</span><span class="nx">loTopPlotID</span><span class="p">,</span><span class="w"> </span><span class="nx">loBotPlotID</span><span class="p">,</span><span class="w"> </span><span class="nx">loColor</span><span class="p">)</span><span class="w"></span>
+
+<span class="c">// ————— Background.</span><span class="w"></span>
+<span class="ni">bgcolor</span><span class="p">(</span><span class="nx">bgColor</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Note that:</p>
+<ul class="simple">
+<li>We clamp the transparency of the background to a 100-75 range so that it doesn’t overwhelm. We also use a neutral color that will not distract too much. The darker the background is, the higher our measure of volatility.</li>
+<li>We also clamp the transparency values for the band fills between 60 and 90.
+We use 90 so that when a new high/low is found and the gradient resets, the starting transparency makes the color somewhat visible.
+We do not use a transparency lower than 60 because we don’t want those bands to hide the signal line.</li>
+<li>We use the very handy <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_ta{dot}percentrank">ta.percentrank()</a> function
+to generate a 0-100 value from our ATR ratio measuring volatility.
+It is useful to convert values whose scale is unknown into known values that can be used to produce transparencies.</li>
+<li>Because we must clamp values three times in our script, we wrote an <code class="docutils literal notranslate"><span class="pre">f_clamp()</span></code> function, instead of explicitly coding the logic three times.</li>
+</ul>
+</div>
+<div class="section" id="tips">
+<h2><a class="toc-backref" href="#id11">Tips</a><a class="headerlink" href="#tips" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="designing-usable-colors-schemes">
+<h3><a class="toc-backref" href="#id12">Designing usable colors schemes</a><a class="headerlink" href="#designing-usable-colors-schemes" title="Permalink to this headline">¶</a></h3>
+<p>If you write scripts intended for other traders, try to avoid colors that will not work well in some environments,
+whether it be for plots, labels, tables or fills. At a minimum, test your visuals to ensure they perform satisfactorily with both the light and dark TradingView themes;
+they are the most commonly used. Colors such as black and white, for example, should be avoided.</p>
+<p>Build the appropriate inputs to provide script users the flexibility to adapt your script’s visuals to their particular environments.</p>
+<p>Take care to build a visual hierarchy of the colors you use that matches the relative importance of your script’s visual components.
+Good designers understand how to achieve the optimal balance of color and weight so the eye is naturally drawn to the most important elements of the design.
+When you make everything stand out, nothing does. Make room for some elements to stand out by toning down the visuals surrounding it.</p>
+<p>Providing a selection of color presets in your inputs — rather than a single color that can be changed — can help color-challenged users.
+Our <a class="reference external" href="https://www.tradingview.com/script/Jdw7wW2g-Technical-Ratings/">Technical Ratings</a> demonstrates one way of achieving this.
+The <a class="reference external" href="https://www.tradingview.com/script/yyDYIrRQ-Pine-Color-Magic-and-Chart-Theme-Simulator/">Pine Script™ Color Magic and Chart Theme Simulator</a> script provides a good selection of base colors to build from.</p>
+</div>
+<div class="section" id="plot-crisp-lines">
+<h3><a class="toc-backref" href="#id13">Plot crisp lines</a><a class="headerlink" href="#plot-crisp-lines" title="Permalink to this headline">¶</a></h3>
+<p>It is best to use zero transparency to plot the important lines in your visuals, to keep them crisp.
+This way, they will show through fills more precisely. Keep in mind that fills have a higher z-index than plots, so they are placed on top of them.
+A slight increase of a line’s width can also go a long way in making it stand out.</p>
+<p>If you want a special plot to stand out, you can also give it more importance by using multiple plots for the same line.
+These are examples where we modulate the successive width and transparency of plots to achieve this:</p>
+<img alt="../_images/Colors-PlotCrispLines-1.png" src="../_images/Colors-PlotCrispLines-1.png"/>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="no">high</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="ni">color.new</span><span class="p">(</span><span class="ni">color.orange</span><span class="p">,</span><span class="w"> </span><span class="mi">80</span><span class="p">),</span><span class="w"> </span><span class="mi">8</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="no">high</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="ni">color.new</span><span class="p">(</span><span class="ni">color.orange</span><span class="p">,</span><span class="w"> </span><span class="mi">60</span><span class="p">),</span><span class="w"> </span><span class="mi">4</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="no">high</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="ni">color.new</span><span class="p">(</span><span class="ni">color.orange</span><span class="p">,</span><span class="w"> </span><span class="mi">00</span><span class="p">),</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"></span>
+
+<span class="ni">plot</span><span class="p">(</span><span class="no">hl2</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="ni">color.new</span><span class="p">(</span><span class="ni">color.orange</span><span class="p">,</span><span class="w"> </span><span class="mi">60</span><span class="p">),</span><span class="w"> </span><span class="mi">4</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="no">hl2</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="ni">color.new</span><span class="p">(</span><span class="ni">color.orange</span><span class="p">,</span><span class="w"> </span><span class="mi">00</span><span class="p">),</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"></span>
+
+<span class="ni">plot</span><span class="p">(</span><span class="no">low</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="ni">color.new</span><span class="p">(</span><span class="ni">color.orange</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">),</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="customize-gradients">
+<h3><a class="toc-backref" href="#id14">Customize gradients</a><a class="headerlink" href="#customize-gradients" title="Permalink to this headline">¶</a></h3>
+<p>When building gradients, adapt them to the visuals they apply to. If you are using a gradient to color candles, for example,
+it is usually best to limit the number of steps in the gradient to ten or less, as it is more difficult for the eye to perceive intensity variations of discrete objects.
+As we did in our examples, cap minimum and maximum transparency levels so your visual elements remain visible and do not overwhelm when it’s not necessary.</p>
+</div>
+<div class="section" id="color-selection-through-script-settings">
+<span id="stylecolors"></span><h3><a class="toc-backref" href="#id15">Color selection through script settings</a><a class="headerlink" href="#color-selection-through-script-settings" title="Permalink to this headline">¶</a></h3>
+<p>The type of color you use in your scripts has an impact on how users of your script will be able to change the colors of your script’s visuals.
+As long as you don’t use colors whose RGBA components have to be calculated at runtime, script users will be able to modify the colors you use by going to your script’s “Settings/Style” tab.
+Our first example script on this page meets that criteria, and the following screenshot shows how we used the script’s “Settings/Style” tab to change the color of the first moving average:</p>
+<img alt="../_images/Colors-ColorsSelection-1.png" src="../_images/Colors-ColorsSelection-1.png"/>
+<p>If your script uses a calculated color, i.e., a color where at least one of its RGBA components can only be known at runtime,
+then the “Settings/Style” tab will NOT offer users the usual color widgets they can use to modify your plot colors.
+Plots of the same script not using calculated colors will also be affected. In this script, for example,
+our first <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plot">plot()</a> call uses a calculated color, and the second one doesn’t:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"Calculated colors"</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="nx">true</span><span class="p">)</span><span class="w"></span>
+<span class="k">float </span><span class="nx">ma</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">ta.sma</span><span class="p">(</span><span class="no">close</span><span class="p">,</span><span class="w"> </span><span class="mi">20</span><span class="p">)</span><span class="w"></span>
+<span class="k">float </span><span class="nx">maHeight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">ta.percentrank</span><span class="p">(</span><span class="nx">ma</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">)</span><span class="w"></span>
+<span class="k">float </span><span class="nx">transparency</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">math.min</span><span class="p">(</span><span class="mi">80</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nx">maHeight</span><span class="p">)</span><span class="w"></span>
+<span class="c">// This plot uses a calculated color.</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="nx">ma</span><span class="p">,</span><span class="w"> </span><span class="s2">"MA1"</span><span class="p">,</span><span class="w"> </span><span class="ni">color.rgb</span><span class="p">(</span><span class="mi">156</span><span class="p">,</span><span class="w"> </span><span class="mi">39</span><span class="p">,</span><span class="w"> </span><span class="mi">176</span><span class="p">,</span><span class="w"> </span><span class="nx">transparency</span><span class="p">),</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"></span>
+<span class="c">// This plot does not use a calculated color.</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="no">close</span><span class="p">,</span><span class="w"> </span><span class="s2">"Close"</span><span class="p">,</span><span class="w"> </span><span class="ni">color.blue</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>The color used in the first plot is a calculated color because its transparency can only be known at runtime.
+It is calculated using the relative position of the moving average in relation to its past 100 values.
+The greater percentage of past values are below the current value, the higher the 0-100 value of <code class="docutils literal notranslate"><span class="pre">maHeight</span></code> will be.
+Since we want the color to be the darkest when <code class="docutils literal notranslate"><span class="pre">maHeight</span></code> is 100, we subtract 100 from it to obtain the zero transparency then.
+We also cap the calculated <code class="docutils literal notranslate"><span class="pre">transparency</span></code> value to a maximum of 80 so that it always remains visible.</p>
+<p>Because that calculated color is used in our script, the “Settings/Style” tab will not show any color widgets:</p>
+<img alt="../_images/Colors-ColorsSelection-2.png" src="../_images/Colors-ColorsSelection-2.png"/>
+<p>The solution to enable script users to control the colors used is to supply them with custom inputs, as we do here:</p>
+<img alt="../_images/Colors-ColorsSelection-3.png" src="../_images/Colors-ColorsSelection-3.png"/>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"Calculated colors"</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="nx">true</span><span class="p">)</span><span class="w"></span>
+<span class="k">color </span><span class="nx">maInput</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">input.color</span><span class="p">(</span><span class="ni">color.purple</span><span class="p">,</span><span class="w"> </span><span class="s2">"MA"</span><span class="p">)</span><span class="w"></span>
+<span class="k">color </span><span class="nx">closeInput</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">input.color</span><span class="p">(</span><span class="ni">color.blue</span><span class="p">,</span><span class="w"> </span><span class="s2">"Close"</span><span class="p">)</span><span class="w"></span>
+<span class="k">float </span><span class="nx">ma</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">ta.sma</span><span class="p">(</span><span class="no">close</span><span class="p">,</span><span class="w"> </span><span class="mi">20</span><span class="p">)</span><span class="w"></span>
+<span class="k">float </span><span class="nx">maHeight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">ta.percentrank</span><span class="p">(</span><span class="nx">ma</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">)</span><span class="w"></span>
+<span class="k">float </span><span class="nx">transparency</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">math.min</span><span class="p">(</span><span class="mi">80</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nx">maHeight</span><span class="p">)</span><span class="w"></span>
+<span class="c">// This plot uses a calculated color.</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="nx">ma</span><span class="p">,</span><span class="w"> </span><span class="s2">"MA1"</span><span class="p">,</span><span class="w"> </span><span class="ni">color.new</span><span class="p">(</span><span class="nx">maInput</span><span class="p">,</span><span class="w"> </span><span class="nx">transparency</span><span class="p">),</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"></span>
+<span class="c">// This plot does not use a calculated color.</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="no">close</span><span class="p">,</span><span class="w"> </span><span class="s2">"Close"</span><span class="p">,</span><span class="w"> </span><span class="nx">closeInput</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Notice how our script’s “Settings” now show an “Inputs” tab, where we have created two color inputs.
+The first one uses <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_color{dot}purple">color.purple</a> as its default value.
+Whether the script user changes that color or not,
+it will then be used in a <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_color{dot}new">color.new()</a> call
+to generate a calculated transparency in the <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plot">plot()</a> call.
+The second input uses as its default the built-in <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_color{dot}blue">color.blue</a> color
+we previously used in the <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plot">plot()</a> call,
+and simply use it as is in the second <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plot">plot()</a> call.</p>
+<a class="reference external image-reference" href="https://www.tradingview.com/"><div align="center" class="align-center"><img alt="../_images/TradingView-Logo-Block.svg" src="../_images/TradingView-Logo-Block.svg" width="200px"/></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="footer-relations">
+<div class="pull-left">
+<a class="btn btn-default" href="Chart_information.html" title="previous chapter (use the left arrow)">Chart information</a>
+</div>
+<div class="pull-right">
+<a class="btn btn-default" href="Fills.html" title="next chapter (use the right arrow)">Fills</a>
+</div>
+</div>
+<div class="clearer"></div>
+</div>

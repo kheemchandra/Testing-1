@@ -1,0 +1,53 @@
+<div id="right-column">
+<div aria-label="breadcrumbs navigation" role="navigation">
+<ol class="breadcrumb">
+<li><a href="../index.html">User Manual</a></li>
+<li><a href="index.html">Concepts</a></li>
+<li>Bar coloring</li>
+</ol>
+</div>
+<div class="document clearer body">
+<a class="reference external image-reference" href="https://www.tradingview.com/pine-script-docs/en/v5/Introduction.html"><div align="right" class="align-right"><img alt="Pine Script™ logo" height="100" src="../_images/Pine_Script_logo.svg" width="100"/></div>
+</a>
+<div class="section" id="bar-coloring">
+<span id="pagebarcoloring"></span><h1>Bar coloring<a class="headerlink" href="#bar-coloring" title="Permalink to this headline">¶</a></h1>
+<p>The <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_barcolor">barcolor()</a> function lets you color chart bars.
+It is the only Pine Script™ function that allows a script running in a pane to affect the chart.</p>
+<p>The function’s signature is:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="ni">barcolor</span><span class="p">(</span><span class="ni">color</span><span class="p">,</span><span class="w"> </span><span class="nx">offset</span><span class="p">,</span><span class="w"> </span><span class="nx">editable</span><span class="p">,</span><span class="w"> </span><span class="nx">show_last</span><span class="p">,</span><span class="w"> </span><span class="nx">title</span><span class="p">)</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="nx">void</span><span class="w"></span>
+</pre></div>
+</div>
+<p>The coloring can be conditional because the <code class="docutils literal notranslate"><span class="pre">color</span></code> parameter accepts “series color” arguments.</p>
+<p>The following script renders <em>inside</em> and <em>outside</em> bars in different colors:</p>
+<img alt="../_images/BarColoring-1.png" src="../_images/BarColoring-1.png"/>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"barcolor example"</span><span class="p">,</span><span class="w"> </span><span class="nx">overlay</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">true</span><span class="p">)</span><span class="w"></span>
+<span class="nx">isUp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">close</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="no">open</span><span class="w"></span>
+<span class="nx">isDown</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">close</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="no">open</span><span class="w"></span>
+<span class="nx">isOutsideUp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">high</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="no">high</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="w"> </span><span class="nx">and</span><span class="w"> </span><span class="no">low</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="no">low</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="w"> </span><span class="nx">and</span><span class="w"> </span><span class="nx">isUp</span><span class="w"></span>
+<span class="nx">isOutsideDown</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">high</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="no">high</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="w"> </span><span class="nx">and</span><span class="w"> </span><span class="no">low</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="no">low</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="w"> </span><span class="nx">and</span><span class="w"> </span><span class="nx">isDown</span><span class="w"></span>
+<span class="nx">isInside</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">high</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="no">high</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="w"> </span><span class="nx">and</span><span class="w"> </span><span class="no">low</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="no">low</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="w"></span>
+<span class="ni">barcolor</span><span class="p">(</span><span class="nx">isInside</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="ni">color.yellow</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="nx">isOutsideUp</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="ni">color.aqua</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="nx">isOutsideDown</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="ni">color.purple</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="no">na</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Note that:</p>
+<ul class="simple">
+<li>The <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_na">na</a> value leaves bars as is.</li>
+<li>In the <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_barcolor">barcolor()</a> call,
+we use embedded <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#op_{question}{colon}">?:</a>
+ternary operator expressions to select the color.</li>
+</ul>
+<a class="reference external image-reference" href="https://www.tradingview.com/"><div align="center" class="align-center"><img alt="../_images/TradingView-Logo-Block.svg" src="../_images/TradingView-Logo-Block.svg" width="200px"/></div>
+</a>
+</div>
+</div>
+<div class="footer-relations">
+<div class="pull-left">
+<a class="btn btn-default" href="Backgrounds.html" title="previous chapter (use the left arrow)">Backgrounds</a>
+</div>
+<div class="pull-right">
+<a class="btn btn-default" href="Bar_plotting.html" title="next chapter (use the right arrow)">Bar plotting</a>
+</div>
+</div>
+<div class="clearer"></div>
+</div>

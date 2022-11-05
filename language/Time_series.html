@@ -1,0 +1,78 @@
+<div id="right-column">
+<div aria-label="breadcrumbs navigation" role="navigation">
+<ol class="breadcrumb">
+<li><a href="../index.html">User Manual</a></li>
+<li><a href="index.html">Language</a></li>
+<li>Time series</li>
+</ol>
+</div>
+<div class="document clearer body">
+<a class="reference external image-reference" href="https://www.tradingview.com/pine-script-docs/en/v5/Introduction.html"><div align="right" class="align-right"><img alt="Pine Script™ logo" height="100" src="../_images/Pine_Script_logo.svg" width="100"/></div>
+</a>
+<div class="section" id="time-series">
+<span id="pagetimeseries"></span><h1>Time series<a class="headerlink" href="#time-series" title="Permalink to this headline">¶</a></h1>
+<p>Much of the power of Pine Script™ stems from the fact that it is designed to process <em>time series</em> efficiently.
+Time series are not a form or a type; they are the fundamental structure Pine Script™ uses to store the successive values of a variable over time,
+where each value is tethered to a point in time. Since charts are composed of bars, each representing a particular point in time,
+time series are the ideal data structure to work with values that may change with time.</p>
+<p>The notion of time series is intimately linked to Pine Script™’s <a class="reference internal" href="Execution_model.html#pageexecutionmodel"><span class="std std-ref">execution model</span></a> and <a class="reference internal" href="Type_system.html#pagetypesystem"><span class="std std-ref">type system</span></a> concepts.
+Understanding all three is key to making the most of the power of Pine Script™.</p>
+<p>Take the built-in <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_open">open</a> variable,
+which contains the “open” price of each bar in the dataset, the <em>dataset</em> being all the bars on any given chart.
+If your script is running on a 5min chart, then each value in the <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_open">open</a>
+time series is the “open” price of the consecutive 5min chart bars.
+When your script refers to <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_open">open</a>,
+it is referring to the “open” price of the bar the script is executing on. To refer to past values in a time series,
+we use the <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#op_[]">[]</a> history-referencing operator.
+When a script is executing on a given bar, <code class="docutils literal notranslate"><span class="pre">open[1]</span></code> refers to the value of the <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_open">open</a>
+time series on the previous bar.</p>
+<p>While time series may remind programmers of arrays, they are totally different.
+Pine Script™ does use an array data structure, but it is a completely different concept than a time series.</p>
+<p>Time series in Pine Script™, combined with its special type of runtime engine and built-in functions,
+are what makes it easy to compute the cumulative total of <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_close">close</a>
+values without using a <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#op_for">for</a> loop, with only <code class="docutils literal notranslate"><span class="pre">ta.cum(close)</span></code>.
+This is possible because although <code class="docutils literal notranslate"><span class="pre">ta.cum(close)</span></code> appears rather static in a script, it is in fact executed on each bar,
+so its value becomes increasingly larger as the <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_close">close</a>
+value of each new bar is added to it. When the script reaches the rightmost bar of the chart,
+<code class="docutils literal notranslate"><span class="pre">ta.cum(close)</span></code> returns the sum of the <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_close">close</a> value from all bars on the chart.</p>
+<p>Similarly, the mean of the difference between the last 14 <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_high">high</a>
+and <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_low">low</a> values can be expressed as <code class="docutils literal notranslate"><span class="pre">ta.sma(high</span> <span class="pre">-</span> <span class="pre">low,</span> <span class="pre">14)</span></code>,
+or the distance in bars since the last time the chart made five consecutive higher highs as <code class="docutils literal notranslate"><span class="pre">barssince(rising(high,</span> <span class="pre">5))</span></code>.</p>
+<p>Even the result of function calls on successive bars leaves a trace of values in a time series that can be referenced using the
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#op_[]">[]</a> history-referencing operator.
+This can be useful, for example, when testing the <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_close">close</a>
+of the current bar for a breach of the highest <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_high">high</a>
+in the last 10 bars, but excluding the current bar, which we could write as <code class="docutils literal notranslate"><span class="pre">breach</span> <span class="pre">=</span> <span class="pre">close</span> <span class="pre">&gt;</span> <span class="pre">highest(close,</span> <span class="pre">10)[1]</span></code>.
+The same statement could also be written as <code class="docutils literal notranslate"><span class="pre">breach</span> <span class="pre">=</span> <span class="pre">close</span> <span class="pre">&gt;</span> <span class="pre">highest(close[1],</span> <span class="pre">10)</span></code>.</p>
+<p>The same looping logic on all bars is applied to function calls such as <code class="docutils literal notranslate"><span class="pre">plot(open)</span></code>
+which will repeat on each bar, successively plotting on the chart the value of <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_high">open</a>
+for each bar.</p>
+<p>Do not confuse “time series” with the “series” form.
+The <em>time series</em> concept explains how consecutive values of variables are stored in Pine Script™; the “series” form denotes variables whose values can change bar to bar.
+Consider, for example, the <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_timeframe{dot}period">timeframe.period</a>
+built-in variable which is of form “simple” and type “string”, so “simple string”.
+The “simple” form entails that the variable’s value is known on bar zero (the first bar where the script executes)
+and will not change during the script’s execution on all the chart’s bars. The variable’s value is the chart’s timeframe in string format,
+so <code class="docutils literal notranslate"><span class="pre">"D"</span></code> for a 1D chart, for example. Even though its value cannot change during the script,
+it would be syntactically correct in Pine Script™ (though not very useful) to refer to its value 10 bars ago using <code class="docutils literal notranslate"><span class="pre">timeframe.period[10]</span></code>.
+This is possible because the successive values of <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_timeframe{dot}period">timeframe.period</a>
+for each bar are stored in a time series, even though all the values in that particular time series are similar.
+Note, however, that when the <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#op_[]">[]</a> operator is used to access past values of a variable,
+it yields a result of “series” form, even though the variable without an offset is of another form,
+such as “simple” in the case of <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_timeframe{dot}period">timeframe.period</a>.</p>
+<p>When you grasp how time series can be efficiently handled using Pine Script™’s syntax and its <a class="reference internal" href="Execution_model.html#pageexecutionmodel"><span class="std std-ref">execution model</span></a>,
+you can define complex calculations using little code.</p>
+<a class="reference external image-reference" href="https://www.tradingview.com/"><div align="center" class="align-center"><img alt="../_images/TradingView-Logo-Block.svg" src="../_images/TradingView-Logo-Block.svg" width="200px"/></div>
+</a>
+</div>
+</div>
+<div class="footer-relations">
+<div class="pull-left">
+<a class="btn btn-default" href="Execution_model.html" title="previous chapter (use the left arrow)">Execution model</a>
+</div>
+<div class="pull-right">
+<a class="btn btn-default" href="Script_structure.html" title="next chapter (use the right arrow)">Script structure</a>
+</div>
+</div>
+<div class="clearer"></div>
+</div>

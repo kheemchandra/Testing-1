@@ -1,0 +1,252 @@
+<div id="right-column">
+<div aria-label="breadcrumbs navigation" role="navigation">
+<ol class="breadcrumb">
+<li><a href="index.html">User Manual</a></li>
+<li>Error messages</li>
+</ol>
+</div>
+<div class="document clearer body">
+<a class="reference external image-reference" href="https://www.tradingview.com/pine-script-docs/en/v5/Introduction.html"><div align="right" class="align-right"><img alt="Pine Script™ logo" height="100" src="_images/Pine_Script_logo.svg" width="100"/></div>
+</a>
+<div class="section" id="error-messages">
+<span id="pageerrormessages"></span><h1>Error messages<a class="headerlink" href="#error-messages" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><a class="reference internal" href="#script-requesting-too-many-securities" id="id1">Script requesting too many securities</a></li>
+<li><a class="reference internal" href="#script-could-not-be-translated-from-null" id="id2">Script could not be translated from: null</a></li>
+<li><a class="reference internal" href="#line-2-no-viable-alternative-at-character" id="id3">line 2: no viable alternative at character ‘$’</a></li>
+<li><a class="reference internal" href="#mismatched-input-expecting" id="id4">Mismatched input &lt;…&gt; expecting &lt;???&gt;</a></li>
+<li><a class="reference internal" href="#loop-is-too-long-500-ms" id="id5">Loop is too long (&gt; 500 ms)</a></li>
+<li><a class="reference internal" href="#script-has-too-many-local-variables" id="id6">Script has too many local variables</a></li>
+<li><a class="reference internal" href="#pine-script-cannot-determine-the-referencing-length-of-a-series-try-using-max-bars-back-in-the-indicator-or-strategy-function" id="id7">Pine Script™ cannot determine the referencing length of a series. Try using max_bars_back in the indicator or strategy function</a></li>
+</ul>
+</div>
+<div class="section" id="script-requesting-too-many-securities">
+<h2><a class="toc-backref" href="#id1">Script requesting too many securities</a><a class="headerlink" href="#script-requesting-too-many-securities" title="Permalink to this headline">¶</a></h2>
+<p>The maximum number of securities in script is limited to 40. If you
+declare a variable as a <code class="docutils literal notranslate"><span class="pre">request.security</span></code> function call and then use that variable as
+input for other variables and calculations, it will not result in
+multiple <code class="docutils literal notranslate"><span class="pre">request.security</span></code> calls. But if you will declare a function that calls
+<code class="docutils literal notranslate"><span class="pre">request.security</span></code> — every call to this function will count as a <code class="docutils literal notranslate"><span class="pre">request.security</span></code> call.</p>
+<p>It is not easy to say how many securities will be called looking at the
+source code. Following example have exactly 3 calls to <code class="docutils literal notranslate"><span class="pre">request.security</span></code>
+after compilation:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"Securities count"</span><span class="p">)</span><span class="w"></span>
+<span class="nx">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">request.security</span><span class="p">(</span><span class="ni">syminfo.tickerid</span><span class="p">,</span><span class="w"> </span><span class="s1">'42'</span><span class="p">,</span><span class="w"> </span><span class="no">close</span><span class="p">)</span><span class="w">  </span><span class="c">// (1) first unique security call</span><span class="w"></span>
+<span class="nx">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">request.security</span><span class="p">(</span><span class="ni">syminfo.tickerid</span><span class="p">,</span><span class="w"> </span><span class="s1">'42'</span><span class="p">,</span><span class="w"> </span><span class="no">close</span><span class="p">)</span><span class="w">  </span><span class="c">// same call as above, will not produce new security call after optimizations</span><span class="w"></span>
+
+<span class="ni">plot</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="nx">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="nx">b</span><span class="p">)</span><span class="w"></span>
+
+<span class="nx">sym</span><span class="p">(</span><span class="nx">p</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w">  </span><span class="c">// no security call on this line</span><span class="w"></span>
+<span class="w">    </span><span class="ni">request.security</span><span class="p">(</span><span class="ni">syminfo.tickerid</span><span class="p">,</span><span class="w"> </span><span class="nx">p</span><span class="p">,</span><span class="w"> </span><span class="no">close</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="nx">sym</span><span class="p">(</span><span class="s1">'D'</span><span class="p">))</span><span class="w">  </span><span class="c">// (2) one indirect call to security</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="nx">sym</span><span class="p">(</span><span class="s1">'W'</span><span class="p">))</span><span class="w">  </span><span class="c">// (3) another indirect call to security</span><span class="w"></span>
+
+<span class="ni">request.security</span><span class="p">(</span><span class="ni">syminfo.tickerid</span><span class="p">,</span><span class="w"> </span><span class="ni">timeframe.period</span><span class="p">,</span><span class="w"> </span><span class="no">open</span><span class="p">)</span><span class="w">  </span><span class="c">// result of this line is never used, and will be optimized out</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="script-could-not-be-translated-from-null">
+<h2><a class="toc-backref" href="#id2">Script could not be translated from: null</a><a class="headerlink" href="#script-could-not-be-translated-from-null" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="nx">study</span><span class="p">(</span><span class="err">$</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Usually this error occurs in version 1 pine scripts, and means that code
+is incorrect. Pine Script™ of version 2 (and higher) is better at
+explaining errors of this kind. So you can try to switch to version 2 by
+adding a <span class="xref std std-ref">special attribute</span> in the first line. You’ll get
+<code class="docutils literal notranslate"><span class="pre">line</span> <span class="pre">2:</span> <span class="pre">no</span> <span class="pre">viable</span> <span class="pre">alternative</span> <span class="pre">at</span> <span class="pre">character</span> <span class="pre">'$'</span></code></p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">// @version=2</span><span class="w"></span>
+<span class="nx">study</span><span class="p">(</span><span class="err">$</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="line-2-no-viable-alternative-at-character">
+<h2><a class="toc-backref" href="#id3">line 2: no viable alternative at character ‘$’</a><a class="headerlink" href="#line-2-no-viable-alternative-at-character" title="Permalink to this headline">¶</a></h2>
+<p>This error message gives a hint on what is wrong. <code class="docutils literal notranslate"><span class="pre">$</span></code> stands in place
+of string with script title. For example:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">// @version=2</span><span class="w"></span>
+<span class="nx">study</span><span class="p">(</span><span class="s2">"title"</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="mismatched-input-expecting">
+<h2><a class="toc-backref" href="#id4">Mismatched input &lt;…&gt; expecting &lt;???&gt;</a><a class="headerlink" href="#mismatched-input-expecting" title="Permalink to this headline">¶</a></h2>
+<p>Same as <code class="docutils literal notranslate"><span class="pre">no</span> <span class="pre">viable</span> <span class="pre">alternative</span></code>, but it is known what should be at that
+place. Example:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"My Script"</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="ni">plot</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">line</span> <span class="pre">3:</span> <span class="pre">mismatched</span> <span class="pre">input</span> <span class="pre">'plot'</span> <span class="pre">expecting</span> <span class="pre">'end</span> <span class="pre">of</span> <span class="pre">line</span> <span class="pre">without</span> <span class="pre">line</span> <span class="pre">continuation'</span></code></p>
+<p>To fix this you should start line with <code class="docutils literal notranslate"><span class="pre">plot</span></code> on a new line without an
+indent:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"My Script"</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="loop-is-too-long-500-ms">
+<h2><a class="toc-backref" href="#id5">Loop is too long (&gt; 500 ms)</a><a class="headerlink" href="#loop-is-too-long-500-ms" title="Permalink to this headline">¶</a></h2>
+<p>We limit the computation time of loop on every historical bar and
+realtime tick to protect our servers from infinite or very long loops.
+This limit also fail-fast indicators that will take too long to compute.
+For example, if you’ll have 5000 bars, and indicator takes 500 milliseconds to
+compute on each of bars, it would have result in more than 16 minutes of
+loading.</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"Loop is too long"</span><span class="p">,</span><span class="w"> </span><span class="nx">max_bars_back</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">101</span><span class="p">)</span><span class="w"></span>
+<span class="nx">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="w"></span>
+<span class="k">for </span><span class="nx">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="nx">to</span><span class="w"> </span><span class="mi">1</span><span class="nx">e3</span><span class="w">  </span><span class="c">// to make it longer</span><span class="w"></span>
+<span class="w">    </span><span class="k">for </span><span class="nx">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="nx">to</span><span class="w"> </span><span class="mi">100</span><span class="w"></span>
+<span class="w">        </span><span class="k">if </span><span class="ni">timestamp</span><span class="p">(</span><span class="mi">2017</span><span class="p">,</span><span class="w"> </span><span class="mi">02</span><span class="p">,</span><span class="w"> </span><span class="mi">23</span><span class="p">,</span><span class="w"> </span><span class="mi">00</span><span class="p">,</span><span class="w"> </span><span class="mi">00</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="no">time</span><span class="o">[</span><span class="nx">j</span><span class="o">]</span><span class="w"> </span><span class="nx">and</span><span class="w"> </span><span class="no">time</span><span class="o">[</span><span class="nx">j</span><span class="o">]</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="ni">timestamp</span><span class="p">(</span><span class="mi">2017</span><span class="p">,</span><span class="w"> </span><span class="mi">02</span><span class="p">,</span><span class="w"> </span><span class="mi">23</span><span class="p">,</span><span class="w"> </span><span class="mi">23</span><span class="p">,</span><span class="w"> </span><span class="mi">59</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="nx">s</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">s</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>It might be possible to optimize algorithm to overcome this error. In
+this case, algorithm may be optimized like this:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"Loop is too long"</span><span class="p">,</span><span class="w"> </span><span class="nx">max_bars_back</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">101</span><span class="p">)</span><span class="w"></span>
+<span class="nx">bar_back_at</span><span class="p">(</span><span class="nx">t</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"></span>
+<span class="w">    </span><span class="nx">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="w"></span>
+<span class="w">    </span><span class="nx">step</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">51</span><span class="w"></span>
+<span class="w">    </span><span class="k">for </span><span class="nx">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="nx">to</span><span class="w"> </span><span class="mi">100</span><span class="w"></span>
+<span class="w">        </span><span class="k">if </span><span class="nx">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="w"></span>
+<span class="w">            </span><span class="nx">i</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="mi">0</span><span class="w"></span>
+<span class="w">            </span><span class="k">break</span>
+<span class="w">        </span><span class="k">if </span><span class="nx">step</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="w"></span>
+<span class="w">            </span><span class="k">break</span>
+<span class="w">        </span><span class="k">if </span><span class="no">time</span><span class="o">[</span><span class="nx">i</span><span class="o">]</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="nx">t</span><span class="w"></span>
+<span class="w">            </span><span class="nx">i</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">step</span><span class="w"></span>
+<span class="w">            </span><span class="nx">i</span><span class="w"></span>
+<span class="w">        </span><span class="k">else</span>
+<span class="w">            </span><span class="nx">i</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">i</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nx">step</span><span class="w"></span>
+<span class="w">            </span><span class="nx">i</span><span class="w"></span>
+<span class="w">        </span><span class="nx">step</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">step</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">2</span><span class="w"></span>
+<span class="w">        </span><span class="nx">step</span><span class="w"></span>
+<span class="w">    </span><span class="nx">i</span><span class="w"></span>
+
+<span class="nx">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="w"></span>
+<span class="k">for </span><span class="nx">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="nx">to</span><span class="w"> </span><span class="mi">1</span><span class="nx">e3</span><span class="w">  </span><span class="c">// to make it longer</span><span class="w"></span>
+<span class="w">    </span><span class="nx">s</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">s</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nx">bar_back_at</span><span class="p">(</span><span class="ni">timestamp</span><span class="p">(</span><span class="mi">2017</span><span class="p">,</span><span class="w"> </span><span class="mi">02</span><span class="p">,</span><span class="w"> </span><span class="mi">23</span><span class="p">,</span><span class="w"> </span><span class="mi">23</span><span class="p">,</span><span class="w"> </span><span class="mi">59</span><span class="p">))</span><span class="w"> </span><span class="o">+</span><span class="w"></span>
+<span class="w">         </span><span class="nx">bar_back_at</span><span class="p">(</span><span class="ni">timestamp</span><span class="p">(</span><span class="mi">2017</span><span class="p">,</span><span class="w"> </span><span class="mi">02</span><span class="p">,</span><span class="w"> </span><span class="mi">23</span><span class="p">,</span><span class="w"> </span><span class="mi">00</span><span class="p">,</span><span class="w"> </span><span class="mi">00</span><span class="p">))</span><span class="w"></span>
+<span class="w">    </span><span class="nx">s</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="script-has-too-many-local-variables">
+<h2><a class="toc-backref" href="#id6">Script has too many local variables</a><a class="headerlink" href="#script-has-too-many-local-variables" title="Permalink to this headline">¶</a></h2>
+<p>This error appears if the script is too large to be compiled. A
+statement <code class="docutils literal notranslate"><span class="pre">var=expression</span></code> creates a local variable for <code class="docutils literal notranslate"><span class="pre">var</span></code>. Apart
+from this, it is important to note, that auxiliary variables can be
+implicitly created during the process of a script compilation. The limit
+applies to variables created both explicitly and implicitly. The
+limitation of 1000 variables is applied to each function individually.
+In fact, the code placed in a <em>global</em> scope of a script also implicitly
+wrapped up into the main function and the limit of 1000 variables
+becomes applicable to it. There are few refactorings you can try to
+avoid this issue:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="nx">var1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">expr1</span><span class="w"></span>
+<span class="nx">var2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">expr2</span><span class="w"></span>
+<span class="nx">var3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">var1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">var2</span><span class="w"></span>
+</pre></div>
+</div>
+<p>can be сonverted into:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="nx">var3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">expr1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">expr2</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="pine-script-cannot-determine-the-referencing-length-of-a-series-try-using-max-bars-back-in-the-indicator-or-strategy-function">
+<h2><a class="toc-backref" href="#id7">Pine Script™ cannot determine the referencing length of a series. Try using max_bars_back in the indicator or strategy function</a><a class="headerlink" href="#pine-script-cannot-determine-the-referencing-length-of-a-series-try-using-max-bars-back-in-the-indicator-or-strategy-function" title="Permalink to this headline">¶</a></h2>
+<p>The error appears in cases where Pine Script™ wrongly autodetects the required
+maximum length of series used in a script. This happens when a script’s
+flow of execution does not allow Pine Script™ to inspect the use of series in
+branches of conditional statements (<code class="docutils literal notranslate"><span class="pre">if</span></code>, <code class="docutils literal notranslate"><span class="pre">iff</span></code> or <code class="docutils literal notranslate"><span class="pre">?</span></code>), and Pine Script™
+cannot automatically detect how far back the series is referenced. Here
+is an example of a script causing this problem:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"Requires max_bars_back"</span><span class="p">)</span><span class="w"></span>
+<span class="nx">test</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="mf">.0</span><span class="w"></span>
+<span class="k">if </span><span class="ni">bar_index</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">1000</span><span class="w"></span>
+<span class="w">    </span><span class="nx">test</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="ni">ta.roc</span><span class="p">(</span><span class="no">close</span><span class="p">,</span><span class="w"> </span><span class="mi">20</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="nx">test</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>In order to help Pine Script™ with detection, you should add the <code class="docutils literal notranslate"><span class="pre">max_bars_back</span></code>
+parameter to the script’s <code class="docutils literal notranslate"><span class="pre">indicator</span></code> or <code class="docutils literal notranslate"><span class="pre">strategy</span></code> function:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"Requires max_bars_back"</span><span class="p">,</span><span class="w"> </span><span class="nx">max_bars_back</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">20</span><span class="p">)</span><span class="w"></span>
+<span class="nx">test</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="mf">.0</span><span class="w"></span>
+<span class="k">if </span><span class="ni">bar_index</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">1000</span><span class="w"></span>
+<span class="w">    </span><span class="nx">test</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="ni">ta.roc</span><span class="p">(</span><span class="no">close</span><span class="p">,</span><span class="w"> </span><span class="mi">20</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="nx">test</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>You may also resolve the issue by taking the problematic
+expression out of the conditional branch, in which case the <code class="docutils literal notranslate"><span class="pre">max_bars_back</span></code>
+parameter is not required:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"My Script"</span><span class="p">)</span><span class="w"></span>
+<span class="nx">test</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="mf">.0</span><span class="w"></span>
+<span class="nx">roc20</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">ta.roc</span><span class="p">(</span><span class="no">close</span><span class="p">,</span><span class="w"> </span><span class="mi">20</span><span class="p">)</span><span class="w"></span>
+<span class="k">if </span><span class="ni">bar_index</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">1000</span><span class="w"></span>
+<span class="w">    </span><span class="nx">test</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">roc20</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="nx">test</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>In cases where the problem is caused by a <strong>variable</strong> rather than a built-in <strong>function</strong> (<code class="docutils literal notranslate"><span class="pre">vwma</span></code> in our example),
+you may use the <code class="docutils literal notranslate"><span class="pre">max_bars_back</span></code> function to explicitly define the referencing length
+for that variable only. This has the advantage of requiring less runtime resources, but entails that you identify
+the problematic variable, e.g., variable <code class="docutils literal notranslate"><span class="pre">s</span></code> in the following example:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"My Script"</span><span class="p">)</span><span class="w"></span>
+<span class="nx">f</span><span class="p">(</span><span class="nx">off</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"></span>
+<span class="w">    </span><span class="nx">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="mf">.0</span><span class="w"></span>
+<span class="w">    </span><span class="nx">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">close</span><span class="w"></span>
+<span class="w">    </span><span class="k">if </span><span class="ni">bar_index</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">242</span><span class="w"></span>
+<span class="w">        </span><span class="nx">t</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">s</span><span class="o">[</span><span class="nx">off</span><span class="o">]</span><span class="w"></span>
+<span class="w">    </span><span class="nx">t</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="nx">f</span><span class="p">(</span><span class="mi">301</span><span class="p">))</span><span class="w"></span>
+</pre></div>
+</div>
+<p>This situation can be resolved using the <code class="docutils literal notranslate"><span class="pre">max_bars_back</span></code> <strong>function</strong> to define the referencing length
+of variable <code class="docutils literal notranslate"><span class="pre">s</span></code> only, rather than for all the script’s variables:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"My Script"</span><span class="p">)</span><span class="w"></span>
+<span class="nx">f</span><span class="p">(</span><span class="nx">off</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"></span>
+<span class="w">    </span><span class="nx">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="mf">.0</span><span class="w"></span>
+<span class="w">    </span><span class="nx">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">close</span><span class="w"></span>
+<span class="w">    </span><span class="nx">max_bars_back</span><span class="p">(</span><span class="nx">s</span><span class="p">,</span><span class="w"> </span><span class="mi">301</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="k">if </span><span class="ni">bar_index</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">242</span><span class="w"></span>
+<span class="w">        </span><span class="nx">t</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">s</span><span class="o">[</span><span class="nx">off</span><span class="o">]</span><span class="w"></span>
+<span class="w">    </span><span class="nx">t</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="nx">f</span><span class="p">(</span><span class="mi">301</span><span class="p">))</span><span class="w"></span>
+</pre></div>
+</div>
+<p>When using drawings that refer to previous bars through <code class="docutils literal notranslate"><span class="pre">bar_index[n]</span></code> and <code class="docutils literal notranslate"><span class="pre">xloc</span> <span class="pre">=</span> <span class="pre">xloc.bar_index</span></code>,
+the time series received from this bar will be used to position the drawings on the time axis.
+Therefore, if it is impossible to determine the correct size of the buffer, this error may occur.
+To avoid this, you need to use <code class="docutils literal notranslate"><span class="pre">max_bars_back(time,</span> <span class="pre">n)</span></code>.
+This behavior is described in more detail in the section about <a class="reference internal" href="concepts/Lines_and_boxes.html#max-bars-back-of-time"><span class="std std-ref">drawings</span></a>.</p>
+<a class="reference external image-reference" href="https://www.tradingview.com/"><div align="center" class="align-center"><img alt="_images/TradingView-Logo-Block.svg" src="_images/TradingView-Logo-Block.svg" width="200px"/></div>
+</a>
+</div>
+</div>
+</div>
+<div class="footer-relations">
+<div class="pull-left">
+<a class="btn btn-default" href="Faq.html" title="previous chapter (use the left arrow)">FAQ</a>
+</div>
+<div class="pull-right">
+<a class="btn btn-default" href="Release_notes.html" title="next chapter (use the right arrow)">Release notes</a>
+</div>
+</div>
+<div class="clearer"></div>
+</div>

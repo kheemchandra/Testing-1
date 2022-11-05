@@ -1,0 +1,598 @@
+<div id="right-column">
+<div aria-label="breadcrumbs navigation" role="navigation">
+<ol class="breadcrumb">
+<li><a href="../index.html">User Manual</a></li>
+<li><a href="index.html">Concepts</a></li>
+<li>Strategies</li>
+</ol>
+</div>
+<div class="document clearer body">
+<a class="reference external image-reference" href="https://www.tradingview.com/pine-script-docs/en/v5/Introduction.html"><div align="right" class="align-right"><img alt="Pine Script™ logo" height="100" src="../_images/Pine_Script_logo.svg" width="100"/></div>
+</a>
+<div class="section" id="strategies">
+<span id="pagestrategies"></span><h1>Strategies<a class="headerlink" href="#strategies" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><a class="reference internal" href="#a-simple-strategy-example" id="id2">A simple strategy example</a></li>
+<li><a class="reference internal" href="#applying-a-strategy-to-a-chart" id="id3">Applying a strategy to a chart</a></li>
+<li><a class="reference internal" href="#backtesting-and-forwardtesting" id="id4">Backtesting and forwardtesting</a></li>
+<li><a class="reference internal" href="#broker-emulator" id="id5">Broker emulator</a></li>
+<li><a class="reference internal" href="#order-placement-commands" id="id6">Order placement commands</a></li>
+<li><a class="reference internal" href="#closing-market-position" id="id7">Closing market position</a></li>
+<li><a class="reference internal" href="#oca-groups" id="id8">OCA groups</a></li>
+<li><a class="reference internal" href="#risk-management" id="id9">Risk management</a></li>
+<li><a class="reference internal" href="#currency" id="id10">Currency</a></li>
+<li><a class="reference internal" href="#margin" id="id11">Margin</a></li>
+</ul>
+</div>
+<p>A <em>strategy</em> is a Pine script that can send, modify and cancel <em>buy/sell orders</em>.
+Strategies allow you to perform <em>backtesting</em> (emulation of a
+strategy trading on historical data) and <em>forwardtesting</em> (emulation
+of a strategy trading on realtime data) according to your
+algorithms.</p>
+<p>A strategy written in Pine Script™ has many of the same capabilities
+as a Pine Script™ <em>indicator</em>. When you write a strategy, it must start
+with the <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_strategy">strategy()</a>
+function call. Strategies may plot data,
+but they can also place, modify and cancel orders. They also have
+access to essential strategy performance information through specific
+keywords. The same information is available externally in the <em>Strategy
+Tester</em> tab. Once a strategy is calculated on historical data, you can
+see hypothetical order fills.</p>
+<div class="section" id="a-simple-strategy-example">
+<h2><a class="toc-backref" href="#id2">A simple strategy example</a><a class="headerlink" href="#a-simple-strategy-example" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">// @version=5</span><span class="w"></span>
+<span class="ni">strategy</span><span class="p">(</span><span class="s2">"test"</span><span class="p">)</span><span class="w"></span>
+<span class="k">if </span><span class="ni">bar_index</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">100</span><span class="w"></span>
+<span class="w">    </span><span class="k">if </span><span class="ni">strategy.position_size</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">0</span><span class="w"></span>
+<span class="w">        </span><span class="ni">strategy.entry</span><span class="p">(</span><span class="s2">"buy"</span><span class="p">,</span><span class="w"> </span><span class="ni">strategy.long</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="k">else</span>
+<span class="w">        </span><span class="ni">strategy.entry</span><span class="p">(</span><span class="s2">"sell"</span><span class="p">,</span><span class="w"> </span><span class="ni">strategy.short</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="ni">strategy.initial_capital</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="ni">strategy.netprofit</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="ni">strategy.openprofit</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>As soon as the script is compiled and applied to a chart, you can see
+filled order marks on it and how your balance was changing during
+backtesting (<em>equity</em> curve). This is a very basic strategy that buys and
+sells on every bar.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">strategy("test")</span></code> line states that the script is a strategy
+named “test”. <code class="docutils literal notranslate"><span class="pre">strategy.entry()</span></code> is a command that can be used to send both
+“buy” and “sell” orders. <code class="docutils literal notranslate"><span class="pre">plot(strategy.equity)</span></code> plots the equity
+curve.</p>
+</div>
+<div class="section" id="applying-a-strategy-to-a-chart">
+<h2><a class="toc-backref" href="#id3">Applying a strategy to a chart</a><a class="headerlink" href="#applying-a-strategy-to-a-chart" title="Permalink to this headline">¶</a></h2>
+<p>To test your strategy, apply it to the chart. Use the symbol and time
+intervals that you want to test. You can use a built-in strategy from
+the <em>Indicators &amp; Strategies</em> dialog box, or write your own.</p>
+<img alt="../_images/Strategy_tester.png" src="../_images/Strategy_tester.png"/>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">When applying strategies to <a class="reference internal" href="Non-standard_charts_data.html#pagenonstandardchartsdata"><span class="std std-ref">non-standard charts</span></a>
+(Heikin Ashi, Renko, etc.), it is very important to realize that results
+will not reflect real market conditions. Orders on these types of charts will be
+executed at the synthetic price levels used on these charts,
+which often <strong>do not reflect real market prices</strong> and thus lead
+to unrealistic backtesting results. We therefore highly recommend
+using only standard chart types for backtesting strategies.</p>
+</div>
+</div>
+<div class="section" id="backtesting-and-forwardtesting">
+<h2><a class="toc-backref" href="#id4">Backtesting and forwardtesting</a><a class="headerlink" href="#backtesting-and-forwardtesting" title="Permalink to this headline">¶</a></h2>
+<p>On TradingView, strategies are calculated on all the chart’s available historical
+data (<em>backtesting</em>), and then automatically continue calculations when real-time data comes in (<em>forwardtesting</em>).</p>
+<p>By default, during both historical and real-time calculation, code is calculated on
+the bar’s close.</p>
+<p>When forwardtesting, you have the option of configuring script calculation to occur
+on every real-time tick. To enable this, check the <em>Recalculate On Every Tick</em>  option in
+the strategy’s <em>Settings/Properties</em>, or specify it in the script’s code
+using: <code class="docutils literal notranslate"><span class="pre">strategy(...,</span> <span class="pre">calc_on_every_tick=true)</span></code>.</p>
+<p>You can set the strategy to perform one additional calculation after an
+order is filled. For this you need to check <em>Recalculate After Order
+filled</em> in the strategy’s <em>Settings/Properties</em>, or do it in the script’s code
+using: <code class="docutils literal notranslate"><span class="pre">strategy(...,</span> <span class="pre">calc_on_order_fills=true)</span></code>.</p>
+</div>
+<div class="section" id="broker-emulator">
+<h2><a class="toc-backref" href="#id5">Broker emulator</a><a class="headerlink" href="#broker-emulator" title="Permalink to this headline">¶</a></h2>
+<p>TradingView uses a <em>broker emulator</em> when running strategies. Unlike
+in real trading, the emulator only fills orders at chart prices, which is
+why an order can only be filled on the next tick in forwardtesting and on
+the next bar or later in backtesting, i.e., after the strategy calculates.</p>
+<p>The following logic is used to emulate order fills:</p>
+<ol class="arabic simple">
+<li>If the bar’s high is closer to bar’s open than the bar’s low,
+the broker emulator assumes that intrabar price was moving this way:
+open → high → low → close.</li>
+<li>If the bar’s low is closer to bar’s open than the bar’s high,
+the broker emulator assumes that intrabar price was moving this way:
+open → low → high → close.</li>
+<li>The broker emulator assumes that there are no gaps inside bars, meaning
+the full range of intrabar prices is available for order execution.</li>
+<li>Even if the <em>Recalculate On Every Tick</em> option is
+enabled  in strategy properties (or the script’s <code class="docutils literal notranslate"><span class="pre">strategy</span></code> call uses
+<code class="docutils literal notranslate"><span class="pre">calc_on_every_tick=true</span></code>), the broker emulator’s behavior still uses the above logic.</li>
+</ol>
+<img alt="../_images/Filled_stategy.png" src="../_images/Filled_stategy.png"/>
+<p>Here is a strategy demonstrating how orders are filled by the broker
+emulator:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">strategy</span><span class="p">(</span><span class="s2">"History SAW demo"</span><span class="p">,</span><span class="w"> </span><span class="nx">overlay</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">true</span><span class="p">,</span><span class="w"> </span><span class="nx">pyramiding</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span><span class="w"> </span><span class="nx">calc_on_order_fills</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">true</span><span class="p">)</span><span class="w"></span>
+<span class="ni">strategy.entry</span><span class="p">(</span><span class="s2">"LE"</span><span class="p">,</span><span class="w"> </span><span class="ni">strategy.long</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>This code is calculated once per bar on the close, but
+an additional calculation occurs as soon as an order is filled. That
+is why you can see 4 filled orders on every bar: 2 orders on open, 1
+order on high and 1 order on low. This is for backtesting. In
+real-time, orders would be executed on every new tick.</p>
+<p>It is also possible to emulate an <em>order queue</em>. The setting is called
+<em>Verify Price For Limit Orders</em> and can be found in strategy properties,
+or set in the script’s code with <code class="docutils literal notranslate"><span class="pre">strategy(...,</span> <span class="pre">backtest_fill_limits_assumption=X)</span></code>.
+The specified value is a minimum price movements in number of points/pips (default value is 0).
+A limit order is filled if the current price is better (higher for sell
+orders, lower for buy orders) by the specified number of points/pips.
+The execution price still matches the limit order price. Example:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">backtest_fill_limits_assumption</span> <span class="pre">=</span> <span class="pre">1</span></code>. Minimum price movement is <code class="docutils literal notranslate"><span class="pre">0.25</span></code>.</li>
+<li>A buy limit order is placed at price <code class="docutils literal notranslate"><span class="pre">12.50</span></code>.</li>
+<li>Current price is <code class="docutils literal notranslate"><span class="pre">12.50</span></code>.</li>
+<li>The order cannot be filled at the current price because
+<code class="docutils literal notranslate"><span class="pre">backtest_fill_limits_assumption</span> <span class="pre">=</span> <span class="pre">1</span></code>. To fill the order the price must
+be <code class="docutils literal notranslate"><span class="pre">0.25*1</span></code> lower. The order is put in the queue.</li>
+<li>Assume that the next tick comes at price <code class="docutils literal notranslate"><span class="pre">12.00</span></code>. This price is 2 points
+lower, meaning the condition <code class="docutils literal notranslate"><span class="pre">backtest_fill_limits_assumption</span> <span class="pre">=</span> <span class="pre">1</span></code>
+is satisfied, so the order should be filled. The order is filled at
+<code class="docutils literal notranslate"><span class="pre">12.50</span></code> (original order price), even if the price is not available
+anymore.</li>
+</ul>
+</div>
+<div class="section" id="order-placement-commands">
+<h2><a class="toc-backref" href="#id6">Order placement commands</a><a class="headerlink" href="#order-placement-commands" title="Permalink to this headline">¶</a></h2>
+<p>All keywords related to strategies start with a
+<code class="docutils literal notranslate"><span class="pre">strategy.</span></code> prefix. The following commands are used for placing
+orders: <code class="docutils literal notranslate"><span class="pre">strategy.entry</span></code>, <code class="docutils literal notranslate"><span class="pre">strategy.order</span></code> and <code class="docutils literal notranslate"><span class="pre">strategy.exit</span></code>.</p>
+<dl class="docutils">
+<dt><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_strategy{dot}entry">strategy.entry()</a></dt>
+<dd>This command only places entry orders. It is
+affected by the <code class="docutils literal notranslate"><span class="pre">pyramiding</span></code> setting in the strategy’s properties and by
+the <code class="docutils literal notranslate"><span class="pre">strategy.risk.allow_entry_in</span></code> function. If there is an open
+market position when an opposite direction order is generated, the
+number of contracts/shares/lots/units will be increased by the number
+of currently open contracts (script equivalent: <code class="docutils literal notranslate"><span class="pre">strategy.position_size</span> <span class="pre">+</span> <span class="pre">quantity</span></code>).
+As a result, the size of the opened market position will be equal to the order size specified in
+the <code class="docutils literal notranslate"><span class="pre">strategy.entry</span></code> command.</dd>
+<dt><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_strategy{dot}order">strategy.order()</a></dt>
+<dd>This command places both entry and exit orders. It is not affected by pyramiding settings or by the
+<code class="docutils literal notranslate"><span class="pre">strategy.risk.allow_entry_in</span></code> function. It allows you to create
+complex entry and exit order constructions when the functionality of
+<code class="docutils literal notranslate"><span class="pre">strategy.entry</span></code> and <code class="docutils literal notranslate"><span class="pre">strategy.exit</span></code> will not do.</dd>
+<dt><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_strategy{dot}exit">strategy.exit()</a></dt>
+<dd>This command allows you to exit a market position
+or form multiple exit order strategies using a stop loss,
+profit target or trailing stop. All such orders are part of the same
+<code class="docutils literal notranslate"><span class="pre">strategy.oca.reduce</span></code> group. An exit order cannot be placed if
+there is no open market position or there is no active entry order
+(an exit order is bound to the ID of an entry order). It is not possible
+to exit a position with a market order using the command
+<code class="docutils literal notranslate"><span class="pre">strategy.exit</span></code>. For this, the <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_strategy{dot}close">strategy.close</a>
+or <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_strategy{dot}close_all">strategy.close_all()</a>
+commands should be used.
+If the number of contracts/shares/lots/units specified for the <code class="docutils literal notranslate"><span class="pre">strategy.exit</span></code> is
+less than the size of current open positions, the exit will be
+partial. It is possible to exit from the same entry order more
+than once using the same exit order ID, which allows you to create
+exit strategies with multiple levels. In cases where a market position
+is formed by multiple entry orders (pyramiding enabled), each exit
+order must be linked to a matching entry order.</dd>
+</dl>
+<p>Example 1:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">strategy</span><span class="p">(</span><span class="s2">"revers demo"</span><span class="p">)</span><span class="w"></span>
+<span class="k">if </span><span class="ni">bar_index</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">100</span><span class="w"></span>
+<span class="w">    </span><span class="k">if </span><span class="ni">strategy.position_size</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">0</span><span class="w"></span>
+<span class="w">        </span><span class="ni">strategy.entry</span><span class="p">(</span><span class="s2">"buy"</span><span class="p">,</span><span class="w"> </span><span class="ni">strategy.long</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="k">else</span>
+<span class="w">        </span><span class="ni">strategy.entry</span><span class="p">(</span><span class="s2">"sell"</span><span class="p">,</span><span class="w"> </span><span class="ni">strategy.short</span><span class="p">,</span><span class="w"> </span><span class="mi">6</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="ni">strategy.initial_capital</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="ni">strategy.netprofit</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="ni">strategy.openprofit</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>The above strategy constantly reverses market position from +4 to -6,
+back and forth, which the plot shows.</p>
+<p>Example 2:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">strategy</span><span class="p">(</span><span class="s2">"exit once demo"</span><span class="p">)</span><span class="w"></span>
+<span class="k">if </span><span class="ni">strategy.position_size</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">0</span><span class="w"></span>
+<span class="w">    </span><span class="ni">strategy.entry</span><span class="p">(</span><span class="s2">"buy"</span><span class="p">,</span><span class="w"> </span><span class="ni">strategy.long</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">)</span><span class="w"></span>
+<span class="ni">strategy.exit</span><span class="p">(</span><span class="s2">"bracket"</span><span class="p">,</span><span class="w"> </span><span class="s2">"buy"</span><span class="p">,</span><span class="w">  </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="nx">profit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="nx">stop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>This strategy demonstrates a case where a market position is never
+closed because it uses a partial exit order to close the market position
+and it cannot be executed more than once. If you double the line
+for exiting, the strategy will close the market position completely.</p>
+<p>Example 3:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">strategy</span><span class="p">(</span><span class="s2">"Partial exit demo"</span><span class="p">)</span><span class="w"></span>
+<span class="k">if </span><span class="ni">bar_index</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">100</span><span class="w"> </span><span class="nx">and</span><span class="w"> </span><span class="ni">strategy.position_size</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">0</span><span class="w"></span>
+<span class="w">    </span><span class="ni">strategy.entry</span><span class="p">(</span><span class="s2">"buy"</span><span class="p">,</span><span class="w"> </span><span class="ni">strategy.long</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">)</span><span class="w"></span>
+<span class="ni">strategy.exit</span><span class="p">(</span><span class="s2">"bracket1"</span><span class="p">,</span><span class="w"> </span><span class="s2">"buy"</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="nx">profit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="nx">stop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">)</span><span class="w"></span>
+<span class="ni">strategy.exit</span><span class="p">(</span><span class="s2">"bracket2"</span><span class="p">,</span><span class="w"> </span><span class="s2">"buy"</span><span class="p">,</span><span class="w"> </span><span class="nx">profit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="nx">stop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">20</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>This code generates 2 levels of brackets (2 take profit orders and 2
+stop loss orders). Both levels are activated at the same time: first
+level to exit 2 contracts and the second one to exit all the rest.</p>
+<img alt="../_images/Levels_brackets.png" src="../_images/Levels_brackets.png"/>
+<p>The first take profit and stop loss orders (level 1) are in an <a class="reference internal" href="#oca-groups"><span class="std std-ref">OCA group</span></a>.
+The other orders (level 2) are in another OCA group. This means
+that as the order from level 1 is filled, the orders from level 2
+are not cancelled; they stay active.</p>
+<p>Every command placing an order has an ID (string value) which is a unique order
+identifier. If an order with the same ID is already placed but not yet
+filled, the last command modifies the existing order. If modification is
+not possible (conversion from buy to sell), the old order is cancelled and
+the new order is placed. <code class="docutils literal notranslate"><span class="pre">strategy.entry</span></code> and <code class="docutils literal notranslate"><span class="pre">strategy.order</span></code> work
+with the same IDs (they can modify the same entry order).
+<code class="docutils literal notranslate"><span class="pre">strategy.exit</span></code> works with other order IDs (it is possible to have an
+entry order and an exit order with the same ID).</p>
+<p>To cancel a specific order using its ID, the
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_strategy{dot}cancel">strategy.cancel(string ID)</a>
+command should be used. To cancel all pending
+orders the <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_strategy{dot}cancel_all">strategy.cancel_all()</a>
+command should be used. Strategy orders are placed as soon as their conditions are satisfied and command
+is called in code. The broker emulator doesn’t execute orders before the next
+tick comes after the code was calculated, while in real trading
+an order can get filled sooner. When a market order is generated at the close of the current bar,
+the broker emulator only executes it at the open price of the next.</p>
+<p>Example:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">strategy</span><span class="p">(</span><span class="s2">"next bar open execution demo"</span><span class="p">)</span><span class="w"></span>
+<span class="k">if </span><span class="ni">bar_index</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">100</span><span class="w"></span>
+<span class="w">    </span><span class="k">if </span><span class="ni">strategy.position_size</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="w"></span>
+<span class="w">        </span><span class="ni">strategy.order</span><span class="p">(</span><span class="s2">"buy"</span><span class="p">,</span><span class="w"> </span><span class="ni">strategy.long</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="k">else</span>
+<span class="w">        </span><span class="ni">strategy.order</span><span class="p">(</span><span class="s2">"sell"</span><span class="p">,</span><span class="w"> </span><span class="ni">strategy.short</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>If this code is applied to a chart, all orders are filled at the open of
+every bar.</p>
+<p>Conditions for order placement (<code class="docutils literal notranslate"><span class="pre">when</span></code>, <code class="docutils literal notranslate"><span class="pre">pyramiding</span></code>, <code class="docutils literal notranslate"><span class="pre">strategy.risk</span></code>)
+are checked when the script is calculated. If all
+conditions are satisfied, the order is placed. If any condition is not
+satisfied, the order is not placed. It is important to cancel price
+orders (limit, stop and stop-limit orders).</p>
+<p>Example (for MSFT, 1D):</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">strategy</span><span class="p">(</span><span class="s2">"Priced Entry demo"</span><span class="p">)</span><span class="w"></span>
+<span class="k">var </span><span class="nx">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="w"></span>
+<span class="k">if </span><span class="ni">year</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">2020</span><span class="w"></span>
+<span class="w">    </span><span class="nx">c</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">c</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="w"></span>
+<span class="k">if </span><span class="nx">c</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="w"></span>
+<span class="w">    </span><span class="ni">strategy.entry</span><span class="p">(</span><span class="s2">"LE1"</span><span class="p">,</span><span class="w"> </span><span class="ni">strategy.long</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="nx">stop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">high</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">35</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="ni">syminfo.mintick</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="ni">strategy.entry</span><span class="p">(</span><span class="s2">"LE2"</span><span class="p">,</span><span class="w"> </span><span class="ni">strategy.long</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="nx">stop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">high</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="ni">syminfo.mintick</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Even though pyramiding is disabled, both these orders are filled in
+backtesting because when they are generated there is no opened long
+market position. Both orders are placed and when price satisfies order
+execution conditions, they both get executed. It is recommended to put the
+orders in an OCA group using <code class="docutils literal notranslate"><span class="pre">strategy.oca.cancel</span></code>. This way
+only one order is filled and the other one is cancelled. Here is the
+modified code:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">strategy</span><span class="p">(</span><span class="s2">"Priced Entry demo"</span><span class="p">)</span><span class="w"></span>
+<span class="k">var </span><span class="nx">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="w"></span>
+<span class="k">if </span><span class="ni">year</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">2020</span><span class="w"></span>
+<span class="w">    </span><span class="nx">c</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">c</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="w"></span>
+<span class="k">if </span><span class="nx">c</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="w"></span>
+<span class="w">    </span><span class="ni">strategy.entry</span><span class="p">(</span><span class="s2">"LE1"</span><span class="p">,</span><span class="w"> </span><span class="ni">strategy.long</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="nx">stop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">high</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">35</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="ni">syminfo.mintick</span><span class="p">,</span><span class="w"> </span><span class="nx">oca_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">strategy.oca</span><span class="nx">.cancel</span><span class="p">,</span><span class="w"> </span><span class="nx">oca_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"LE"</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="ni">strategy.entry</span><span class="p">(</span><span class="s2">"LE2"</span><span class="p">,</span><span class="w"> </span><span class="ni">strategy.long</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="nx">stop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">high</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="ni">syminfo.mintick</span><span class="p">,</span><span class="w"> </span><span class="nx">oca_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">strategy.oca</span><span class="nx">.cancel</span><span class="p">,</span><span class="w"> </span><span class="nx">oca_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"LE"</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>If, for some reason, order placing conditions are not met when executing
+the command, the entry order will not be placed. For example, if
+pyramiding settings are set to 2, the existing position already contains two
+entries and the strategy tries to place a third one, it will not be
+placed. Entry conditions are evaluated at the order generation stage and
+not at the execution stage. Therefore, if you submit two price type
+entries with pyramiding disabled, once one of them is executed the other
+will not be cancelled automatically. To avoid issues we recommend using
+<code class="docutils literal notranslate"><span class="pre">strategy.oca.cancel</span></code> groups for entries so when one entry order is filled the
+others are cancelled.</p>
+<p>The same is true for price type exits. Orders will be placed once their
+conditions are met, i.e., an entry order with a matching ID is filled.</p>
+</div>
+<div class="section" id="closing-market-position">
+<h2><a class="toc-backref" href="#id7">Closing market position</a><a class="headerlink" href="#closing-market-position" title="Permalink to this headline">¶</a></h2>
+<p>Despite the fact that it is possible to exit from a specific entry in code, when
+orders are shown in the <em>List of Trades</em> in the <em>Strategy Tester</em> tab, they all
+are linked according to FIFO (first in, first out) rules. If an entry order
+ID is not specified for an exit order in code, the exit order closes the
+first entry order that opened market position. Let’s study the following
+example:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">strategy</span><span class="p">(</span><span class="s2">"exit Demo"</span><span class="p">,</span><span class="w"> </span><span class="nx">pyramiding</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="nx">overlay</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">true</span><span class="p">)</span><span class="w"></span>
+<span class="k">if </span><span class="ni">strategy.position_size</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="nx">and</span><span class="w"> </span><span class="ni">year</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">2014</span><span class="w"></span>
+<span class="w">    </span><span class="ni">strategy.entry</span><span class="p">(</span><span class="s2">"Buy1"</span><span class="p">,</span><span class="w"> </span><span class="ni">strategy.long</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">)</span><span class="w"></span>
+<span class="k">else if </span><span class="ni">strategy.position_size</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">5</span><span class="w"></span>
+<span class="w">    </span><span class="ni">strategy.entry</span><span class="p">(</span><span class="s2">"Buy2"</span><span class="p">,</span><span class="w"> </span><span class="ni">strategy.long</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="nx">stop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">strategy.position_avg_price</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="ni">strategy.position_avg_price</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">0</span><span class="mf">.1</span><span class="p">)</span><span class="w"></span>
+<span class="k">else if </span><span class="ni">strategy.position_size</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">15</span><span class="w"></span>
+<span class="w">    </span><span class="ni">strategy.exit</span><span class="p">(</span><span class="s2">"bracket"</span><span class="p">,</span><span class="w"> </span><span class="nx">loss</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="nx">profit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>The code given above places 2 orders sequentially: “Buy1” at market
+price and “Buy2” at a 10% higher price (stop order). The exit order is placed
+only after entry orders have been filled. If you apply the code to a
+chart, you will see that each entry order is closed by an exit order,
+though we did not specify entry order ID to close in this line:
+<code class="docutils literal notranslate"><span class="pre">strategy.exit("bracket",</span> <span class="pre">loss=10,</span> <span class="pre">profit=10,</span> <span class="pre">when=strategy.position_size</span> <span class="pre">==</span> <span class="pre">15)</span></code></p>
+<p>Another example:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">strategy</span><span class="p">(</span><span class="s2">"exit Demo"</span><span class="p">,</span><span class="w"> </span><span class="nx">pyramiding</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="nx">overlay</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">true</span><span class="p">)</span><span class="w"></span>
+<span class="k">if </span><span class="ni">strategy.position_size</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="w"></span>
+<span class="w">    </span><span class="ni">strategy.entry</span><span class="p">(</span><span class="s2">"Buy1"</span><span class="p">,</span><span class="w"> </span><span class="ni">strategy.long</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">)</span><span class="w"></span>
+<span class="k">else if </span><span class="ni">strategy.position_size</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">5</span><span class="w"></span>
+<span class="w">    </span><span class="ni">strategy.entry</span><span class="p">(</span><span class="s2">"Buy2"</span><span class="p">,</span><span class="w"> </span><span class="ni">strategy.long</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="nx">stop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">strategy.position_avg_price</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="ni">strategy.position_avg_price</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">0</span><span class="mf">.1</span><span class="p">)</span><span class="w"></span>
+<span class="k">else if </span><span class="ni">strategy.position_size</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">15</span><span class="w"></span>
+<span class="w">    </span><span class="ni">strategy.close</span><span class="p">(</span><span class="s2">"Buy2"</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="ni">strategy.exit</span><span class="p">(</span><span class="s2">"bracket"</span><span class="p">,</span><span class="w"> </span><span class="s2">"Buy1"</span><span class="p">,</span><span class="w"> </span><span class="nx">loss</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="nx">profit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="ni">strategy.position_avg_price</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<ul class="simple">
+<li>It opens a 5-contract long position with the order “Buy1”.</li>
+<li>It extends the long position by purchasing 10 more contracts at 10%
+higher price with the order “Buy2”.</li>
+<li>The exit order (strategy.close) to sell 10 contracts (exit from
+“Buy2”) is filled.</li>
+</ul>
+<p>If you take a look at the plot, you can see that average entry price =
+“Buy2” execution price and our strategy closed exactly this entry order,
+while on the <em>Trade List</em> tab we can see that it closed the first “Buy1”
+order and half of the second “Buy2”. It means that no matter which
+entry order you specify for your strategy to close, the broker emulator
+will still close the first one, according to FIFO rules. It works
+the same way as when trading with a real broker.</p>
+</div>
+<div class="section" id="oca-groups">
+<span id="id1"></span><h2><a class="toc-backref" href="#id8">OCA groups</a><a class="headerlink" href="#oca-groups" title="Permalink to this headline">¶</a></h2>
+<p>It is possible to put orders in 2 different One-Cancells-All (OCA) groups in Pine Script™.</p>
+<dl class="docutils">
+<dt><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_strategy{dot}oca{dot}cancel">strategy.oca.cancel</a></dt>
+<dd>As soon as an order from the group is filled
+(even partially) or cancelled, the other orders from the same group
+get cancelled. One should keep in mind that if order prices are the
+same or they are close, more than 1 order of the same group may be
+filled. This OCA group type is available only for entry orders
+because all exit orders are placed in <code class="docutils literal notranslate"><span class="pre">strategy.oca.reduce</span></code>.</dd>
+</dl>
+<p>Example:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">strategy</span><span class="p">(</span><span class="s2">"oca_cancel demo"</span><span class="p">)</span><span class="w"></span>
+<span class="k">if </span><span class="ni">year</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">2014</span><span class="w"> </span><span class="nx">and</span><span class="w"> </span><span class="ni">year</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">2016</span><span class="w"></span>
+<span class="w">    </span><span class="ni">strategy.entry</span><span class="p">(</span><span class="s2">"LE"</span><span class="p">,</span><span class="w"> </span><span class="ni">strategy.long</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="ni">strategy.entry</span><span class="p">(</span><span class="s2">"SE"</span><span class="p">,</span><span class="w"> </span><span class="ni">strategy.short</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>You may think that this is a reverse strategy since pyramiding is not
+allowed, but in fact both orders will get filled because they are market
+orders, which means they are to be executed immediately at the current price.
+The second order doesn’t get cancelled because both are filled almost at
+the same moment and the system doesn’t have time to process the first order
+fill and cancel the second one before it gets executed. The same would
+happen if these were price orders with same or similar prices. The strategy
+places all orders allowed according to market position, etc.</p>
+<p>The strategy places all orders that do not contradict the rules (in our
+case market position is flat, therefore any entry order can be filled).
+At each tick calculation, firstly all orders with the satisfied
+conditions are executed and only then the orders from the group where an
+order was executed are cancelled.</p>
+<p>To turn the above strategy into a reverse strategy you need to place orders in the OCA group:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">strategy</span><span class="p">(</span><span class="s2">"oca_cancel demo"</span><span class="p">)</span><span class="w"></span>
+<span class="k">if </span><span class="ni">year</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">2014</span><span class="w"> </span><span class="nx">and</span><span class="w"> </span><span class="ni">year</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">2016</span><span class="w"></span>
+<span class="w">    </span><span class="ni">strategy.entry</span><span class="p">(</span><span class="s2">"LE"</span><span class="p">,</span><span class="w"> </span><span class="ni">strategy.long</span><span class="p">,</span><span class="w"> </span><span class="nx">oca_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">strategy.oca</span><span class="nx">.cancel</span><span class="p">,</span><span class="w"> </span><span class="nx">oca_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"Entry"</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="ni">strategy.entry</span><span class="p">(</span><span class="s2">"SE"</span><span class="p">,</span><span class="w"> </span><span class="ni">strategy.short</span><span class="p">,</span><span class="w"> </span><span class="nx">oca_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">strategy.oca</span><span class="nx">.cancel</span><span class="p">,</span><span class="w"> </span><span class="nx">oca_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"Entry"</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<dl class="docutils">
+<dt><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_strategy{dot}oca{dot}reduce">strategy.oca.reduce</a></dt>
+<dd>This group type allows multiple orders
+within the group to be filled. As one of the orders within the group
+starts to be filled, the size of other orders is reduced by the
+filled contracts amount. It is very useful for the exit strategies.
+Once the price touches your take-profit order and it is being filled,
+the stop-loss is not cancelled but its amount is reduced by the
+filled contracts amount, thus protecting the rest of the open
+position.</dd>
+<dt><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_strategy{dot}oca{dot}none">strategy.oca.none</a></dt>
+<dd>The order is placed outside of the group
+(default value for the <code class="docutils literal notranslate"><span class="pre">strategy.order</span></code> and <code class="docutils literal notranslate"><span class="pre">strategy.entry</span></code> functions).</dd>
+</dl>
+<p>Every group has its own unique id, like orders. If
+two groups have the same id, but different type, they will be considered a
+different groups. Example:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">strategy</span><span class="p">(</span><span class="s2">"My Script"</span><span class="p">)</span><span class="w"></span>
+<span class="k">if </span><span class="ni">year</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">2014</span><span class="w"> </span><span class="nx">and</span><span class="w"> </span><span class="ni">year</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">2016</span><span class="w"></span>
+<span class="w">    </span><span class="ni">strategy.entry</span><span class="p">(</span><span class="s2">"Buy"</span><span class="p">,</span><span class="w"> </span><span class="ni">strategy.long</span><span class="p">,</span><span class="w"> </span><span class="nx">oca_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"My oca"</span><span class="p">,</span><span class="w"> </span><span class="nx">oca_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">strategy.oca</span><span class="nx">.reduce</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="ni">strategy.exit</span><span class="p">(</span><span class="s2">"FromBy"</span><span class="p">,</span><span class="w"> </span><span class="s2">"Buy"</span><span class="p">,</span><span class="w"> </span><span class="nx">profit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span><span class="w"> </span><span class="nx">loss</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">200</span><span class="p">,</span><span class="w"> </span><span class="nx">oca_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"My oca"</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="ni">strategy.entry</span><span class="p">(</span><span class="s2">"Sell"</span><span class="p">,</span><span class="w"> </span><span class="ni">strategy.short</span><span class="p">,</span><span class="w"> </span><span class="nx">oca_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"My oca"</span><span class="p">,</span><span class="w"> </span><span class="nx">oca_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">strategy.oca</span><span class="nx">.cancel</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="ni">strategy.order</span><span class="p">(</span><span class="s2">"Order"</span><span class="p">,</span><span class="w"> </span><span class="ni">strategy.short</span><span class="p">,</span><span class="w"> </span><span class="nx">oca_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"My oca"</span><span class="p">,</span><span class="w"> </span><span class="nx">oca_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">strategy.oca</span><span class="nx">.none</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>“Buy” and “Sell” will be placed in different groups as their type is
+different. “Order” will be outside of any group as its type is set to
+<code class="docutils literal notranslate"><span class="pre">strategy.oca.none</span></code>. Moreover, “Buy” will be placed in the exit group
+as exits are always placed in the <code class="docutils literal notranslate"><span class="pre">strategy.oca.reduce_size</span></code> type
+group.</p>
+</div>
+<div class="section" id="risk-management">
+<h2><a class="toc-backref" href="#id9">Risk management</a><a class="headerlink" href="#risk-management" title="Permalink to this headline">¶</a></h2>
+<p>It is not easy to create a universally profitable strategy. Usually,
+strategies are created for certain market patterns and can produce
+uncontrollable losses when applied to other data. Therefore, stopping
+auto trading when too many losses occur is important. A
+special group of strategy commands help you manage risk. They all start with
+the <code class="docutils literal notranslate"><span class="pre">strategy.risk.</span></code> prefix.</p>
+<p>In any given strategy you can combine any number of risk management criteria
+in any combination. Every risk category command is calculated at every tick as
+well as at every order execution event, regardless of the
+<code class="docutils literal notranslate"><span class="pre">calc_on_order_fills</span></code> strategy setting. There is no way to disable
+any risk rule at runtime from a script. Regardless of where in the script
+the risk rule is located it will always be applied unless the line with
+the rule is deleted and the script is recompiled.</p>
+<p>When a risk management rule is triggered, no orders will be generated
+starting from the next calculation of the script.
+Therefore, if a strategy has several rules of the same type with
+different parameters, it will stop calculating when the rule with the
+most strict parameters is triggered. When a strategy is stopped, all
+unexecuted orders are cancelled and then a market order is sent to close
+the position if it is not flat.</p>
+<p>Furthermore, it is worth remembering that when using resolutions higher
+than 1 day, the whole bar is considered to be 1 day for the rules
+starting with prefix <code class="docutils literal notranslate"><span class="pre">strategy.risk.max_intraday_</span></code>.</p>
+<p>Example (MSFT, 1):</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">strategy</span><span class="p">(</span><span class="s2">"multi risk demo"</span><span class="p">,</span><span class="w"> </span><span class="nx">overlay</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">true</span><span class="p">,</span><span class="w"> </span><span class="nx">pyramiding</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="nx">calc_on_order_fills</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">true</span><span class="p">)</span><span class="w"></span>
+<span class="k">if </span><span class="ni">year</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">2014</span><span class="w"></span>
+<span class="w">    </span><span class="ni">strategy.entry</span><span class="p">(</span><span class="s2">"LE"</span><span class="p">,</span><span class="w"> </span><span class="ni">strategy.long</span><span class="p">)</span><span class="w"></span>
+<span class="ni">strategy.risk</span><span class="nx">.max_intraday_filled_orders</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="w"></span>
+<span class="ni">strategy.risk</span><span class="nx">.max_intraday_filled_orders</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>The position will be closed and trading will be stopped until the end of
+every trading session after two orders are executed within this session,
+as the second rule is triggered earlier and is valid until the end of
+the trading session.</p>
+<p>One should remember that the <code class="docutils literal notranslate"><span class="pre">strategy.risk.allow_entry_in</span></code> rule is
+applied to entries only so it will be possible to enter in a trade using
+the <code class="docutils literal notranslate"><span class="pre">strategy.order</span></code> command, as this command is not an entry command
+per se. Moreover, when the <code class="docutils literal notranslate"><span class="pre">strategy.risk.allow_entry_in</span></code> rule is
+active, entries in a “prohibited trade” become exits instead of reverse
+trades.</p>
+<p>Example (MSFT, 1D):</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">strategy</span><span class="p">(</span><span class="s2">"allow_entry_in demo"</span><span class="p">,</span><span class="w"> </span><span class="nx">overlay</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">true</span><span class="p">)</span><span class="w"></span>
+<span class="k">if </span><span class="ni">bar_index</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">800</span><span class="w"></span>
+<span class="w">    </span><span class="k">if </span><span class="ni">strategy.position_size</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">0</span><span class="w"></span>
+<span class="w">        </span><span class="ni">strategy.entry</span><span class="p">(</span><span class="s2">"LE"</span><span class="p">,</span><span class="w"> </span><span class="ni">strategy.long</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="k">else</span>
+<span class="w">        </span><span class="ni">strategy.entry</span><span class="p">(</span><span class="s2">"SE"</span><span class="p">,</span><span class="w"> </span><span class="ni">strategy.short</span><span class="p">)</span><span class="w"></span>
+<span class="ni">strategy.risk</span><span class="nx">.allow_entry_in</span><span class="p">(</span><span class="ni">strategy.direction</span><span class="nx">.long</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>As short entries are prohibited by the risk rules,
+long exit trades will be made instead of reverse trades.</p>
+</div>
+<div class="section" id="currency">
+<h2><a class="toc-backref" href="#id10">Currency</a><a class="headerlink" href="#currency" title="Permalink to this headline">¶</a></h2>
+<p>TradingView strategies can operate in a currency that is different from the
+instrument’s currency. <em>Net Profit</em> and <em>Open Profit</em> are recalculated in the
+account currency. Account currency is set in the strategy properties’
+<em>Base Currency</em> drop-down list or in the script via the
+<code class="docutils literal notranslate"><span class="pre">strategy(...,</span> <span class="pre">currency=currency.*)</span></code> parameter.
+Performance report values are calculated in the selected currency.</p>
+<p>Trade profit (open or closed) is calculated based on the profit in the
+instrument currency multiplied by the cross-rate on the <em>close</em> of the
+trading day previous to the bar where the strategy is calculated.</p>
+<p>Example: we trade EURUSD, D and have selected <code class="docutils literal notranslate"><span class="pre">currency.EUR</span></code> as the strategy
+currency. Our strategy buys and exits the position using 1 point
+profit target or stop loss.</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">strategy</span><span class="p">(</span><span class="s2">"Currency test"</span><span class="p">,</span><span class="w"> </span><span class="nx">currency</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">currency.EUR</span><span class="p">)</span><span class="w"></span>
+<span class="k">if </span><span class="ni">bar_index</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">800</span><span class="w"></span>
+<span class="w">    </span><span class="ni">strategy.entry</span><span class="p">(</span><span class="s2">"LE"</span><span class="p">,</span><span class="w"> </span><span class="ni">strategy.long</span><span class="p">,</span><span class="w"> </span><span class="mi">1000</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="ni">strategy.exit</span><span class="p">(</span><span class="s2">"LX"</span><span class="p">,</span><span class="w"> </span><span class="s2">"LE"</span><span class="p">,</span><span class="w"> </span><span class="nx">profit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="nx">loss</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"></span>
+<span class="nx">profit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">strategy.netprofit</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="ni">math.abs</span><span class="p">((</span><span class="nx">profit</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nx">profit</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="p">)</span><span class="o">*</span><span class="mi">100</span><span class="p">),</span><span class="w"> </span><span class="s2">"1 point profit"</span><span class="p">,</span><span class="w"> </span><span class="k">color </span><span class="o">=</span><span class="w"> </span><span class="ni">color.blue</span><span class="p">,</span><span class="w"> </span><span class="nx">linewidth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="no">close</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="p">,</span><span class="w"> </span><span class="s2">"prev usdeur"</span><span class="p">,</span><span class="w"> </span><span class="k">color </span><span class="o">=</span><span class="w"> </span><span class="ni">color.red</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>After adding this strategy to the chart we can see that the plot lines
+are matching. This demonstrates that the rate to calculate the profit
+for every trade was based on the <em>close</em> of the previous day.</p>
+<p>When trading on intra-day resolutions, the cross-rate on the close of the
+trading day previous to the bar where the strategy is calculated will be
+used and it will not change during the trading session.</p>
+<p>When trading on resolutions higher than 1 day, the cross-rate on the
+close of the trading day previous to the close of the bar where the
+strategy is calculated will be used. Let’s say we trade on a weekly
+chart, then the cross rate on Thursday’s session close will always be
+used to calculate the profits.</p>
+<p>In real-time, yesterday’s session close rate is used.</p>
+</div>
+<div class="section" id="margin">
+<h2><a class="toc-backref" href="#id11">Margin</a><a class="headerlink" href="#margin" title="Permalink to this headline">¶</a></h2>
+<p>Margin for Long/Short positions (parameters: margin_long, margin_short) specifies the margin for each trade, i.e., the percent of the position that the trader must fund. For example, if the Margin for long positions is set to 25%, the trader has to have enough funds to cover 25% of the open trade and can potentially spend up to 400% of their equity on every trade.</p>
+<p>If a trade has been opened and it starts losing money to the extent where the trader’s funds are not enough to cover their portion of the trade, a Margin Call occurs and forcibly liquidates a part of the original position. The precise number of units that will be liquidated is 4 times the amount it takes to simply cover the loss. It is calculated via the following algorithm:</p>
+<ol class="arabic simple">
+<li>Calculate Money Spent, the amount of money the trader has spent on opening the position.</li>
+</ol>
+<p>Position Size * Entry Price</p>
+<ol class="arabic simple" start="2">
+<li>Calculate the Market Value of Security (MVS).</li>
+</ol>
+<p>Position Size * Current Price</p>
+<ol class="arabic simple" start="3">
+<li>Calculate the Open Profit. If the trade direction is short and Open Profit is a positive number, the result should still be negative, so we multiply the absolute value of our calculation by -1.</li>
+</ol>
+<p>ABS(MVS - Money Spent) * -1</p>
+<ol class="arabic simple" start="4">
+<li>Calculate the Equity, i.e., the money available to the trader at the current moment.</li>
+</ol>
+<p>Initial Capital + Net Profit + Open Profit</p>
+<ol class="arabic simple" start="5">
+<li>Convert Margin Percent to Margin Ratio.</li>
+</ol>
+<p>Margin Percent / 100</p>
+<ol class="arabic simple" start="6">
+<li>Calculate Margin, i.e., the exact amount of money needed to cover their part of the open position.</li>
+</ol>
+<p>MVS * Margin Ratio</p>
+<ol class="arabic simple" start="7">
+<li>Calculate Available Funds, i.e., the amount of lost money the trader cannot cover with their current equity.</li>
+</ol>
+<p>Equity - Margin</p>
+<ol class="arabic simple" start="8">
+<li>Calculate the total amount of money the trader has lost.</li>
+</ol>
+<p>Available Funds / Margin Ratio</p>
+<ol class="arabic simple" start="9">
+<li>Calculate how many units the trader would need to sell to cover the loss. The value is truncated to the same decimal point as the minimum contract size for the current symbol.</li>
+</ol>
+<p>TRUNCATE(Step #8 / Current Price)</p>
+<ol class="arabic simple" start="10">
+<li>Calculate how many units the broker will sell to cover the loss. Our emulated broker sells 4 times as many units as necessary to make sure the margin call isn’t constantly triggered if the losses continue. This value will be positive for short trades because the broker buys units to cover the loss instead of selling them.</li>
+</ol>
+<p>Step #9 * 4</p>
+<p>To examine this calculation in detail, let’s add the built-in Supertrend Strategy to the NASDAQ:TSLA chart on the 1D timeframe. Set Order size to 300% of equity and Margin for long positions to 25%.</p>
+<img alt="../_images/Strategy_margin.png" src="../_images/Strategy_margin.png"/>
+<p>Our first entry happened on the opening of the bar on 16 Sep 2010. We buy 682438 units (Position size) for 4.43 USD (Entry price). Then, on 23 Sep 2010, when the price was at 3.9 (Current price), 111052 units were forcibly liquidated via margin call.</p>
+<ol class="arabic simple">
+<li>Money spent: 682438 * 4.43 = 3023200.34</li>
+<li>MVS: 682438 * 3.9 = 2661508.2</li>
+<li>Open Profit: −361692.14</li>
+<li>Equity: 1000000 + 0 − 361692.14 = 638307.86</li>
+<li>Margin Ratio: 25 / 100 = 0.25</li>
+<li>Margin: 2661508.2 * 0.25 = 665377.05</li>
+<li>Available Funds: 638307.86 - 665377.05 = -27069.19</li>
+<li>Money Lost: -27069.19 / 0.25 = -108276.76</li>
+<li>Shares to cover the loss: TRUNCATE(-108276.76 / 3.9) = TRUNCATE(-27763.27) = -27763</li>
+<li>Margin Call Size: -27763 * 4 = - 111052</li>
+</ol>
+<a class="reference external image-reference" href="https://www.tradingview.com/"><div align="center" class="align-center"><img alt="../_images/TradingView-Logo-Block.svg" src="../_images/TradingView-Logo-Block.svg" width="200px"/></div>
+</a>
+</div>
+</div>
+</div>
+<div class="footer-relations">
+<div class="pull-left">
+<a class="btn btn-default" href="Sessions.html" title="previous chapter (use the left arrow)">Sessions</a>
+</div>
+<div class="pull-right">
+<a class="btn btn-default" href="Tables.html" title="next chapter (use the right arrow)">Tables</a>
+</div>
+</div>
+<div class="clearer"></div>
+</div>

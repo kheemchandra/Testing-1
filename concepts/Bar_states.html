@@ -1,0 +1,221 @@
+<div id="right-column">
+<div aria-label="breadcrumbs navigation" role="navigation">
+<ol class="breadcrumb">
+<li><a href="../index.html">User Manual</a></li>
+<li><a href="index.html">Concepts</a></li>
+<li>Bar states</li>
+</ol>
+</div>
+<div class="document clearer body">
+<a class="reference external image-reference" href="https://www.tradingview.com/pine-script-docs/en/v5/Introduction.html"><div align="right" class="align-right"><img alt="Pine Script™ logo" height="100" src="../_images/Pine_Script_logo.svg" width="100"/></div>
+</a>
+<div class="section" id="bar-states">
+<span id="pagebarstates"></span><h1>Bar states<a class="headerlink" href="#bar-states" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><a class="reference internal" href="#introduction" id="id1">Introduction</a></li>
+<li><a class="reference internal" href="#bar-state-built-in-variables" id="id2">Bar state built-in variables</a><ul>
+<li><a class="reference internal" href="#barstate-isfirst" id="id3">`barstate.isfirst`</a></li>
+<li><a class="reference internal" href="#barstate-islast" id="id4">`barstate.islast`</a></li>
+<li><a class="reference internal" href="#barstate-ishistory" id="id5">`barstate.ishistory`</a></li>
+<li><a class="reference internal" href="#barstate-isrealtime" id="id6">`barstate.isrealtime`</a></li>
+<li><a class="reference internal" href="#barstate-isnew" id="id7">`barstate.isnew`</a></li>
+<li><a class="reference internal" href="#barstate-isconfirmed" id="id8">`barstate.isconfirmed`</a></li>
+<li><a class="reference internal" href="#barstate-islastconfirmedhistory" id="id9">`barstate.islastconfirmedhistory`</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#example" id="id10">Example</a></li>
+</ul>
+</div>
+<div class="section" id="introduction">
+<h2><a class="toc-backref" href="#id1">Introduction</a><a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>A set of built-in variables in the <code class="docutils literal notranslate"><span class="pre">barstate</span></code> namespace allow your script to detect different properties of the bar on which the script is currently executing.</p>
+<p>These states can be used to restrict the execution or the logic of your code to specific bars.</p>
+<p>Some built-ins return information on the trading session the current bar belongs to.
+They are explained in the <a class="reference internal" href="Sessions.html#pagesessions-sessionstates"><span class="std std-ref">Session states</span></a> section.</p>
+</div>
+<div class="section" id="bar-state-built-in-variables">
+<h2><a class="toc-backref" href="#id2">Bar state built-in variables</a><a class="headerlink" href="#bar-state-built-in-variables" title="Permalink to this headline">¶</a></h2>
+<p>Note that while indicators and libraries run on all price or volume updates in real time, strategies not using <code class="docutils literal notranslate"><span class="pre">calc_on_every_tick</span></code> will not;
+they will only execute when the realtime bar closes. This will affect the detection of bar states in that type of script.
+On open markets, for example, this code will not display a background until the realtime closes because that is when the strategy runs:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">strategy</span><span class="p">(</span><span class="s2">"S"</span><span class="p">)</span><span class="w"></span>
+<span class="ni">bgcolor</span><span class="p">(</span><span class="ni">barstate.islast</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="ni">color.silver</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="no">na</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<div class="section" id="barstate-isfirst">
+<h3><a class="toc-backref" href="#id3">`barstate.isfirst`</a><a class="headerlink" href="#barstate-isfirst" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_barstate{dot}isfirst">barstate.isfirst</a>
+is only <code class="docutils literal notranslate"><span class="pre">true</span></code> on the dataset’s first bar, i.e., when <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_bar_index">bar_index</a> is zero.</p>
+<p>It can be useful to initialize variables on the first bar only, e.g.:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">// Declare array and set its values on the first bar only.</span><span class="w"></span>
+<span class="nx">FILL_COLOR</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">color.green</span><span class="w"></span>
+<span class="k">var </span><span class="nx">fillColors</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">array.new_color</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="k">if </span><span class="ni">barstate.isfirst</span><span class="w"></span>
+<span class="w">    </span><span class="c">// Initialize the array elements with progressively lighter shades of the fill color.</span><span class="w"></span>
+<span class="w">    </span><span class="ni">array.push</span><span class="p">(</span><span class="nx">fillColors</span><span class="p">,</span><span class="w"> </span><span class="ni">color.new</span><span class="p">(</span><span class="nx">FILL_COLOR</span><span class="p">,</span><span class="w"> </span><span class="mi">70</span><span class="p">))</span><span class="w"></span>
+<span class="w">    </span><span class="ni">array.push</span><span class="p">(</span><span class="nx">fillColors</span><span class="p">,</span><span class="w"> </span><span class="ni">color.new</span><span class="p">(</span><span class="nx">FILL_COLOR</span><span class="p">,</span><span class="w"> </span><span class="mi">75</span><span class="p">))</span><span class="w"></span>
+<span class="w">    </span><span class="ni">array.push</span><span class="p">(</span><span class="nx">fillColors</span><span class="p">,</span><span class="w"> </span><span class="ni">color.new</span><span class="p">(</span><span class="nx">FILL_COLOR</span><span class="p">,</span><span class="w"> </span><span class="mi">80</span><span class="p">))</span><span class="w"></span>
+<span class="w">    </span><span class="ni">array.push</span><span class="p">(</span><span class="nx">fillColors</span><span class="p">,</span><span class="w"> </span><span class="ni">color.new</span><span class="p">(</span><span class="nx">FILL_COLOR</span><span class="p">,</span><span class="w"> </span><span class="mi">85</span><span class="p">))</span><span class="w"></span>
+<span class="w">    </span><span class="ni">array.push</span><span class="p">(</span><span class="nx">fillColors</span><span class="p">,</span><span class="w"> </span><span class="ni">color.new</span><span class="p">(</span><span class="nx">FILL_COLOR</span><span class="p">,</span><span class="w"> </span><span class="mi">90</span><span class="p">))</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="barstate-islast">
+<h3><a class="toc-backref" href="#id4">`barstate.islast`</a><a class="headerlink" href="#barstate-islast" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_barstate{dot}islast">barstate.islast</a>
+is <code class="docutils literal notranslate"><span class="pre">true</span></code> if the current bar is the last one on the chart, whether that bar is a realtime bar or not.</p>
+<p>It can be used to restrict the execution of code to the chart’s last bar, which is often useful when drawing lines, labels or tables.
+Here, we use it to determine when to update a label which we want to appear only on the last bar.
+We create the label only once and then update its properties using <code class="docutils literal notranslate"><span class="pre">label.set_*()</span></code> functions because it is more efficient:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="nx">true</span><span class="p">)</span><span class="w"></span>
+<span class="c">// Create label on the first bar only.</span><span class="w"></span>
+<span class="k">var label </span><span class="nx">hiLabel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">label.new</span><span class="p">(</span><span class="no">na</span><span class="p">,</span><span class="w"> </span><span class="no">na</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">)</span><span class="w"></span>
+<span class="c">// Update the label's position and text on the last bar,</span><span class="w"></span>
+<span class="c">// including on all realtime bar updates.</span><span class="w"></span>
+<span class="k">if </span><span class="ni">barstate.islast</span><span class="w"></span>
+<span class="w">    </span><span class="ni">label.set_xy</span><span class="p">(</span><span class="nx">hiLabel</span><span class="p">,</span><span class="w"> </span><span class="ni">bar_index</span><span class="p">,</span><span class="w"> </span><span class="no">high</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="ni">label.set_text</span><span class="p">(</span><span class="nx">hiLabel</span><span class="p">,</span><span class="w"> </span><span class="ni">str.tostring</span><span class="p">(</span><span class="no">high</span><span class="p">,</span><span class="w"> </span><span class="ni">format.mintick</span><span class="p">))</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="barstate-ishistory">
+<h3><a class="toc-backref" href="#id5">`barstate.ishistory`</a><a class="headerlink" href="#barstate-ishistory" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_barstate{dot}ishistory">barstate.ishistory</a>
+is <code class="docutils literal notranslate"><span class="pre">true</span></code> on all historical bars. It can never be <code class="docutils literal notranslate"><span class="pre">true</span></code> on a bar when
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_barstate{dot}isrealtime">barstate.isrealtime</a> is also <code class="docutils literal notranslate"><span class="pre">true</span></code>,
+and it does not become <code class="docutils literal notranslate"><span class="pre">true</span></code> on a realtime bar’s closing update, when
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_barstate{dot}isconfirmed">barstate.isconfirmed</a> becomes <code class="docutils literal notranslate"><span class="pre">true</span></code>.
+On closed markets, it can be <code class="docutils literal notranslate"><span class="pre">true</span></code> on the same bar where <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_barstate{dot}islast">barstate.islast</a>
+is also <code class="docutils literal notranslate"><span class="pre">true</span></code>.</p>
+</div>
+<div class="section" id="barstate-isrealtime">
+<h3><a class="toc-backref" href="#id6">`barstate.isrealtime`</a><a class="headerlink" href="#barstate-isrealtime" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_barstate{dot}isrealtime">barstate.isrealtime</a>
+is <code class="docutils literal notranslate"><span class="pre">true</span></code> if the current data update is a real-time bar update, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise (thus it is historical).
+Note that <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_barstate{dot}islast">barstate.islast</a> is also <code class="docutils literal notranslate"><span class="pre">true</span></code> on all realtime bars.</p>
+</div>
+<div class="section" id="barstate-isnew">
+<h3><a class="toc-backref" href="#id7">`barstate.isnew`</a><a class="headerlink" href="#barstate-isnew" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_barstate{dot}isnew">barstate.isnew</a>
+is <code class="docutils literal notranslate"><span class="pre">true</span></code> on all historical bars and on the realtime bar’s first (opening) update.</p>
+<p>All historical bars are considered <em>new</em> bars because the Pine Script™ runtime executes your script on each bar sequentially, from the chart’s first bar in time, to the last.
+Each historical bar is thus <em>discovered</em> by your script as it executes, bar to bar.</p>
+<p><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_barstate{dot}isnew">barstate.isnew</a>
+can be useful to reset <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#op_varip">varip</a> variables when a new realtime bar comes in.
+The following code will reset <code class="docutils literal notranslate"><span class="pre">updateNo</span></code> to 1 on all historical bars and at the beginning of each realtime bar.
+It calculates the number of realtime updates during each realtime bar:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span><span class="w"></span>
+<span class="nx">updateNo</span><span class="p">()</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"></span>
+<span class="w">    </span><span class="k">varip int </span><span class="nx">updateNo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">na</span><span class="w"></span>
+<span class="w">    </span><span class="k">if </span><span class="ni">barstate.isnew</span><span class="w"></span>
+<span class="w">        </span><span class="nx">updateNo</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="mi">1</span><span class="w"></span>
+<span class="w">    </span><span class="k">else</span>
+<span class="w">        </span><span class="nx">updateNo</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">1</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="nx">updateNo</span><span class="p">())</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="barstate-isconfirmed">
+<h3><a class="toc-backref" href="#id8">`barstate.isconfirmed`</a><a class="headerlink" href="#barstate-isconfirmed" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_barstate{dot}isconfirmed">barstate.isconfirmed</a>
+is <code class="docutils literal notranslate"><span class="pre">true</span></code> on all historical bars and on the last (closing) update of a realtime bar.</p>
+<p>It can be useful to avoid repainting by requiring the realtime bar to be closed before a condition can become <code class="docutils literal notranslate"><span class="pre">true</span></code>.
+We use it here to hold plotting of our RSI until the realtime bar closes and becomes an elapsed realtime bar.
+It will plot on historical bars because <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_barstate{dot}isconfirmed">barstate.isconfirmed</a>
+is always <code class="docutils literal notranslate"><span class="pre">true</span></code> on them:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span><span class="w"></span>
+<span class="nx">myRSI</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">ta.rsi</span><span class="p">(</span><span class="no">close</span><span class="p">,</span><span class="w"> </span><span class="mi">20</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="ni">barstate.isconfirmed</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="nx">myRSI</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="no">na</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_barstate{dot}isconfirmed">barstate.isconfirmed</a>
+will not work when used in a <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_request{dot}security">request.security()</a> call.</p>
+</div>
+<div class="section" id="barstate-islastconfirmedhistory">
+<h3><a class="toc-backref" href="#id9">`barstate.islastconfirmedhistory`</a><a class="headerlink" href="#barstate-islastconfirmedhistory" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_barstate{dot}islastconfirmedhistory">barstate.islastconfirmedhistory</a>
+is <code class="docutils literal notranslate"><span class="pre">true</span></code> if the script is executing on the dataset’s last bar when the market is closed, or on the bar immediately preceding the realtime bar if the market is open.</p>
+<p>It can be used to detect the first realtime bar with <code class="docutils literal notranslate"><span class="pre">barstate.islastconfirmedhistory[1]</span></code>, or to postpone server-intensive calculations until the last historical bar, which would otherwise be undetectable on open markets.</p>
+</div>
+</div>
+<div class="section" id="example">
+<h2><a class="toc-backref" href="#id10">Example</a><a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
+<p>Here is an example of a script using <code class="docutils literal notranslate"><span class="pre">barstate.*</span></code> variables:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"Bar States"</span><span class="p">,</span><span class="w"> </span><span class="nx">overlay</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">true</span><span class="p">,</span><span class="w"> </span><span class="nx">max_labels_count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">500</span><span class="p">)</span><span class="w"></span>
+
+<span class="nx">stateText</span><span class="p">()</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"></span>
+<span class="w">    </span><span class="k">string </span><span class="nx">txt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">""</span><span class="w"></span>
+<span class="w">    </span><span class="nx">txt</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="ni">barstate.isfirst</span><span class="w">     </span><span class="o">?</span><span class="w"> </span><span class="s2">"isfirst\n"</span><span class="w">     </span><span class="o">:</span><span class="w"> </span><span class="s2">""</span><span class="w"></span>
+<span class="w">    </span><span class="nx">txt</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="ni">barstate.islast</span><span class="w">      </span><span class="o">?</span><span class="w"> </span><span class="s2">"islast\n"</span><span class="w">      </span><span class="o">:</span><span class="w"> </span><span class="s2">""</span><span class="w"></span>
+<span class="w">    </span><span class="nx">txt</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="ni">barstate.ishistory</span><span class="w">   </span><span class="o">?</span><span class="w"> </span><span class="s2">"ishistory\n"</span><span class="w">   </span><span class="o">:</span><span class="w"> </span><span class="s2">""</span><span class="w"></span>
+<span class="w">    </span><span class="nx">txt</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="ni">barstate.isrealtime</span><span class="w">  </span><span class="o">?</span><span class="w"> </span><span class="s2">"isrealtime\n"</span><span class="w">  </span><span class="o">:</span><span class="w"> </span><span class="s2">""</span><span class="w"></span>
+<span class="w">    </span><span class="nx">txt</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="ni">barstate.isnew</span><span class="w">       </span><span class="o">?</span><span class="w"> </span><span class="s2">"isnew\n"</span><span class="w">       </span><span class="o">:</span><span class="w"> </span><span class="s2">""</span><span class="w"></span>
+<span class="w">    </span><span class="nx">txt</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="ni">barstate.isconfirmed</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s2">"isconfirmed\n"</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s2">""</span><span class="w"></span>
+<span class="w">    </span><span class="nx">txt</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="ni">barstate.islastconfirmedhistory</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s2">"islastconfirmedhistory\n"</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s2">""</span><span class="w"></span>
+
+<span class="nx">labelColor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">switch</span>
+<span class="w">    </span><span class="ni">barstate.isfirst</span><span class="w">                </span><span class="o">=&gt;</span><span class="w"> </span><span class="ni">color.fuchsia</span><span class="w"></span>
+<span class="w">    </span><span class="ni">barstate.islastconfirmedhistory</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="ni">color.gray</span><span class="w"></span>
+<span class="w">    </span><span class="ni">barstate.ishistory</span><span class="w">              </span><span class="o">=&gt;</span><span class="w"> </span><span class="ni">color.silver</span><span class="w"></span>
+<span class="w">    </span><span class="ni">barstate.isconfirmed</span><span class="w">            </span><span class="o">=&gt;</span><span class="w"> </span><span class="ni">color.orange</span><span class="w"></span>
+<span class="w">    </span><span class="ni">barstate.isnew</span><span class="w">                  </span><span class="o">=&gt;</span><span class="w"> </span><span class="ni">color.red</span><span class="w"></span>
+<span class="w">    </span><span class="o">=&gt;</span><span class="w"> </span><span class="ni">color.yellow</span><span class="w"></span>
+
+<span class="ni">label.new</span><span class="p">(</span><span class="ni">bar_index</span><span class="p">,</span><span class="w"> </span><span class="no">na</span><span class="p">,</span><span class="w"> </span><span class="nx">stateText</span><span class="p">(),</span><span class="w"> </span><span class="nx">yloc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">yloc.abovebar</span><span class="p">,</span><span class="w"> </span><span class="k">color </span><span class="o">=</span><span class="w"> </span><span class="nx">labelColor</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Note that:</p>
+<ul class="simple">
+<li>Each state’s name will appear in the label’s text when it is <code class="docutils literal notranslate"><span class="pre">true</span></code>.</li>
+<li>There are five possible colors for the label’s background:<ul>
+<li>fuchsia on the first bar</li>
+<li>silver on historical bars</li>
+<li>gray on the last confirmed historical bar</li>
+<li>orange when a realtime bar is confirmed (when it closes and becomes an elapsed realtime bar)</li>
+<li>red on the realtime bar’s first execution</li>
+<li>yellow for other executions of the realtime bar</li>
+</ul>
+</li>
+</ul>
+<p>We begin by adding the indicator to the chart of an open market, but before any realtime update is received.
+Note how the last confirmed history bar is identified in #1, and how the last bar is identified as the last one,
+but is still considered a historical bar because no realtime updates have been received.</p>
+<img alt="../_images/BarStates-Example-01.png" src="../_images/BarStates-Example-01.png"/>
+<p>Let’s look at what happens when realtime updates start coming in:</p>
+<img alt="../_images/BarStates-Example-02.png" src="../_images/BarStates-Example-02.png"/>
+<p>Note that:</p>
+<ul class="simple">
+<li>The realtime bar is red because it is its first execution,
+because <code class="docutils literal notranslate"><span class="pre">barstate.isnew</span></code> is <code class="docutils literal notranslate"><span class="pre">true</span></code> and <code class="docutils literal notranslate"><span class="pre">barstate.ishistory</span></code> is no longer <code class="docutils literal notranslate"><span class="pre">true</span></code>, so our
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#op_switch">switch</a> structure
+determing our color uses the <code class="docutils literal notranslate"><span class="pre">barstate.isnew</span> <span class="pre">=&gt;</span> <span class="pre">color.red</span></code> branch.
+This will usually not last long because on the next update <code class="docutils literal notranslate"><span class="pre">barstate.isnew</span></code> will no longer be <code class="docutils literal notranslate"><span class="pre">true</span></code>
+so the label’s color will turn yellow.</li>
+<li>The label of elapsed realtime bars is orange because those bars were not historical bars when they closed.
+Accordingly, the <code class="docutils literal notranslate"><span class="pre">barstate.ishistory</span> <span class="pre">=&gt;</span> <span class="pre">color.silver</span></code> branch in the <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#op_switch">switch</a>
+structure was not executed, but the next one, <code class="docutils literal notranslate"><span class="pre">barstate.isconfirmed</span> <span class="pre">=&gt;</span> <span class="pre">color.orange</span></code> was.</li>
+</ul>
+<p>This last example shows how the realtime bar’s label will turn yellow after the first execution on the bar.
+This is the way the label will usually appear on realtime bars:</p>
+<img alt="../_images/BarStates-Example-03.png" src="../_images/BarStates-Example-03.png"/>
+<a class="reference external image-reference" href="https://www.tradingview.com/"><div align="center" class="align-center"><img alt="../_images/TradingView-Logo-Block.svg" src="../_images/TradingView-Logo-Block.svg" width="200px"/></div>
+</a>
+</div>
+</div>
+</div>
+<div class="footer-relations">
+<div class="pull-left">
+<a class="btn btn-default" href="Bar_plotting.html" title="previous chapter (use the left arrow)">Bar plotting</a>
+</div>
+<div class="pull-right">
+<a class="btn btn-default" href="Chart_information.html" title="next chapter (use the right arrow)">Chart information</a>
+</div>
+</div>
+<div class="clearer"></div>
+</div>

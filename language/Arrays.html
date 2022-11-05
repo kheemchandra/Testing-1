@@ -1,0 +1,788 @@
+<div id="right-column">
+<div aria-label="breadcrumbs navigation" role="navigation">
+<ol class="breadcrumb">
+<li><a href="../index.html">User Manual</a></li>
+<li><a href="index.html">Language</a></li>
+<li>Arrays</li>
+</ol>
+</div>
+<div class="document clearer body">
+<a class="reference external image-reference" href="https://www.tradingview.com/pine-script-docs/en/v5/Introduction.html"><div align="right" class="align-right"><img alt="Pine Script™ logo" height="100" src="../_images/Pine_Script_logo.svg" width="100"/></div>
+</a>
+<div class="section" id="arrays">
+<span id="pagearrays"></span><h1>Arrays<a class="headerlink" href="#arrays" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><a class="reference internal" href="#introduction" id="id3">Introduction</a></li>
+<li><a class="reference internal" href="#declaring-arrays" id="id4">Declaring arrays</a><ul>
+<li><a class="reference internal" href="#using-the-var-keyword" id="id5">Using the `var` keyword</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#reading-and-writing-array-values" id="id6">Reading and writing array values</a></li>
+<li><a class="reference internal" href="#looping-through-array-elements" id="id7">Looping through array elements</a></li>
+<li><a class="reference internal" href="#scope" id="id8">Scope</a></li>
+<li><a class="reference internal" href="#history-referencing" id="id9">History referencing</a></li>
+<li><a class="reference internal" href="#inserting-and-removing-array-elements" id="id10">Inserting and removing array elements</a><ul>
+<li><a class="reference internal" href="#inserting" id="id11">Inserting</a></li>
+<li><a class="reference internal" href="#removing" id="id12">Removing</a></li>
+<li><a class="reference internal" href="#using-an-array-as-a-stack" id="id13">Using an array as a stack</a></li>
+<li><a class="reference internal" href="#using-an-array-as-a-queue" id="id14">Using an array as a queue</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#calculations-on-arrays" id="id15">Calculations on arrays</a></li>
+<li><a class="reference internal" href="#manipulating-arrays" id="id16">Manipulating arrays</a><ul>
+<li><a class="reference internal" href="#concatenation" id="id17">Concatenation</a></li>
+<li><a class="reference internal" href="#copying" id="id18">Copying</a></li>
+<li><a class="reference internal" href="#joining" id="id19">Joining</a></li>
+<li><a class="reference internal" href="#sorting" id="id20">Sorting</a></li>
+<li><a class="reference internal" href="#reversing" id="id21">Reversing</a></li>
+<li><a class="reference internal" href="#slicing" id="id22">Slicing</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#searching-arrays" id="id23">Searching arrays</a></li>
+<li><a class="reference internal" href="#error-handling" id="id24">Error handling</a><ul>
+<li><a class="reference internal" href="#index-xx-is-out-of-bounds-array-size-is-yy" id="id25">Index xx is out of bounds. Array size is yy</a></li>
+<li><a class="reference internal" href="#cannot-call-array-methods-when-id-of-array-is-na" id="id26">Cannot call array methods when ID of array is ‘na’</a></li>
+<li><a class="reference internal" href="#array-is-too-large-maximum-size-is-100000" id="id27">Array is too large. Maximum size is 100000</a></li>
+<li><a class="reference internal" href="#cannot-create-an-array-with-a-negative-size" id="id28">Cannot create an array with a negative size</a></li>
+<li><a class="reference internal" href="#cannot-use-shift-if-array-is-empty" id="id29">Cannot use <cite>shift()</cite> if array is empty.</a></li>
+<li><a class="reference internal" href="#cannot-use-pop-if-array-is-empty" id="id30">Cannot use <cite>pop()</cite> if array is empty.</a></li>
+<li><a class="reference internal" href="#index-from-should-be-less-than-index-to" id="id31">Index ‘from’ should be less than index ‘to’</a></li>
+<li><a class="reference internal" href="#slice-is-out-of-bounds-of-the-parent-array" id="id32">Slice is out of bounds of the parent array</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="introduction">
+<h2><a class="toc-backref" href="#id3">Introduction</a><a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>Arrays can be used to store multiple values in one data structure. Think of them as a better way to handle cases where you would
+otherwise need a set of variables named <code class="docutils literal notranslate"><span class="pre">price00</span></code>, <code class="docutils literal notranslate"><span class="pre">price01</span></code> and <code class="docutils literal notranslate"><span class="pre">price02</span></code>. Arrays are an advanced feature used for scripts
+requiring intricate data-handling. If you are a beginning Pine Script™ programmer, we recommend you become familiar with other,
+more accessible Pine Script™ features before you tackle arrays.</p>
+<p>Pine Script™ arrays are one-dimensional. All elements of an array are of the same type, which can be
+“int”, “float”, “bool”, “color”, “string”, “line”, “label”, “box” or “table”, always of “series” form.
+Arrays are referenced using an array ID similar to line or label IDs.
+Pine Script™ does not use an indexing operator to reference individual array elements;
+instead, functions like <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}get">array.get()</a>
+and <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}set">array.set()</a> are used to read and write values of array elements.
+Array values can be used in all Pine Script™ expressions and functions where a value of “series” form is allowed.</p>
+<p>Elements within an array are referred to using an <em>index</em>, which starts at 0 and extends to the number or elements in the array, minus one.
+Arrays in Pine Script™ can be sized dynamically, so the number of elements in the array can be modified within one iteration of the script on a bar,
+and vary across bars. Multiple arrays can be used in the same script. The size of arrays is limited to 100,000.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">We will use <em>beginning</em> of an array to designate index 0, and <em>end</em> of an array to designate the array’s element with the highest index value. We will also extend the meaning of <em>array</em> to include array IDs, for the sake of brevity.</p>
+</div>
+</div>
+<div class="section" id="declaring-arrays">
+<h2><a class="toc-backref" href="#id4">Declaring arrays</a><a class="headerlink" href="#declaring-arrays" title="Permalink to this headline">¶</a></h2>
+<p>The following syntax can be used to declare arrays:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="nx">type</span><span class="o">&gt;[]</span><span class="w"> </span><span class="o">&lt;</span><span class="nx">identifier</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="nx">expression</span><span class="o">&gt;</span><span class="w"></span>
+<span class="k">var </span><span class="o">&lt;</span><span class="nx">type</span><span class="o">&gt;[]</span><span class="w"> </span><span class="o">&lt;</span><span class="nx">identifier</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="nx">expression</span><span class="o">&gt;</span><span class="w"></span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">[]</span></code> modifier (not to be confused with the <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#op_[]">[]</a>
+history-referencing operator) is appended to the type name when declaring arrays. However, since type-specific functions are always used to create arrays,
+the <code class="docutils literal notranslate"><span class="pre">&lt;type&gt;[]</span></code> part of the declaration is redundant, except if you initialize an array variable to <code class="docutils literal notranslate"><span class="pre">na</span></code>.
+Explicitly declaring the type of the array is useful, however, to clearly state our intention to readers.</p>
+<p>In the following example we declare an array variable named <code class="docutils literal notranslate"><span class="pre">prices</span></code> and initialize it with <code class="docutils literal notranslate"><span class="pre">na</span></code>.
+Consequently, its type must be specified. The variable will be used to designate an array containing “float” values,
+but no array is created by this declaration yet. For the moment, the array variable contains no valid array ID, its value being <code class="docutils literal notranslate"><span class="pre">na</span></code>:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="ni">float</span><span class="o">[]</span><span class="w"> </span><span class="nx">prices</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">na</span><span class="w"></span>
+</pre></div>
+</div>
+<p>When declaring an array and the <code class="docutils literal notranslate"><span class="pre">&lt;expression&gt;</span></code> is not <code class="docutils literal notranslate"><span class="pre">na</span></code>, one of the <code class="docutils literal notranslate"><span class="pre">array.new_&lt;type&gt;(size,</span> <span class="pre">initial_value)</span></code> functions or
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}from">array.from()</a> must be used.
+The arguments of both the <code class="docutils literal notranslate"><span class="pre">size</span></code> and <code class="docutils literal notranslate"><span class="pre">initial_value</span></code> parameters can be “series”, to allow dynamic sizing and initialization of array elements.
+The following example creates an array containing zero “float” elements,
+and this time, the array ID returned by the <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}new_float">array.new_float()</a>
+function call is assigned to <code class="docutils literal notranslate"><span class="pre">prices</span></code>:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="nx">prices</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">array.new_float</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Similar array creation functions exist for the other types of array elements:
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}new_int">array.new_int()</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}new_bool">array.new_bool()</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}new_color">array.new_color()</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}new_string">array.new_string()</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}new_line">array.new_line()</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}new_label">array.new_label()</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}new_box">array.new_box()</a> and
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}new_table">array.new_table()</a>.</p>
+<p>When declaring an array, you can initialize all elements in the array using the <code class="docutils literal notranslate"><span class="pre">initial_value</span></code> parameter.
+When no argument is supplied for <code class="docutils literal notranslate"><span class="pre">initial_value</span></code>, the array elements are initialized to <code class="docutils literal notranslate"><span class="pre">na</span></code>.
+The following declaration creates and array ID named <code class="docutils literal notranslate"><span class="pre">prices</span></code>.
+The array is created with two elements, each initialized with the value of the <code class="docutils literal notranslate"><span class="pre">close</span></code> built-in variable on that bar:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="nx">prices</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">array.new_float</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="no">close</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>You can also use <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}from">array.from()</a> to create an array and intialize it with different values at the same time. <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}from">array.from()</a> infers the array’s size and the type of its elements, which must be consistent, from the arguments supplied to the function when calling it. Similarly to <a href="#id1"><span class="problematic" id="id2">``</span></a>array.new_*()` functions, it accepts “series” arguments.</p>
+<p>Both these lines will create a “bool[]” array with the same two elements:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="nx">statesArray</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">array.from</span><span class="p">(</span><span class="no">close</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="no">open</span><span class="p">,</span><span class="w"> </span><span class="no">high</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="no">close</span><span class="p">)</span><span class="w"></span>
+<span class="ni">bool</span><span class="o">[]</span><span class="w"> </span><span class="nx">statesArray</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">array.from</span><span class="p">(</span><span class="no">close</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="no">open</span><span class="p">,</span><span class="w"> </span><span class="no">high</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="no">close</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<div class="section" id="using-the-var-keyword">
+<h3><a class="toc-backref" href="#id5">Using the `var` keyword</a><a class="headerlink" href="#using-the-var-keyword" title="Permalink to this headline">¶</a></h3>
+<p>The <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#op_var">var</a> keyword can be used when declaring arrays.
+It works just as it does for other variables; it causes the declaration to only
+be executed on the first iteration of the script on the dataset’s bar at <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_bar_index">bar_index</a> zero.
+Because the array is never re-initialized on subsequent bars, its value will persist across bars, as the script iterates on them.</p>
+<p>When an array declaration is done using <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#op_var">var</a>
+and a new value is pushed at the end of the array on each bar, the array will grow by one on each bar and be of size <code class="docutils literal notranslate"><span class="pre">bar_index</span> <span class="pre">+</span> <span class="pre">1</span></code> plus one
+(<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_bar_index">bar_index</a> starts at zero) by the time the script executes on the last bar, as this code will do:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"Using `var`"</span><span class="p">)</span><span class="w"></span>
+<span class="k">var </span><span class="nx">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">array.new_float</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="ni">array.push</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="no">close</span><span class="p">)</span><span class="w"></span>
+<span class="k">if </span><span class="ni">barstate.islast</span><span class="w"></span>
+<span class="w">    </span><span class="ni">label.new</span><span class="p">(</span><span class="ni">bar_index</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="s2">"Array size: "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="ni">str.tostring</span><span class="p">(</span><span class="ni">array.size</span><span class="p">(</span><span class="nx">a</span><span class="p">))</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">"\nbar_index: "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="ni">str.tostring</span><span class="p">(</span><span class="ni">bar_index</span><span class="p">),</span><span class="w"> </span><span class="nx">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">size.large</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>The same code without the <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#op_var">var</a> keyword would re-declare the array on each bar.
+After execution of the <code class="docutils literal notranslate"><span class="pre">array.push()</span></code> call, the array would thus be of size one on all the dataset’s bars.</p>
+<p>This initializes an array of constant lengths which will not change during the script’s execution, so we only declare it on the first bar:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="k">var </span><span class="ni">int</span><span class="o">[]</span><span class="w"> </span><span class="nx">lengths</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">array.from</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">12</span><span class="p">,</span><span class="w"> </span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="mi">50</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span><span class="w"> </span><span class="mi">200</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="reading-and-writing-array-values">
+<h2><a class="toc-backref" href="#id6">Reading and writing array values</a><a class="headerlink" href="#reading-and-writing-array-values" title="Permalink to this headline">¶</a></h2>
+<p>Values can be written to existing individual array elements using
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}set">array.set(id, index, value)</a>,
+and read using <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}get">array.get(id, index)</a>.
+As is the case whenever an array index is used in your code, it is imperative that the index never be greater than
+the array’s size, minus one (because array indices start at zero). You can obtain the size of an array by using the
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}size">array.size(id)</a> function.</p>
+<p>The following example uses <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}set">array.set()</a>
+to initialize an array of colors to instances of one base color using different transparency levels.
+It then fetches the proper array element to use it in a <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_bgcolor">bgcolor()</a> call:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"Distance from high"</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="nx">true</span><span class="p">)</span><span class="w"></span>
+<span class="nx">lookbackInput</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">input.int</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w"></span>
+<span class="nx">FILL_COLOR</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">color.green</span><span class="w"></span>
+<span class="c">// Declare array and set its values on the first bar only.</span><span class="w"></span>
+<span class="k">var </span><span class="nx">fillColors</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">array.new_color</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="w"></span>
+<span class="k">if </span><span class="ni">barstate.isfirst</span><span class="w"></span>
+<span class="w">    </span><span class="c">// Initialize the array elements with progressively lighter shades of the fill color.</span><span class="w"></span>
+<span class="w">    </span><span class="ni">array.set</span><span class="p">(</span><span class="nx">fillColors</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="ni">color.new</span><span class="p">(</span><span class="nx">FILL_COLOR</span><span class="p">,</span><span class="w"> </span><span class="mi">70</span><span class="p">))</span><span class="w"></span>
+<span class="w">    </span><span class="ni">array.set</span><span class="p">(</span><span class="nx">fillColors</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="ni">color.new</span><span class="p">(</span><span class="nx">FILL_COLOR</span><span class="p">,</span><span class="w"> </span><span class="mi">75</span><span class="p">))</span><span class="w"></span>
+<span class="w">    </span><span class="ni">array.set</span><span class="p">(</span><span class="nx">fillColors</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="ni">color.new</span><span class="p">(</span><span class="nx">FILL_COLOR</span><span class="p">,</span><span class="w"> </span><span class="mi">80</span><span class="p">))</span><span class="w"></span>
+<span class="w">    </span><span class="ni">array.set</span><span class="p">(</span><span class="nx">fillColors</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="ni">color.new</span><span class="p">(</span><span class="nx">FILL_COLOR</span><span class="p">,</span><span class="w"> </span><span class="mi">85</span><span class="p">))</span><span class="w"></span>
+<span class="w">    </span><span class="ni">array.set</span><span class="p">(</span><span class="nx">fillColors</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="ni">color.new</span><span class="p">(</span><span class="nx">FILL_COLOR</span><span class="p">,</span><span class="w"> </span><span class="mi">90</span><span class="p">))</span><span class="w"></span>
+
+<span class="c">// Find the offset to highest high. Change its sign because the function returns a negative value.</span><span class="w"></span>
+<span class="nx">lastHiBar</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="ni">ta.highestbars</span><span class="p">(</span><span class="no">high</span><span class="p">,</span><span class="w"> </span><span class="nx">lookbackInput</span><span class="p">)</span><span class="w"></span>
+<span class="c">// Convert the offset to an array index, capping it to 4 to avoid a runtime error.</span><span class="w"></span>
+<span class="c">// The index used by `array.get()` will be the equivalent of `floor(fillNo)`.</span><span class="w"></span>
+<span class="nx">fillNo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">math.min</span><span class="p">(</span><span class="nx">lastHiBar</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="nx">lookbackInput</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">5</span><span class="p">),</span><span class="w"> </span><span class="mi">4</span><span class="p">)</span><span class="w"></span>
+<span class="c">// Set background to a progressively lighter fill with increasing distance from location of highest high.</span><span class="w"></span>
+<span class="ni">bgcolor</span><span class="p">(</span><span class="ni">array.get</span><span class="p">(</span><span class="nx">fillColors</span><span class="p">,</span><span class="w"> </span><span class="nx">fillNo</span><span class="p">))</span><span class="w"></span>
+<span class="c">// Plot key values to the Data Window for debugging.</span><span class="w"></span>
+<span class="ni">plotchar</span><span class="p">(</span><span class="nx">lastHiBar</span><span class="p">,</span><span class="w"> </span><span class="s2">"lastHiBar"</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="ni">location.top</span><span class="p">,</span><span class="w"> </span><span class="nx">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">size.tiny</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plotchar</span><span class="p">(</span><span class="nx">fillNo</span><span class="p">,</span><span class="w"> </span><span class="s2">"fillNo"</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="ni">location.top</span><span class="p">,</span><span class="w"> </span><span class="nx">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">size.tiny</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<img alt="../_images/Arrays-ReadingAndWriting-DistanceFromHigh.png" src="../_images/Arrays-ReadingAndWriting-DistanceFromHigh.png"/>
+<p>Another technique that can be used to initialize the elements in an array is to declare the array with size zero, and then populate it using
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}push">array.push()</a>
+to append <strong>new</strong> elements to the end of the array, increasing the size of the array by one at each call.
+The following code is functionally identical to the initialization section from the preceding script:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">// Declare array and set its values on the first bar only.</span><span class="w"></span>
+<span class="k">var </span><span class="nx">fillColors</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">array.new_color</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="k">if </span><span class="ni">barstate.isfirst</span><span class="w"></span>
+<span class="w">    </span><span class="c">// Initialize the array elements with progressively lighter shades of the fill color.</span><span class="w"></span>
+<span class="w">    </span><span class="ni">array.push</span><span class="p">(</span><span class="nx">fillColors</span><span class="p">,</span><span class="w"> </span><span class="ni">color.new</span><span class="p">(</span><span class="nx">FILL_COLOR</span><span class="p">,</span><span class="w"> </span><span class="mi">70</span><span class="p">))</span><span class="w"></span>
+<span class="w">    </span><span class="ni">array.push</span><span class="p">(</span><span class="nx">fillColors</span><span class="p">,</span><span class="w"> </span><span class="ni">color.new</span><span class="p">(</span><span class="nx">FILL_COLOR</span><span class="p">,</span><span class="w"> </span><span class="mi">75</span><span class="p">))</span><span class="w"></span>
+<span class="w">    </span><span class="ni">array.push</span><span class="p">(</span><span class="nx">fillColors</span><span class="p">,</span><span class="w"> </span><span class="ni">color.new</span><span class="p">(</span><span class="nx">FILL_COLOR</span><span class="p">,</span><span class="w"> </span><span class="mi">80</span><span class="p">))</span><span class="w"></span>
+<span class="w">    </span><span class="ni">array.push</span><span class="p">(</span><span class="nx">fillColors</span><span class="p">,</span><span class="w"> </span><span class="ni">color.new</span><span class="p">(</span><span class="nx">FILL_COLOR</span><span class="p">,</span><span class="w"> </span><span class="mi">85</span><span class="p">))</span><span class="w"></span>
+<span class="w">    </span><span class="ni">array.push</span><span class="p">(</span><span class="nx">fillColors</span><span class="p">,</span><span class="w"> </span><span class="ni">color.new</span><span class="p">(</span><span class="nx">FILL_COLOR</span><span class="p">,</span><span class="w"> </span><span class="mi">90</span><span class="p">))</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Finally, we could use <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}from">array.from()</a>:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"Using `var`"</span><span class="p">)</span><span class="w"></span>
+<span class="nx">FILL_COLOR</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">color.green</span><span class="w"></span>
+<span class="k">var </span><span class="ni">color</span><span class="o">[]</span><span class="w"> </span><span class="nx">fillColors</span><span class="w"> </span><span class="o">=</span><span class="w"></span>
+<span class="w">  </span><span class="ni">array.from</span><span class="p">(</span><span class="w"></span>
+<span class="w">   </span><span class="ni">color.new</span><span class="p">(</span><span class="nx">FILL_COLOR</span><span class="p">,</span><span class="w"> </span><span class="mi">70</span><span class="p">),</span><span class="w"></span>
+<span class="w">   </span><span class="ni">color.new</span><span class="p">(</span><span class="nx">FILL_COLOR</span><span class="p">,</span><span class="w"> </span><span class="mi">75</span><span class="p">),</span><span class="w"></span>
+<span class="w">   </span><span class="ni">color.new</span><span class="p">(</span><span class="nx">FILL_COLOR</span><span class="p">,</span><span class="w"> </span><span class="mi">80</span><span class="p">),</span><span class="w"></span>
+<span class="w">   </span><span class="ni">color.new</span><span class="p">(</span><span class="nx">FILL_COLOR</span><span class="p">,</span><span class="w"> </span><span class="mi">85</span><span class="p">),</span><span class="w"></span>
+<span class="w">   </span><span class="ni">color.new</span><span class="p">(</span><span class="nx">FILL_COLOR</span><span class="p">,</span><span class="w"> </span><span class="mi">90</span><span class="p">))</span><span class="w"></span>
+<span class="c">// Cycle background through the array's colors.</span><span class="w"></span>
+<span class="ni">bgcolor</span><span class="p">(</span><span class="ni">array.get</span><span class="p">(</span><span class="nx">fillColors</span><span class="p">,</span><span class="w"> </span><span class="ni">bar_index</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="ni">array.size</span><span class="p">(</span><span class="nx">fillColors</span><span class="p">)))</span><span class="w"></span>
+</pre></div>
+</div>
+<p>The <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}fill">array.fill(id, value, index_from, index_to)</a> function
+can be used to fill contiguous sets of array elements with a value. Used without the last two optional parameters, the function fills the whole array, so:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="nx">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">array.new_float</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="no">close</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>and:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="nx">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">array.new_float</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="w"></span>
+<span class="ni">array.fill</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="no">close</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>are equivalent, but:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="nx">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">array.new_float</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="w"></span>
+<span class="ni">array.fill</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="no">close</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>only fills the second and third elements (at index 1 and 2) of the array with <code class="docutils literal notranslate"><span class="pre">close</span></code>.
+Note how <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}fill">array.fill()</a>’s
+last parameter, <code class="docutils literal notranslate"><span class="pre">index_to</span></code>, needs to be one greater than the last index to be filled.
+The remaining elements will hold the <code class="docutils literal notranslate"><span class="pre">na</span></code> value, as no intialization value was provided when the array was declared.</p>
+</div>
+<div class="section" id="looping-through-array-elements">
+<span id="pagearrays-looping"></span><h2><a class="toc-backref" href="#id7">Looping through array elements</a><a class="headerlink" href="#looping-through-array-elements" title="Permalink to this headline">¶</a></h2>
+<p>When looping through array elements when the array’s size is unknown, you can use:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"Protected `for` loop"</span><span class="p">)</span><span class="w"></span>
+<span class="nx">sizeInput</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">input.int</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="s2">"Array size"</span><span class="p">,</span><span class="w"> </span><span class="nx">minval</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nx">maxval</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">100000</span><span class="p">)</span><span class="w"></span>
+<span class="nx">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">array.new_float</span><span class="p">(</span><span class="nx">sizeInput</span><span class="p">)</span><span class="w"></span>
+<span class="k">if </span><span class="ni">barstate.isfirst</span><span class="w"></span>
+<span class="w">    </span><span class="k">for </span><span class="nx">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="nx">to</span><span class="w"> </span><span class="p">(</span><span class="ni">array.size</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="no">na</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="ni">array.size</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="ni">array.set</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="nx">i</span><span class="p">,</span><span class="w"> </span><span class="nx">i</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="ni">array.sum</span><span class="p">(</span><span class="nx">a</span><span class="p">))</span><span class="w"></span>
+</pre></div>
+</div>
+<p>This takes advantage of the fact that <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#">for</a> loops do not execute if the <code class="docutils literal notranslate"><span class="pre">to</span></code> expression is
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_na">na</a>. Note that the <code class="docutils literal notranslate"><span class="pre">to</span></code> value is only evaluated once, upon entry.</p>
+<p>A <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#op_while">while</a> statement can also be used:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"Protected `while` loop"</span><span class="p">)</span><span class="w"></span>
+<span class="nx">sizeInput</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">input.int</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="s2">"Array size"</span><span class="p">,</span><span class="w"> </span><span class="nx">minval</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nx">maxval</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">100000</span><span class="p">)</span><span class="w"></span>
+<span class="k">var </span><span class="nx">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">array.new_float</span><span class="p">(</span><span class="nx">sizeInput</span><span class="p">)</span><span class="w"></span>
+<span class="k">if </span><span class="ni">barstate.isfirst</span><span class="w"></span>
+<span class="w">    </span><span class="nx">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="w"></span>
+<span class="w">    </span><span class="k">while </span><span class="nx">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="ni">array.size</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="ni">array.set</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="nx">i</span><span class="p">,</span><span class="w"> </span><span class="nx">i</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="nx">i</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">1</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="ni">array.sum</span><span class="p">(</span><span class="nx">a</span><span class="p">))</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="scope">
+<h2><a class="toc-backref" href="#id8">Scope</a><a class="headerlink" href="#scope" title="Permalink to this headline">¶</a></h2>
+<p>Arrays can be declared in a script’s global scope, as well as in the local scope of a function or an <code class="docutils literal notranslate"><span class="pre">if</span></code> branch.
+One major distinction between Pine Script™ arrays and variables declared in the global scope, is that global arrays can be modified from within the local scope of a function.
+This new capability can be used to implement global variables that can be both read and set from within any function in the script.
+We use it here to calculate progressively lower or higher levels:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"Bands"</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="nx">true</span><span class="p">)</span><span class="w"></span>
+<span class="nx">factorInput</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="ni">input.float</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="nx">.</span><span class="p">,</span><span class="w"> </span><span class="s2">"Step %"</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">100</span><span class="p">)</span><span class="w"></span>
+<span class="c">// Use the lowest average OHLC in last 50 bars from 10 bars back as the our base level.</span><span class="w"></span>
+<span class="nx">level</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">array.new_float</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="ni">ta.lowest</span><span class="p">(</span><span class="no">ohlc4</span><span class="p">,</span><span class="w"> </span><span class="mi">50</span><span class="p">)</span><span class="o">[</span><span class="mi">10</span><span class="o">]</span><span class="p">)</span><span class="w"></span>
+
+<span class="nx">nextLevel</span><span class="p">(</span><span class="nx">val</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"></span>
+<span class="w">    </span><span class="nx">newLevel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">array.get</span><span class="p">(</span><span class="nx">level</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nx">val</span><span class="w"></span>
+<span class="w">    </span><span class="c">// Write new level to the global array so it can be used as the base in the next call to this function.</span><span class="w"></span>
+<span class="w">    </span><span class="ni">array.set</span><span class="p">(</span><span class="nx">level</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nx">newLevel</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="nx">newLevel</span><span class="w"></span>
+
+<span class="ni">plot</span><span class="p">(</span><span class="nx">nextLevel</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="nx">nextLevel</span><span class="p">(</span><span class="nx">factorInput</span><span class="p">))</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="nx">nextLevel</span><span class="p">(</span><span class="nx">factorInput</span><span class="p">))</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="nx">nextLevel</span><span class="p">(</span><span class="nx">factorInput</span><span class="p">))</span><span class="w"></span>
+</pre></div>
+</div>
+<img alt="../_images/Arrays-Scope-Bands.png" src="../_images/Arrays-Scope-Bands.png"/>
+</div>
+<div class="section" id="history-referencing">
+<span id="pagearrays-historyreferencing"></span><h2><a class="toc-backref" href="#id9">History referencing</a><a class="headerlink" href="#history-referencing" title="Permalink to this headline">¶</a></h2>
+<p>Past instances of array IDs or elements cannot be referenced directly using Pine Script™’s
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#op_[]">[ ]</a>
+history-referencing operator.
+One <strong>cannot</strong> write: <code class="docutils literal notranslate"><span class="pre">array.get(a[1],</span> <span class="pre">0)</span></code> to fetch the value of the array’s first element on the previous bar.</p>
+<p>In Pine Script™, however, each call to a function leaves behind a series trail of function results on previous bars.
+This series can in turn be used when working with arrays. One can thus write: <code class="docutils literal notranslate"><span class="pre">ma</span> <span class="pre">=</span> <span class="pre">ta.sma(array.get(a,</span> <span class="pre">0),</span> <span class="pre">20)</span></code> to calculate
+the simple moving average of the value returned by the <code class="docutils literal notranslate"><span class="pre">array.get(a,</span> <span class="pre">0)</span></code> call on the last 20 bars.</p>
+<p>To illustrate this, let’s first see how we can fetch the previous bar’s <code class="docutils literal notranslate"><span class="pre">close</span></code> value in two, equivalent ways.
+For <code class="docutils literal notranslate"><span class="pre">previousClose1</span></code> we use the result of the <code class="docutils literal notranslate"><span class="pre">array.get(a,</span> <span class="pre">0)</span></code> function call on the previous bar.
+Since on the previous bar the array’s only element was initialized to that bar’s <code class="docutils literal notranslate"><span class="pre">close</span></code> (as it is on every bar),
+referring to <code class="docutils literal notranslate"><span class="pre">array.get(a,</span> <span class="pre">0)[1]</span></code> returns that bar’s <code class="docutils literal notranslate"><span class="pre">close</span></code>, i.e., the value of the <code class="docutils literal notranslate"><span class="pre">array.get(a,</span> <span class="pre">0)</span></code> call on the previous bar.</p>
+<p>For <code class="docutils literal notranslate"><span class="pre">previousClose2</span></code> we use the history-referencing operator to fetch the previous bar’s <code class="docutils literal notranslate"><span class="pre">close</span></code> in normal Pine Script™ fashion:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"History referencing"</span><span class="p">)</span><span class="w"></span>
+<span class="c">// Re-declare the array on each bar.</span><span class="w"></span>
+<span class="nx">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">array.new_float</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"></span>
+<span class="c">// Set the value of its only element to `close`.</span><span class="w"></span>
+<span class="ni">array.set</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="no">close</span><span class="p">)</span><span class="w"></span>
+
+<span class="nx">previousClose1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">array.get</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="w"></span>
+<span class="nx">previousClose2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">close</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="nx">previousClose1</span><span class="p">,</span><span class="w"> </span><span class="s2">"previousClose1"</span><span class="p">,</span><span class="w"> </span><span class="ni">color.gray</span><span class="p">,</span><span class="w"> </span><span class="mi">6</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="nx">previousClose2</span><span class="p">,</span><span class="w"> </span><span class="s2">"previousClose2"</span><span class="p">,</span><span class="w"> </span><span class="ni">color.white</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>In the following example we add two, equivalent calculations of a moving average to our previous code example.
+For <code class="docutils literal notranslate"><span class="pre">ma1</span></code> we use <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_ta{dot}sma">ta.sma()</a>
+on the series of values returned by the <code class="docutils literal notranslate"><span class="pre">array.get(a,</span> <span class="pre">0)</span></code> function call on each bar.
+Since at this point in the script the call returns the current bar’s <code class="docutils literal notranslate"><span class="pre">close</span></code>,
+that is the value used for the average’s calculation.
+We evaluate <code class="docutils literal notranslate"><span class="pre">ma2</span></code> using the usual way we would calculate a simple average in Pine Script™:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"History referencing"</span><span class="p">)</span><span class="w"></span>
+<span class="nx">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">array.new_float</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"></span>
+<span class="ni">array.set</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="no">close</span><span class="p">)</span><span class="w"></span>
+<span class="nx">previousClose1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">array.get</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="w"></span>
+<span class="nx">previousClose2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">close</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="nx">previousClose1</span><span class="p">,</span><span class="w"> </span><span class="s2">"previousClose1"</span><span class="p">,</span><span class="w"> </span><span class="ni">color.gray</span><span class="p">,</span><span class="w"> </span><span class="mi">6</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="nx">previousClose2</span><span class="p">,</span><span class="w"> </span><span class="s2">"previousClose2"</span><span class="p">,</span><span class="w"> </span><span class="ni">color.white</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"></span>
+
+<span class="nx">ma1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">ta.sma</span><span class="p">(</span><span class="ni">array.get</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">),</span><span class="w"> </span><span class="mi">20</span><span class="p">)</span><span class="w"></span>
+<span class="nx">ma2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">ta.sma</span><span class="p">(</span><span class="no">close</span><span class="p">,</span><span class="w"> </span><span class="mi">20</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="nx">ma1</span><span class="p">,</span><span class="w"> </span><span class="s2">"MA 1"</span><span class="p">,</span><span class="w"> </span><span class="ni">color.aqua</span><span class="p">,</span><span class="w"> </span><span class="mi">6</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="nx">ma2</span><span class="p">,</span><span class="w"> </span><span class="s2">"MA 2"</span><span class="p">,</span><span class="w"> </span><span class="ni">color.white</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"></span>
+
+<span class="c">// Last set having no impact.</span><span class="w"></span>
+<span class="ni">array.set</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="mf">.0</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Notice the last line of this script. It illustrates how even if we set the value of the array’s element
+to <code class="docutils literal notranslate"><span class="pre">10.0</span></code> at the end of the script, resulting in the final value for the element being committed as <code class="docutils literal notranslate"><span class="pre">10.0</span></code>
+on the bar’s last execution of the script, the earlier call to <code class="docutils literal notranslate"><span class="pre">array.get(a,</span> <span class="pre">0)</span></code> nonetheless returned the <code class="docutils literal notranslate"><span class="pre">close</span></code> value
+because that was the value of the array element at that point in the script.
+The series value of the function call will thus be each bar’s <code class="docutils literal notranslate"><span class="pre">close</span></code> value.</p>
+<img alt="../_images/Arrays-HistoryReferencing.png" src="../_images/Arrays-HistoryReferencing.png"/>
+</div>
+<div class="section" id="inserting-and-removing-array-elements">
+<h2><a class="toc-backref" href="#id10">Inserting and removing array elements</a><a class="headerlink" href="#inserting-and-removing-array-elements" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="inserting">
+<h3><a class="toc-backref" href="#id11">Inserting</a><a class="headerlink" href="#inserting" title="Permalink to this headline">¶</a></h3>
+<p>Three functions can be used to insert new elements in an array.</p>
+<p><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}unshift">array.unshift()</a>
+inserts a new element at the beginning of an array, at index zero, and shifts any existing elements right by one.</p>
+<p><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}insert">array.insert()</a>
+can insert a new element at any position in the array. Its <code class="docutils literal notranslate"><span class="pre">index</span></code> parameter is the index where the new element will be added.
+The element existing at the index used in the function call and any others to its right are shifted one place to the right:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"`array.insert()`"</span><span class="p">)</span><span class="w"></span>
+<span class="nx">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">array.new_float</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="k">for </span><span class="nx">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="nx">to</span><span class="w"> </span><span class="mi">4</span><span class="w"></span>
+<span class="w">    </span><span class="ni">array.set</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="nx">i</span><span class="p">,</span><span class="w"> </span><span class="nx">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"></span>
+<span class="k">if </span><span class="ni">barstate.islast</span><span class="w"></span>
+<span class="w">    </span><span class="ni">label.new</span><span class="p">(</span><span class="ni">bar_index</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="s2">"BEFORE\na: "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="ni">str.tostring</span><span class="p">(</span><span class="nx">a</span><span class="p">),</span><span class="w"> </span><span class="nx">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">size.large</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="ni">array.insert</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">999</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="ni">label.new</span><span class="p">(</span><span class="ni">bar_index</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="s2">"AFTER\na: "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="ni">str.tostring</span><span class="p">(</span><span class="nx">a</span><span class="p">),</span><span class="w"> </span><span class="nx">style</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">label.style_label_up</span><span class="p">,</span><span class="w"> </span><span class="nx">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">size.large</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<img alt="../_images/Arrays-InsertingAndRemovingArrayElements-Insert.png" src="../_images/Arrays-InsertingAndRemovingArrayElements-Insert.png"/>
+<p><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}push">array.push()</a>
+will add a new element at the end of an array.</p>
+</div>
+<div class="section" id="removing">
+<h3><a class="toc-backref" href="#id12">Removing</a><a class="headerlink" href="#removing" title="Permalink to this headline">¶</a></h3>
+<p>Four functions can be used to remove elements from an array. The first three will return the value of the removed element.</p>
+<p><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}remove">array.remove()</a>
+removes the element at the <code class="docutils literal notranslate"><span class="pre">index</span></code> value used, and returns that element’s value.</p>
+<p><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}shift">array.shift()</a>
+removes the first element from an array and returns its value.</p>
+<p><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}pop">array.pop()</a>
+removes the last element of an array and returns its value.</p>
+<p><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}clear">array.clear()</a>
+will remove all elements in the array.</p>
+</div>
+<div class="section" id="using-an-array-as-a-stack">
+<h3><a class="toc-backref" href="#id13">Using an array as a stack</a><a class="headerlink" href="#using-an-array-as-a-stack" title="Permalink to this headline">¶</a></h3>
+<p>Stacks are LIFO (last in, first out) constructions. They behave somewhat like a vertical pile of books to which books can only be added or removed one at a time,
+always from the top. Pine Script™ arrays can be used as a stack, in which case you will use the
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}push">array.push()</a> and
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}pop">array.pop()</a>
+functions to add and remove elements at the end of the array.</p>
+<p><code class="docutils literal notranslate"><span class="pre">array.push(prices,</span> <span class="pre">close)</span></code> will add a new element to the end of the <code class="docutils literal notranslate"><span class="pre">prices</span></code> array, increasing the array’s size by one.</p>
+<p><code class="docutils literal notranslate"><span class="pre">array.pop(prices)</span></code> will remove the end element from the <code class="docutils literal notranslate"><span class="pre">prices</span></code> array, return its value and decrease the array’s size by one.</p>
+<p>See how the functions are used here to remember successive lows in rallies:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"Lows from new highs"</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="nx">true</span><span class="p">)</span><span class="w"></span>
+<span class="k">var </span><span class="nx">lows</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">array.new_float</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="nx">flushLows</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">false</span>
+
+<span class="c">// Remove last element from the stack when `_cond` is true.</span><span class="w"></span>
+<span class="nx">array_pop</span><span class="p">(</span><span class="nx">id</span><span class="p">,</span><span class="w"> </span><span class="nx">cond</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="nx">cond</span><span class="w"> </span><span class="nx">and</span><span class="w"> </span><span class="ni">array.size</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="ni">array.pop</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="ni">float</span><span class="p">(</span><span class="no">na</span><span class="p">)</span><span class="w"></span>
+
+<span class="k">if </span><span class="ni">ta.rising</span><span class="p">(</span><span class="no">high</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="c">// Rising highs; push a new low on the stack.</span><span class="w"></span>
+<span class="w">    </span><span class="ni">array.push</span><span class="p">(</span><span class="nx">lows</span><span class="p">,</span><span class="w"> </span><span class="no">low</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="c">// Force the return type of this `if` block to be the same as that of the next block.</span><span class="w"></span>
+<span class="w">    </span><span class="ni">bool</span><span class="p">(</span><span class="no">na</span><span class="p">)</span><span class="w"></span>
+<span class="k">else if </span><span class="ni">array.size</span><span class="p">(</span><span class="nx">lows</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">4</span><span class="w"> </span><span class="nx">or</span><span class="w"> </span><span class="no">low</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="ni">array.min</span><span class="p">(</span><span class="nx">lows</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="c">// We have at least 4 lows or price has breached the lowest low;</span><span class="w"></span>
+<span class="w">    </span><span class="c">// sort lows and set flag indicating we will plot and flush the levels.</span><span class="w"></span>
+<span class="w">    </span><span class="ni">array.sort</span><span class="p">(</span><span class="nx">lows</span><span class="p">,</span><span class="w"> </span><span class="nx">order.ascending</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="nx">flushLows</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="k">true</span>
+
+<span class="c">// If needed, plot and flush lows.</span><span class="w"></span>
+<span class="nx">lowLevel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">array_pop</span><span class="p">(</span><span class="nx">lows</span><span class="p">,</span><span class="w"> </span><span class="nx">flushLows</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="nx">lowLevel</span><span class="p">,</span><span class="w"> </span><span class="s2">"Low 1"</span><span class="p">,</span><span class="w"> </span><span class="no">low</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="nx">lowLevel</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="ni">color.silver</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="ni">color.purple</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="ni">plot.style_linebr</span><span class="p">)</span><span class="w"></span>
+<span class="nx">lowLevel</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">array_pop</span><span class="p">(</span><span class="nx">lows</span><span class="p">,</span><span class="w"> </span><span class="nx">flushLows</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="nx">lowLevel</span><span class="p">,</span><span class="w"> </span><span class="s2">"Low 2"</span><span class="p">,</span><span class="w"> </span><span class="no">low</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="nx">lowLevel</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="ni">color.silver</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="ni">color.purple</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="ni">plot.style_linebr</span><span class="p">)</span><span class="w"></span>
+<span class="nx">lowLevel</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">array_pop</span><span class="p">(</span><span class="nx">lows</span><span class="p">,</span><span class="w"> </span><span class="nx">flushLows</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="nx">lowLevel</span><span class="p">,</span><span class="w"> </span><span class="s2">"Low 3"</span><span class="p">,</span><span class="w"> </span><span class="no">low</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="nx">lowLevel</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="ni">color.silver</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="ni">color.purple</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="ni">plot.style_linebr</span><span class="p">)</span><span class="w"></span>
+<span class="nx">lowLevel</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">array_pop</span><span class="p">(</span><span class="nx">lows</span><span class="p">,</span><span class="w"> </span><span class="nx">flushLows</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="nx">lowLevel</span><span class="p">,</span><span class="w"> </span><span class="s2">"Low 4"</span><span class="p">,</span><span class="w"> </span><span class="no">low</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="nx">lowLevel</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="ni">color.silver</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="ni">color.purple</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="ni">plot.style_linebr</span><span class="p">)</span><span class="w"></span>
+
+<span class="k">if </span><span class="nx">flushLows</span><span class="w"></span>
+<span class="w">    </span><span class="c">// Clear remaining levels after the last 4 have been plotted.</span><span class="w"></span>
+<span class="w">    </span><span class="ni">array.clear</span><span class="p">(</span><span class="nx">lows</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<img alt="../_images/Arrays-InsertingAndRemovingArrayElements-LowsFromNewHighs.png" src="../_images/Arrays-InsertingAndRemovingArrayElements-LowsFromNewHighs.png"/>
+</div>
+<div class="section" id="using-an-array-as-a-queue">
+<h3><a class="toc-backref" href="#id14">Using an array as a queue</a><a class="headerlink" href="#using-an-array-as-a-queue" title="Permalink to this headline">¶</a></h3>
+<p>Queues are FIFO (first in, first out) constructions. They behave somewhat like cars arriving at a red light.
+New cars are queued at the end of the line, and the first car to leave will be the first one that arrived to the red light.</p>
+<p>In the following code example, we let users decide through the script’s inputs how many labels they want to have on their chart.
+We use that quantity to determine the size of the array of labels we then create, initializing the array’s elements to <code class="docutils literal notranslate"><span class="pre">na</span></code>.</p>
+<p>When a new pivot is detected, we create a label for it, saving the label’s ID in the <code class="docutils literal notranslate"><span class="pre">pLabel</span></code> variable.
+We then queue the ID of that label by
+using <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}push">array.push()</a>
+to append the new label’s ID to the end of the array, making our array size one greater than the maximum number of labels to keep on the chart.</p>
+<p>Lastly, we de-queue the oldest label by removing the array’s first element using
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}shift">array.shift()</a> and deleting the label referenced by that array element’s value.
+As we have now de-queued an element from our queue, the array contains <code class="docutils literal notranslate"><span class="pre">pivotCountInput</span></code> elements once again.
+Note that on the dataset’s first bars we will be deleting <code class="docutils literal notranslate"><span class="pre">na</span></code> label IDs until the maximum number of labels has been created,
+but this does not cause runtime errors. Let’s look at our code:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="nx">MAX_LABELS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">100</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"Show Last n High Pivots"</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="nx">true</span><span class="p">,</span><span class="w"> </span><span class="nx">max_labels_count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">MAX_LABELS</span><span class="p">)</span><span class="w"></span>
+
+<span class="nx">pivotCountInput</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">input.int</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="s2">"How many pivots to show"</span><span class="p">,</span><span class="w"> </span><span class="nx">minval</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nx">maxval</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">MAX_LABELS</span><span class="p">)</span><span class="w"></span>
+<span class="nx">pivotLegsInput</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="ni">input.int</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="s2">"Pivot legs"</span><span class="p">,</span><span class="w"> </span><span class="nx">minval</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="nx">maxval</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span><span class="p">)</span><span class="w"></span>
+
+<span class="c">// Create an array containing the user-selected max count of label IDs.</span><span class="w"></span>
+<span class="k">var </span><span class="nx">labelIds</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">array.new_label</span><span class="p">(</span><span class="nx">pivotCountInput</span><span class="p">)</span><span class="w"></span>
+
+<span class="nx">pHi</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">ta.pivothigh</span><span class="p">(</span><span class="nx">pivotLegsInput</span><span class="p">,</span><span class="w"> </span><span class="nx">pivotLegsInput</span><span class="p">)</span><span class="w"></span>
+<span class="k">if </span><span class="nx">not</span><span class="w"> </span><span class="no">na</span><span class="p">(</span><span class="nx">pHi</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="c">// New pivot found; plot its label `i_pivotLegs` bars back.</span><span class="w"></span>
+<span class="w">    </span><span class="nx">pLabel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">label.new</span><span class="p">(</span><span class="ni">bar_index</span><span class="o">[</span><span class="nx">pivotLegsInput</span><span class="o">]</span><span class="p">,</span><span class="w"> </span><span class="nx">pHi</span><span class="p">,</span><span class="w"> </span><span class="ni">str.tostring</span><span class="p">(</span><span class="nx">pHi</span><span class="p">,</span><span class="w"> </span><span class="ni">format.mintick</span><span class="p">),</span><span class="w"> </span><span class="nx">textcolor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">color.white</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="c">// Queue the new label's ID by appending it to the end of the array.</span><span class="w"></span>
+<span class="w">    </span><span class="ni">array.push</span><span class="p">(</span><span class="nx">labelIds</span><span class="p">,</span><span class="w"> </span><span class="nx">pLabel</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="c">// De-queue the oldest label ID from the queue and delete the corresponding label.</span><span class="w"></span>
+<span class="w">    </span><span class="ni">label.delete</span><span class="p">(</span><span class="ni">array.shift</span><span class="p">(</span><span class="nx">labelIds</span><span class="p">))</span><span class="w"></span>
+</pre></div>
+</div>
+<img alt="../_images/Arrays-InsertingAndRemovingArrayElements-ShowLastnHighPivots.png" src="../_images/Arrays-InsertingAndRemovingArrayElements-ShowLastnHighPivots.png"/>
+</div>
+</div>
+<div class="section" id="calculations-on-arrays">
+<h2><a class="toc-backref" href="#id15">Calculations on arrays</a><a class="headerlink" href="#calculations-on-arrays" title="Permalink to this headline">¶</a></h2>
+<p>While series variables can be viewed as a horizontal set of values stretching back in time, Pine Script™’s one-dimensional arrays can be viewed as vertical structures
+residing on each bar. As an array’s set of elements is not a <span class="xref std std-ref">time series</span>, Pine Script™’s usual mathematical functions are not allowed on them. Special-purpose functions must be used to operate on all of an array’s values. The available functions are:
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}avg">array.avg()</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}covariance">array.covariance()</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}min">array.min()</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}max">array.max()</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}median">array.median()</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}mode">array.mode()</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}range">array.range()</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}standardize">array.standardize()</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}stdev">array.stdev()</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}sum">array.sum()</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}variance">array.variance()</a>.</p>
+<p>Note that contrary to the usual mathematical functions in Pine Script™, those used on arrays do not return <code class="docutils literal notranslate"><span class="pre">na</span></code> when some of the values they
+calculate on have <code class="docutils literal notranslate"><span class="pre">na</span></code> values. There are a few exceptions to this rule:</p>
+<blockquote>
+<div><ul class="simple">
+<li>When all array elements have <code class="docutils literal notranslate"><span class="pre">na</span></code> value or the array contains no elements, <code class="docutils literal notranslate"><span class="pre">na</span></code> is returned. <code class="docutils literal notranslate"><span class="pre">array.standardize()</span></code> however, will return an empty array.</li>
+<li><code class="docutils literal notranslate"><span class="pre">array.mode()</span></code> will return <code class="docutils literal notranslate"><span class="pre">na</span></code> when no mode is found.</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="manipulating-arrays">
+<h2><a class="toc-backref" href="#id16">Manipulating arrays</a><a class="headerlink" href="#manipulating-arrays" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="concatenation">
+<h3><a class="toc-backref" href="#id17">Concatenation</a><a class="headerlink" href="#concatenation" title="Permalink to this headline">¶</a></h3>
+<p>Two arrays can be merged—or concatenated—using <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}concat">array.concat()</a>.
+When arrays are concatenated, the second array is appended to the end of the first,
+so the first array is modified while the second one remains intact. The function returns the array ID of the first array:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"`array.concat()`"</span><span class="p">)</span><span class="w"></span>
+<span class="nx">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">array.new_float</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="nx">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">array.new_float</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="ni">array.push</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="ni">array.push</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"></span>
+<span class="ni">array.push</span><span class="p">(</span><span class="nx">b</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"></span>
+<span class="ni">array.push</span><span class="p">(</span><span class="nx">b</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="w"></span>
+<span class="k">if </span><span class="ni">barstate.islast</span><span class="w"></span>
+<span class="w">    </span><span class="ni">label.new</span><span class="p">(</span><span class="ni">bar_index</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="s2">"BEFORE\na: "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="ni">str.tostring</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">"\nb: "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="ni">str.tostring</span><span class="p">(</span><span class="nx">b</span><span class="p">),</span><span class="w"> </span><span class="nx">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">size.large</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="nx">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">array.concat</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="nx">b</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="ni">array.push</span><span class="p">(</span><span class="nx">c</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="ni">label.new</span><span class="p">(</span><span class="ni">bar_index</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="s2">"AFTER\na: "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="ni">str.tostring</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">"\nb: "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="ni">str.tostring</span><span class="p">(</span><span class="nx">b</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">"\nc: "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="ni">str.tostring</span><span class="p">(</span><span class="nx">c</span><span class="p">),</span><span class="w"> </span><span class="nx">style</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">label.style_label_up</span><span class="p">,</span><span class="w"> </span><span class="nx">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">size.large</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<img alt="../_images/Arrays-ManipulatingArrays-Concat.png" src="../_images/Arrays-ManipulatingArrays-Concat.png"/>
+</div>
+<div class="section" id="copying">
+<h3><a class="toc-backref" href="#id18">Copying</a><a class="headerlink" href="#copying" title="Permalink to this headline">¶</a></h3>
+<p>You can copy an array using <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}copy">array.copy()</a>.
+Here we copy the array <code class="docutils literal notranslate"><span class="pre">a</span></code> to a new array named <code class="docutils literal notranslate"><span class="pre">_b</span></code>:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"`array.copy()`"</span><span class="p">)</span><span class="w"></span>
+<span class="nx">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">array.new_float</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="ni">array.push</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="ni">array.push</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"></span>
+<span class="k">if </span><span class="ni">barstate.islast</span><span class="w"></span>
+<span class="w">    </span><span class="nx">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">array.copy</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="ni">array.push</span><span class="p">(</span><span class="nx">b</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="ni">label.new</span><span class="p">(</span><span class="ni">bar_index</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="s2">"a: "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="ni">str.tostring</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">"\nb: "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="ni">str.tostring</span><span class="p">(</span><span class="nx">b</span><span class="p">),</span><span class="w"> </span><span class="nx">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">size.large</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Note that simply using <code class="docutils literal notranslate"><span class="pre">_b</span> <span class="pre">=</span> <span class="pre">a</span></code> in the previous example would not have copied the array, but only its ID.
+From thereon, both variables would point to the same array, so using either one would affect the same array.</p>
+<img alt="../_images/Arrays-ManipulatingArrays-Copy.png" src="../_images/Arrays-ManipulatingArrays-Copy.png"/>
+</div>
+<div class="section" id="joining">
+<h3><a class="toc-backref" href="#id19">Joining</a><a class="headerlink" href="#joining" title="Permalink to this headline">¶</a></h3>
+<p>Use <code class="docutils literal notranslate"><span class="pre">array.join</span></code> to concatenate all of the elements in the array into a string and separate these elements with the specified separator:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span><span class="w"></span>
+<span class="nx">v1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">array.new_string</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="s2">"test"</span><span class="p">)</span><span class="w"></span>
+<span class="nx">v2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">array.new_string</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="s2">"test"</span><span class="p">)</span><span class="w"></span>
+<span class="ni">array.push</span><span class="p">(</span><span class="nx">v2</span><span class="p">,</span><span class="w"> </span><span class="s2">"test1"</span><span class="p">)</span><span class="w"></span>
+<span class="nx">v3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">array.new_float</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">)</span><span class="w"></span>
+<span class="nx">v4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">array.new_int</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">)</span><span class="w"></span>
+<span class="nx">l1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">label.new</span><span class="p">(</span><span class="ni">bar_index</span><span class="p">,</span><span class="w"> </span><span class="no">close</span><span class="p">,</span><span class="w"> </span><span class="ni">array.join</span><span class="p">(</span><span class="nx">v1</span><span class="p">))</span><span class="w"></span>
+<span class="nx">l2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">label.new</span><span class="p">(</span><span class="ni">bar_index</span><span class="p">,</span><span class="w"> </span><span class="no">close</span><span class="p">,</span><span class="w"> </span><span class="ni">array.join</span><span class="p">(</span><span class="nx">v2</span><span class="p">,</span><span class="w"> </span><span class="s2">","</span><span class="p">))</span><span class="w"></span>
+<span class="nx">l3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">label.new</span><span class="p">(</span><span class="ni">bar_index</span><span class="p">,</span><span class="w"> </span><span class="no">close</span><span class="p">,</span><span class="w"> </span><span class="ni">array.join</span><span class="p">(</span><span class="nx">v3</span><span class="p">,</span><span class="w"> </span><span class="s2">","</span><span class="p">))</span><span class="w"></span>
+<span class="nx">l4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">label.new</span><span class="p">(</span><span class="ni">bar_index</span><span class="p">,</span><span class="w"> </span><span class="no">close</span><span class="p">,</span><span class="w"> </span><span class="ni">array.join</span><span class="p">(</span><span class="nx">v4</span><span class="p">,</span><span class="w"> </span><span class="s2">","</span><span class="p">))</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="sorting">
+<h3><a class="toc-backref" href="#id20">Sorting</a><a class="headerlink" href="#sorting" title="Permalink to this headline">¶</a></h3>
+<p>Arrays containing “int” or “float” elements can be sorted in either ascending or descending order using
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}sort">array.sort()</a>.
+The <code class="docutils literal notranslate"><span class="pre">order</span></code> parameter is optional and defaults to <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_order{dot}ascending">order.ascending</a>.
+As all <code class="docutils literal notranslate"><span class="pre">array.*()</span></code> function arguments, it is of form “series”, so can be determined at runtime, as is done here.
+Note that in the example, which array is sorted is also determined at runtime:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"`array.sort()`"</span><span class="p">)</span><span class="w"></span>
+<span class="nx">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">array.new_float</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="nx">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">array.new_float</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="ni">array.push</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"></span>
+<span class="ni">array.push</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="ni">array.push</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"></span>
+<span class="ni">array.push</span><span class="p">(</span><span class="nx">b</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">)</span><span class="w"></span>
+<span class="ni">array.push</span><span class="p">(</span><span class="nx">b</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="w"></span>
+<span class="ni">array.push</span><span class="p">(</span><span class="nx">b</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">)</span><span class="w"></span>
+<span class="k">if </span><span class="ni">barstate.islast</span><span class="w"></span>
+<span class="w">    </span><span class="nx">barUp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">close</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="no">open</span><span class="w"></span>
+<span class="w">    </span><span class="ni">array.sort</span><span class="p">(</span><span class="nx">barUp</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="nx">a</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="nx">b</span><span class="p">,</span><span class="w"> </span><span class="nx">barUp</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="nx">order.ascending</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="nx">order.descending</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="ni">label.new</span><span class="p">(</span><span class="ni">bar_index</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"></span>
+<span class="w">      </span><span class="s2">"a "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="nx">barUp</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s2">"is sorted ▲: "</span><span class="w">   </span><span class="o">:</span><span class="w"> </span><span class="s2">"is not sorted: "</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="ni">str.tostring</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">"\n\n"</span><span class="w"> </span><span class="o">+</span><span class="w"></span>
+<span class="w">      </span><span class="s2">"b "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="nx">barUp</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s2">"is not sorted: "</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s2">"is sorted ▼: "</span><span class="p">)</span><span class="w">   </span><span class="o">+</span><span class="w"> </span><span class="ni">str.tostring</span><span class="p">(</span><span class="nx">b</span><span class="p">),</span><span class="w"> </span><span class="nx">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">size.large</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<img alt="../_images/Arrays-ManipulatingArrays-Sort.png" src="../_images/Arrays-ManipulatingArrays-Sort.png"/>
+</div>
+<div class="section" id="reversing">
+<h3><a class="toc-backref" href="#id21">Reversing</a><a class="headerlink" href="#reversing" title="Permalink to this headline">¶</a></h3>
+<p>Use <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}reverse">array.reverse()</a>  to reverse an array:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"`array.reverse()`"</span><span class="p">)</span><span class="w"></span>
+<span class="nx">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">array.new_float</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="ni">array.push</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="ni">array.push</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"></span>
+<span class="ni">array.push</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"></span>
+<span class="k">if </span><span class="ni">barstate.islast</span><span class="w"></span>
+<span class="w">    </span><span class="ni">array.reverse</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="ni">label.new</span><span class="p">(</span><span class="ni">bar_index</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="s2">"a: "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="ni">str.tostring</span><span class="p">(</span><span class="nx">a</span><span class="p">))</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="slicing">
+<h3><a class="toc-backref" href="#id22">Slicing</a><a class="headerlink" href="#slicing" title="Permalink to this headline">¶</a></h3>
+<p>Slicing an array using <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}slice">array.slice()</a>
+creates a shallow copy of a subset of the parent array.
+You determine the size of the subset to slice using the <code class="docutils literal notranslate"><span class="pre">index_from</span></code> and <code class="docutils literal notranslate"><span class="pre">index_to</span></code> parameters.
+The <code class="docutils literal notranslate"><span class="pre">index_to</span></code> argument must be one greater than the end of the subset you want to slice.</p>
+<p>The shallow copy created by the slice acts like a window on the parent array’s content.
+The indices used for the slice define the window’s position and size over the parent array.
+If, as in the example below, a slice is created from the first three elements of an array (indices 0 to 2),
+then regardless of changes made to the parent array, and as long as it contains at least three elements,
+the shallow copy will always contain the parent array’s first three elements.</p>
+<p>Additionally, once the shallow copy is created, operations on the copy are mirrored on the parent array.
+Adding an element to the end of the shallow copy, as is done in the following example,
+will widen the window by one element and also insert that element in the parent array at index 3.
+In this example, to slice the subset from index 0 to index 2 of array <code class="docutils literal notranslate"><span class="pre">a</span></code>, we must use <code class="docutils literal notranslate"><span class="pre">_sliceOfA</span> <span class="pre">=</span> <span class="pre">array.slice(a,</span> <span class="pre">0,</span> <span class="pre">3)</span></code>:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"`array.slice()`"</span><span class="p">)</span><span class="w"></span>
+<span class="nx">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">array.new_float</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="ni">array.push</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="ni">array.push</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"></span>
+<span class="ni">array.push</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"></span>
+<span class="ni">array.push</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="w"></span>
+<span class="k">if </span><span class="ni">barstate.islast</span><span class="w"></span>
+<span class="w">    </span><span class="c">// Create a shadow of elements at index 1 and 2 from array `a`.</span><span class="w"></span>
+<span class="w">    </span><span class="nx">sliceOfA</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">array.slice</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="ni">label.new</span><span class="p">(</span><span class="ni">bar_index</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="s2">"BEFORE\na: "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="ni">str.tostring</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">"\nsliceOfA: "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="ni">str.tostring</span><span class="p">(</span><span class="nx">sliceOfA</span><span class="p">))</span><span class="w"></span>
+<span class="w">    </span><span class="c">// Remove first element of parent array `a`.</span><span class="w"></span>
+<span class="w">    </span><span class="ni">array.remove</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="c">// Add a new element at the end of the shallow copy, thus also affecting the original array `a`.</span><span class="w"></span>
+<span class="w">    </span><span class="ni">array.push</span><span class="p">(</span><span class="nx">sliceOfA</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="ni">label.new</span><span class="p">(</span><span class="ni">bar_index</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="s2">"AFTER\na: "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="ni">str.tostring</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">"\nsliceOfA: "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="ni">str.tostring</span><span class="p">(</span><span class="nx">sliceOfA</span><span class="p">),</span><span class="w"> </span><span class="nx">style</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">label.style_label_up</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<img alt="../_images/Arrays-ManipulatingArrays-Slice.png" src="../_images/Arrays-ManipulatingArrays-Slice.png"/>
+</div>
+</div>
+<div class="section" id="searching-arrays">
+<h2><a class="toc-backref" href="#id23">Searching arrays</a><a class="headerlink" href="#searching-arrays" title="Permalink to this headline">¶</a></h2>
+<p>We can test if a value is part of an array with the
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}includes">array.includes()</a> function,
+which returns true if the element is found.
+We can find the first occurrence of a value in an array by using the
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}indexof">array.indexof()</a> function.
+The first occurence is the one with the lowest index.
+We can also find the last occurrence of a value with
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}lastindexof">array.lastindexof()</a>:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"Searching in arrays"</span><span class="p">)</span><span class="w"></span>
+<span class="nx">valueInput</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">input.int</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"></span>
+<span class="nx">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">array.new_float</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="ni">array.push</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="ni">array.push</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"></span>
+<span class="ni">array.push</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"></span>
+<span class="ni">array.push</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"></span>
+<span class="k">if </span><span class="ni">barstate.islast</span><span class="w"></span>
+<span class="w">    </span><span class="nx">valueFound</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="ni">array.includes</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="nx">valueInput</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="nx">firstIndexFound</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">array.indexof</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="nx">valueInput</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="nx">lastIndexFound</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="ni">array.lastindexof</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="nx">valueInput</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="ni">label.new</span><span class="p">(</span><span class="ni">bar_index</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="s2">"a: "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="ni">str.tostring</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"></span>
+<span class="w">      </span><span class="s2">"\nFirst "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="ni">str.tostring</span><span class="p">(</span><span class="nx">valueInput</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="nx">firstIndexFound</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s2">" value was found at index: "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="ni">str.tostring</span><span class="p">(</span><span class="nx">firstIndexFound</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s2">" value was not found."</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"></span>
+<span class="w">      </span><span class="s2">"\nLast "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="ni">str.tostring</span><span class="p">(</span><span class="nx">valueInput</span><span class="p">)</span><span class="w">  </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="nx">lastIndexFound</span><span class="w">  </span><span class="o">!=</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s2">" value was found at index: "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="ni">str.tostring</span><span class="p">(</span><span class="nx">lastIndexFound</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s2">" value was not found."</span><span class="p">))</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="error-handling">
+<h2><a class="toc-backref" href="#id24">Error handling</a><a class="headerlink" href="#error-handling" title="Permalink to this headline">¶</a></h2>
+<p>Malformed <code class="docutils literal notranslate"><span class="pre">array.*()</span></code> call syntax in Pine scripts will cause the usual <strong>compiler</strong> error messages to appear in Pine Script™ Editor’s console, at the bottom of the window,
+when you save a script. Refer to the <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/">Pine Script™ v5 Reference Manual</a>
+when in doubt regarding the exact syntax of function calls.</p>
+<p>Scripts using arrays can also throw <strong>runtime</strong> errors, which appear in place of the indicator’s name on charts.
+We discuss those runtime errors in this section.</p>
+<div class="section" id="index-xx-is-out-of-bounds-array-size-is-yy">
+<h3><a class="toc-backref" href="#id25">Index xx is out of bounds. Array size is yy</a><a class="headerlink" href="#index-xx-is-out-of-bounds-array-size-is-yy" title="Permalink to this headline">¶</a></h3>
+<p>This will most probably be the most frequent error you encounter. It will happen when you reference an nonexistent array index.
+The “xx” value will be the value of the faulty index you tried to use, and “yy” will be the size of the array.
+Recall that array indices start at zero—not one—and end at the array’s size, minus one. An array of size 3’s last valid index is thus <code class="docutils literal notranslate"><span class="pre">2</span></code>.</p>
+<p>To avoid this error, you must make provisions in your code logic to prevent using an index lying outside of the array’s index boundaries.
+This code will generate the error because the last index we use in the loop is outside the valid index range for the array:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"Out of bounds index"</span><span class="p">)</span><span class="w"></span>
+<span class="nx">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">array.new_float</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"></span>
+<span class="k">for </span><span class="nx">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="nx">to</span><span class="w"> </span><span class="mi">3</span><span class="w"></span>
+<span class="w">    </span><span class="ni">array.set</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="nx">i</span><span class="p">,</span><span class="w"> </span><span class="nx">i</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="ni">array.pop</span><span class="p">(</span><span class="nx">a</span><span class="p">))</span><span class="w"></span>
+</pre></div>
+</div>
+<p>The correct <code class="docutils literal notranslate"><span class="pre">for</span></code> statement is:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="k">for </span><span class="nx">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="nx">to</span><span class="w"> </span><span class="mi">2</span><span class="w"></span>
+</pre></div>
+</div>
+<p>To loop on all array elements in an array of unknown size, use:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"Protected `for` loop"</span><span class="p">)</span><span class="w"></span>
+<span class="nx">sizeInput</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">input.int</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="s2">"Array size"</span><span class="p">,</span><span class="w"> </span><span class="nx">minval</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nx">maxval</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">100000</span><span class="p">)</span><span class="w"></span>
+<span class="nx">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">array.new_float</span><span class="p">(</span><span class="nx">sizeInput</span><span class="p">)</span><span class="w"></span>
+<span class="k">for </span><span class="nx">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="nx">to</span><span class="w"> </span><span class="p">(</span><span class="ni">array.size</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="no">na</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="ni">array.size</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="ni">array.set</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="nx">i</span><span class="p">,</span><span class="w"> </span><span class="nx">i</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="ni">array.pop</span><span class="p">(</span><span class="nx">a</span><span class="p">))</span><span class="w"></span>
+</pre></div>
+</div>
+<p>When you size arrays dynamically using a field in your script’s <em>Settings/Inputs</em> tab, protect the boundaries of that value using
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_input{dot}int">input.int()</a>’s <code class="docutils literal notranslate"><span class="pre">minval</span></code> and <code class="docutils literal notranslate"><span class="pre">maxval</span></code> parameters:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"Protected array size"</span><span class="p">)</span><span class="w"></span>
+<span class="nx">sizeInput</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">input.int</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="s2">"Array size"</span><span class="p">,</span><span class="w"> </span><span class="nx">minval</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="nx">maxval</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">100000</span><span class="p">)</span><span class="w"></span>
+<span class="nx">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">array.new_float</span><span class="p">(</span><span class="nx">sizeInput</span><span class="p">)</span><span class="w"></span>
+<span class="k">for </span><span class="nx">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="nx">to</span><span class="w"> </span><span class="nx">sizeInput</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="w"></span>
+<span class="w">    </span><span class="ni">array.set</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="nx">i</span><span class="p">,</span><span class="w"> </span><span class="nx">i</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="ni">array.size</span><span class="p">(</span><span class="nx">a</span><span class="p">))</span><span class="w"></span>
+</pre></div>
+</div>
+<p>See the <a class="reference internal" href="#pagearrays-looping"><span class="std std-ref">Looping</span></a> section of this page for more information.</p>
+</div>
+<div class="section" id="cannot-call-array-methods-when-id-of-array-is-na">
+<h3><a class="toc-backref" href="#id26">Cannot call array methods when ID of array is ‘na’</a><a class="headerlink" href="#cannot-call-array-methods-when-id-of-array-is-na" title="Permalink to this headline">¶</a></h3>
+<p>When an array ID is initialized to <code class="docutils literal notranslate"><span class="pre">na</span></code>, operations on it are not allowed, since no array exists.
+All that exists at that point is an array variable containing the <code class="docutils literal notranslate"><span class="pre">na</span></code> value rather that a valid array ID pointing to an existing array.
+Note that an array created with no elements in it, as you do when you use <code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">=</span> <span class="pre">array.new_int(0)</span></code>, has a valid ID nonetheless.
+This code will throw the error we are discussing:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"Out of bounds index"</span><span class="p">)</span><span class="w"></span>
+<span class="ni">int</span><span class="o">[]</span><span class="w"> </span><span class="nx">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">na</span><span class="w"></span>
+<span class="ni">array.push</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="mi">111</span><span class="p">)</span><span class="w"></span>
+<span class="ni">label.new</span><span class="p">(</span><span class="ni">bar_index</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="s2">"a: "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="ni">str.tostring</span><span class="p">(</span><span class="nx">a</span><span class="p">))</span><span class="w"></span>
+</pre></div>
+</div>
+<p>To avoid it, create an array with size zero using:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="ni">int</span><span class="o">[]</span><span class="w"> </span><span class="nx">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">array.new_int</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>or:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="nx">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">array.new_int</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="array-is-too-large-maximum-size-is-100000">
+<h3><a class="toc-backref" href="#id27">Array is too large. Maximum size is 100000</a><a class="headerlink" href="#array-is-too-large-maximum-size-is-100000" title="Permalink to this headline">¶</a></h3>
+<p>This error will appear if your code attempts to declare an array with a size greater than 100,000.
+It will also occur if, while dynamically appending elements to an array, a new element would increase the array’s size past the maximum.</p>
+</div>
+<div class="section" id="cannot-create-an-array-with-a-negative-size">
+<h3><a class="toc-backref" href="#id28">Cannot create an array with a negative size</a><a class="headerlink" href="#cannot-create-an-array-with-a-negative-size" title="Permalink to this headline">¶</a></h3>
+<p>We haven’t found any use for arrays of negative size yet, but if you ever do, we may allow them )</p>
+</div>
+<div class="section" id="cannot-use-shift-if-array-is-empty">
+<h3><a class="toc-backref" href="#id29">Cannot use <cite>shift()</cite> if array is empty.</a><a class="headerlink" href="#cannot-use-shift-if-array-is-empty" title="Permalink to this headline">¶</a></h3>
+<p>This error will occur if <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}shift">array.shift()</a>
+is called to remove the first element of an empty array.</p>
+</div>
+<div class="section" id="cannot-use-pop-if-array-is-empty">
+<h3><a class="toc-backref" href="#id30">Cannot use <cite>pop()</cite> if array is empty.</a><a class="headerlink" href="#cannot-use-pop-if-array-is-empty" title="Permalink to this headline">¶</a></h3>
+<p>This error will occur if <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}pop">array.pop()</a>
+is called to remove the last element of an empty array.</p>
+</div>
+<div class="section" id="index-from-should-be-less-than-index-to">
+<h3><a class="toc-backref" href="#id31">Index ‘from’ should be less than index ‘to’</a><a class="headerlink" href="#index-from-should-be-less-than-index-to" title="Permalink to this headline">¶</a></h3>
+<p>When two indices are used in functions such as <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_array{dot}slice">array.slice()</a>,
+the first index must always be smaller than the second one.</p>
+</div>
+<div class="section" id="slice-is-out-of-bounds-of-the-parent-array">
+<h3><a class="toc-backref" href="#id32">Slice is out of bounds of the parent array</a><a class="headerlink" href="#slice-is-out-of-bounds-of-the-parent-array" title="Permalink to this headline">¶</a></h3>
+<p>This message occurs whenever the parent array’s size is modified in such a way that it makes the shallow copy
+created by a slice point outside the boundaries of the parent array. This code will reproduce it because after creating a slice
+from index 3 to 4 (the last two elements of our five-element parent array), we remove the parent’s first element,
+making its size four and its last index 3. From that moment on, the shallow copy which is still poiting to the “window” at
+the parent array’s indices 3 to 4, is pointing out of the parent array’s boundaries:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"Slice out of bounds"</span><span class="p">)</span><span class="w"></span>
+<span class="nx">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">array.new_float</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="nx">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">array.slice</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">)</span><span class="w"></span>
+<span class="ni">array.remove</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="nx">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">array.indexof</span><span class="p">(</span><span class="nx">b</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="nx">c</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<a class="reference external image-reference" href="https://www.tradingview.com/"><div align="center" class="align-center"><img alt="../_images/TradingView-Logo-Block.svg" src="../_images/TradingView-Logo-Block.svg" width="200px"/></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="footer-relations">
+<div class="pull-left">
+<a class="btn btn-default" href="User-defined_functions.html" title="previous chapter (use the left arrow)">User-defined functions</a>
+</div>
+<div class="pull-right">
+<a class="btn btn-default" href="../concepts/index.html" title="next chapter (use the right arrow)">Concepts</a>
+</div>
+</div>
+<div class="clearer"></div>
+</div>

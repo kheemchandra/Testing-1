@@ -1,0 +1,182 @@
+<div id="right-column">
+<div aria-label="breadcrumbs navigation" role="navigation">
+<ol class="breadcrumb">
+<li><a href="../index.html">User Manual</a></li>
+<li><a href="index.html">Language</a></li>
+<li>User-defined functions</li>
+</ol>
+</div>
+<div class="document clearer body">
+<a class="reference external image-reference" href="https://www.tradingview.com/pine-script-docs/en/v5/Introduction.html"><div align="right" class="align-right"><img alt="Pine Script™ logo" height="100" src="../_images/Pine_Script_logo.svg" width="100"/></div>
+</a>
+<div class="section" id="user-defined-functions">
+<span id="pageuserdefinedfunctions"></span><h1>User-defined functions<a class="headerlink" href="#user-defined-functions" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><a class="reference internal" href="#introduction" id="id1">Introduction</a></li>
+<li><a class="reference internal" href="#single-line-functions" id="id2">Single-line functions</a></li>
+<li><a class="reference internal" href="#multi-line-functions" id="id3">Multi-line functions</a></li>
+<li><a class="reference internal" href="#scopes-in-the-script" id="id4">Scopes in the script</a></li>
+<li><a class="reference internal" href="#functions-that-return-multiple-results" id="id5">Functions that return multiple results</a></li>
+<li><a class="reference internal" href="#limitations" id="id6">Limitations</a></li>
+</ul>
+</div>
+<div class="section" id="introduction">
+<h2><a class="toc-backref" href="#id1">Introduction</a><a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>User-defined functions are functions that you write, as opposed to the built-in functions in Pine Script™.
+They are useful to define calculations that you must do repetitevely, or that you want to isolate from your script’s main section of calculations.
+Think of user-defined functions as a way to extend the capabilities of Pine Script™, when no built-in function will do what you need.</p>
+<p>You can write your functions in two ways:</p>
+<ul class="simple">
+<li>In a single line, when they are simple, or</li>
+<li>On multiple lines</li>
+</ul>
+<p>Functions can be located in two places:</p>
+<ul class="simple">
+<li>If a function is only used in one script, you can include it in the script where it is used.
+See our <a class="reference internal" href="../writing/Style_guide.html#pagestyleguide-functiondeclarations"><span class="std std-ref">Style guide</span></a> for recommendations on where to place functions in your script.</li>
+<li>You can create a <a class="reference internal" href="../concepts/Libraries.html#pagelibraries"><span class="std std-ref">Pine Script™ library</span></a> to include your functions, which makes them reusable in other scripts without having to copy their code.
+Distinct requirements exist for library functions. They are explained in the page on <a class="reference internal" href="../concepts/Libraries.html#pagelibraries"><span class="std std-ref">libraries</span></a>.</li>
+</ul>
+<p>Whether they use one line or multiple lines, user-defined functions have the following characteristics:</p>
+<ul class="simple">
+<li>They cannot be embedded. All functions are defined in the script’s global scope.</li>
+<li>They do not support recursion. It is <strong>not allowed</strong> for a function to call itself from within its own code.</li>
+<li>The type of the value returned by a function is determined automatically and depends on the type of arguments used in each particular function call.</li>
+<li>Each function call</li>
+</ul>
+</div>
+<div class="section" id="single-line-functions">
+<h2><a class="toc-backref" href="#id2">Single-line functions</a><a class="headerlink" href="#single-line-functions" title="Permalink to this headline">¶</a></h2>
+<p>Simple functions can often be written in one line. This is the formal definition of single-line functions:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&lt;function_declaration&gt;
+    &lt;identifier&gt;(&lt;parameter_list&gt;) =&gt; &lt;return_value&gt;
+
+&lt;parameter_list&gt;
+    {&lt;parameter_definition&gt;{, &lt;parameter_definition&gt;}}
+
+&lt;parameter_definition&gt;
+    [&lt;identifier&gt; = &lt;default_value&gt;]
+
+&lt;return_value&gt;
+    &lt;statement&gt; | &lt;expression&gt; | &lt;tuple&gt;
+</pre></div>
+</div>
+<p>Here is an example:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="nx">f</span><span class="p">(</span><span class="nx">x</span><span class="p">,</span><span class="w"> </span><span class="nx">y</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="nx">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">y</span><span class="w"></span>
+</pre></div>
+</div>
+<p>After the function <code class="docutils literal notranslate"><span class="pre">f()</span></code> has been declared, it’s possible to call it using different types of arguments:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="nx">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">f</span><span class="p">(</span><span class="no">open</span><span class="p">,</span><span class="w"> </span><span class="no">close</span><span class="p">)</span><span class="w"></span>
+<span class="nx">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">f</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"></span>
+<span class="nx">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">f</span><span class="p">(</span><span class="no">open</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>In the example above, the type of variable <code class="docutils literal notranslate"><span class="pre">a</span></code> is <em>series</em> because the arguments are both <em>series</em>.
+The type of variable <code class="docutils literal notranslate"><span class="pre">b</span></code> is <em>integer</em> because arguments are both <em>literal integers</em>.
+The type of variable <code class="docutils literal notranslate"><span class="pre">c</span></code> is <em>series</em> because the addition of a <em>series</em> and <em>literal integer</em> produces a <em>series</em> result.</p>
+</div>
+<div class="section" id="multi-line-functions">
+<h2><a class="toc-backref" href="#id3">Multi-line functions</a><a class="headerlink" href="#multi-line-functions" title="Permalink to this headline">¶</a></h2>
+<p>Pine Script™ also supports multi-line functions with the following syntax:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&lt;identifier&gt;(&lt;parameter_list&gt;) =&gt;
+    &lt;local_block&gt;
+
+&lt;identifier&gt;(&lt;list of parameters&gt;) =&gt;
+    &lt;variable declaration&gt;
+    ...
+    &lt;variable declaration or expression&gt;
+</pre></div>
+</div>
+<p>where:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&lt;parameter_list&gt;
+    {&lt;parameter_definition&gt;{, &lt;parameter_definition&gt;}}
+
+&lt;parameter_definition&gt;
+    [&lt;identifier&gt; = &lt;default_value&gt;]
+</pre></div>
+</div>
+<p>The body of a multi-line function consists of several statements. Each
+statement is placed on a separate line and must be preceded by 1
+indentation (4 spaces or 1 tab). The indentation before the statement
+indicates that it is a part of the body of the function and not part of the
+script’s global scope. After the function’s code, the first statement without an indent
+indicates the body of the function has ended.</p>
+<p>Either an expression or a declared variable should be the last statement
+of the function’s body. The result of this expression (or variable) will
+be the result of the function’s call. For example:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="nx">geom_average</span><span class="p">(</span><span class="nx">x</span><span class="p">,</span><span class="w"> </span><span class="nx">y</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"></span>
+<span class="w">    </span><span class="nx">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">x</span><span class="o">*</span><span class="nx">x</span><span class="w"></span>
+<span class="w">    </span><span class="nx">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">y</span><span class="o">*</span><span class="nx">y</span><span class="w"></span>
+<span class="w">    </span><span class="ni">math.sqrt</span><span class="p">(</span><span class="nx">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">b</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>The function <code class="docutils literal notranslate"><span class="pre">geom_average</span></code> has two arguments and creates two variables
+in the body: <code class="docutils literal notranslate"><span class="pre">a</span></code> and <code class="docutils literal notranslate"><span class="pre">b</span></code>. The last statement calls the function <code class="docutils literal notranslate"><span class="pre">math.sqrt</span></code>
+(an extraction of the square root). The <code class="docutils literal notranslate"><span class="pre">geom_average</span></code> call will return
+the value of the last expression: <code class="docutils literal notranslate"><span class="pre">(math.sqrt(a</span> <span class="pre">+</span> <span class="pre">b))</span></code>.</p>
+</div>
+<div class="section" id="scopes-in-the-script">
+<h2><a class="toc-backref" href="#id4">Scopes in the script</a><a class="headerlink" href="#scopes-in-the-script" title="Permalink to this headline">¶</a></h2>
+<p>Variables declared outside the body of a function or of other local blocks belong to
+the <em>global</em> scope. User-declared and buit-in functions, as well as built-in
+variables also belong to the global scope.</p>
+<p>Each function has its own <em>local</em> scope. All the variables declared
+within the function, as well as the function’s arguments, belong to the scope of
+that function, meaning that it is impossible to reference them from
+outside — e.g., from the global scope or the local scope of another
+function.</p>
+<p>On the other hand, since it is possible to refer to any variable or function
+declared in the global scope from the scope of a function (except for
+self-referencing recursive calls), one can say
+that the local scope is embedded into the global scope.</p>
+<p>In Pine Script™, nested functions are not allowed, i.e., one cannot declare a
+function inside another one. All user functions are declared in the
+global scope. Local scopes cannot intersect with each other.</p>
+</div>
+<div class="section" id="functions-that-return-multiple-results">
+<h2><a class="toc-backref" href="#id5">Functions that return multiple results</a><a class="headerlink" href="#functions-that-return-multiple-results" title="Permalink to this headline">¶</a></h2>
+<p>In most cases a function returns only one result, but it is possible to
+return a list of results (a <em>tuple</em>-like result):</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="nx">fun</span><span class="p">(</span><span class="nx">x</span><span class="p">,</span><span class="w"> </span><span class="nx">y</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"></span>
+<span class="w">    </span><span class="nx">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">x</span><span class="o">+</span><span class="nx">y</span><span class="w"></span>
+<span class="w">    </span><span class="nx">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">x</span><span class="o">-</span><span class="nx">y</span><span class="w"></span>
+<span class="w">    </span><span class="o">[</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="nx">b</span><span class="o">]</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Special syntax is required for calling such functions:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="o">[</span><span class="nx">res0</span><span class="p">,</span><span class="w"> </span><span class="nx">res1</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">fun</span><span class="p">(</span><span class="no">open</span><span class="p">,</span><span class="w"> </span><span class="no">close</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="nx">res0</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="nx">res1</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="limitations">
+<h2><a class="toc-backref" href="#id6">Limitations</a><a class="headerlink" href="#limitations" title="Permalink to this headline">¶</a></h2>
+<p>User-defined functions can use any of the Pine Script™ built-ins, except:
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_barcolor">barcolor()</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_fill">fill()</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_hline">hline()</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_indicator">indicator()</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_library">library()</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plot">plot()</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plotbar">plotbar()</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plotcandle">plotcandle()</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plotchar">plotchar()</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plotshape">plotshape()</a> and
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_strategy">strategy()</a>.</p>
+<a class="reference external image-reference" href="https://www.tradingview.com/"><div align="center" class="align-center"><img alt="../_images/TradingView-Logo-Block.svg" src="../_images/TradingView-Logo-Block.svg" width="200px"/></div>
+</a>
+</div>
+</div>
+</div>
+<div class="footer-relations">
+<div class="pull-left">
+<a class="btn btn-default" href="Built-ins.html" title="previous chapter (use the left arrow)">Built-ins</a>
+</div>
+<div class="pull-right">
+<a class="btn btn-default" href="Arrays.html" title="next chapter (use the right arrow)">Arrays</a>
+</div>
+</div>
+<div class="clearer"></div>
+</div>

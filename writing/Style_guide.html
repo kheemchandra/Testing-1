@@ -1,0 +1,302 @@
+<div id="right-column">
+<div aria-label="breadcrumbs navigation" role="navigation">
+<ol class="breadcrumb">
+<li><a href="../index.html">User Manual</a></li>
+<li><a href="index.html">Writing scripts</a></li>
+<li>Style guide</li>
+</ol>
+</div>
+<div class="document clearer body">
+<a class="reference external image-reference" href="https://www.tradingview.com/pine-script-docs/en/v5/Introduction.html"><div align="right" class="align-right"><img alt="Pine Script™ logo" height="100" src="../_images/Pine_Script_logo.svg" width="100"/></div>
+</a>
+<div class="section" id="style-guide">
+<span id="pagestyleguide"></span><h1>Style guide<a class="headerlink" href="#style-guide" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><a class="reference internal" href="#introduction" id="id1">Introduction</a></li>
+<li><a class="reference internal" href="#naming-conventions" id="id2">Naming Conventions</a></li>
+<li><a class="reference internal" href="#script-organization" id="id3">Script organization</a><ul>
+<li><a class="reference internal" href="#license" id="id4">&lt;license&gt;</a></li>
+<li><a class="reference internal" href="#version" id="id5">&lt;version&gt;</a></li>
+<li><a class="reference internal" href="#declaration-statement" id="id6">&lt;declaration_statement&gt;</a></li>
+<li><a class="reference internal" href="#import-statements" id="id7">&lt;import_statements&gt;</a></li>
+<li><a class="reference internal" href="#constant-declarations" id="id8">&lt;constant_declarations&gt;</a></li>
+<li><a class="reference internal" href="#inputs" id="id9">&lt;inputs&gt;</a></li>
+<li><a class="reference internal" href="#function-declarations" id="id10">&lt;function_declarations&gt;</a></li>
+<li><a class="reference internal" href="#calculations" id="id11">&lt;calculations&gt;</a></li>
+<li><a class="reference internal" href="#strategy-calls" id="id12">&lt;strategy_calls&gt;</a></li>
+<li><a class="reference internal" href="#visuals" id="id13">&lt;visuals&gt;</a></li>
+<li><a class="reference internal" href="#alerts" id="id14">&lt;alerts&gt;</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spacing" id="id15">Spacing</a></li>
+<li><a class="reference internal" href="#line-wrapping" id="id16">Line wrapping</a></li>
+<li><a class="reference internal" href="#vertical-alignment" id="id17">Vertical alignment</a></li>
+<li><a class="reference internal" href="#explicit-typing" id="id18">Explicit typing</a></li>
+</ul>
+</div>
+<div class="section" id="introduction">
+<h2><a class="toc-backref" href="#id1">Introduction</a><a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>This style guide provides recommendations on how to name variables and organize your Pine scripts in a standard way that works well.
+Scripts that follow our best practices will be easier to read, understand and maintain.</p>
+<p>You can see scripts using these guidelines published from the
+<a class="reference external" href="https://www.tradingview.com/u/TradingView/#published-scripts">TradingView</a> and
+<a class="reference external" href="https://www.tradingview.com/u/PineCoders/#published-scripts">PineCoders</a> accounts on the platform.</p>
+</div>
+<div class="section" id="naming-conventions">
+<h2><a class="toc-backref" href="#id2">Naming Conventions</a><a class="headerlink" href="#naming-conventions" title="Permalink to this headline">¶</a></h2>
+<p>We recommend the use of:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">camelCase</span></code> for all identifiers, i.e., variable or function names: <code class="docutils literal notranslate"><span class="pre">ma</span></code>, <code class="docutils literal notranslate"><span class="pre">maFast</span></code>, <code class="docutils literal notranslate"><span class="pre">maLengthInput</span></code>, <code class="docutils literal notranslate"><span class="pre">maColor</span></code>, <code class="docutils literal notranslate"><span class="pre">roundedOHLC()</span></code>, <code class="docutils literal notranslate"><span class="pre">pivotHi()</span></code>.</li>
+<li>All caps <code class="docutils literal notranslate"><span class="pre">SNAKE_CASE</span></code> for constants: <code class="docutils literal notranslate"><span class="pre">BULL_COLOR</span></code>, <code class="docutils literal notranslate"><span class="pre">BEAR_COLOR</span></code>, <code class="docutils literal notranslate"><span class="pre">MAX_LOOKBACK</span></code>.</li>
+<li>The use of qualifying suffixes when it provides valuable clues about the type or provenance of a variable:
+<code class="docutils literal notranslate"><span class="pre">maShowInput</span></code>, <code class="docutils literal notranslate"><span class="pre">bearColor</span></code>, <code class="docutils literal notranslate"><span class="pre">bearColorInput</span></code>, <code class="docutils literal notranslate"><span class="pre">volumesArray</span></code>, <code class="docutils literal notranslate"><span class="pre">maPlotID</span></code>, <code class="docutils literal notranslate"><span class="pre">resultsTable</span></code>, <code class="docutils literal notranslate"><span class="pre">levelsColorArray</span></code>.</li>
+</ul>
+</div>
+<div class="section" id="script-organization">
+<h2><a class="toc-backref" href="#id3">Script organization</a><a class="headerlink" href="#script-organization" title="Permalink to this headline">¶</a></h2>
+<p>The Pine Script™ compiler is quite forgiving of the positioning of specific statements or compiler directives in the script.
+While other arrangements are syntactically correct, this is how we recommend organizing scripts:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&lt;license&gt;
+&lt;version&gt;
+&lt;declaration_statement&gt;
+&lt;import_statements&gt;
+&lt;constant_declarations&gt;
+&lt;inputs&gt;
+&lt;function_declarations&gt;
+&lt;calculations&gt;
+&lt;strategy_calls&gt;
+&lt;visuals&gt;
+&lt;alerts&gt;
+</pre></div>
+</div>
+<div class="section" id="license">
+<h3><a class="toc-backref" href="#id4">&lt;license&gt;</a><a class="headerlink" href="#license" title="Permalink to this headline">¶</a></h3>
+<p>If you publish your open-source scripts publicly on TradingView (scripts can also be published privately),
+your open-source code is by default protected by the Mozilla license. You may choose any other license you prefer.</p>
+<p>The reuse of code from those scripts is governed by our <a class="reference external" href="https://www.tradingview.com/house-rules/?solution=43000590599">House Rules on Script Publishing</a>
+which preempt the author’s license.</p>
+<p>The standard license comments appearing at the beginning of scripts are:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/</span><span class="w"></span>
+<span class="c">// © username</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="version">
+<h3><a class="toc-backref" href="#id5">&lt;version&gt;</a><a class="headerlink" href="#version" title="Permalink to this headline">¶</a></h3>
+<p>This is the compiler directive defining the version of Pine Script™ the script will use. If none is present, v1 is used. For v5, use</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="declaration-statement">
+<h3><a class="toc-backref" href="#id6">&lt;declaration_statement&gt;</a><a class="headerlink" href="#declaration-statement" title="Permalink to this headline">¶</a></h3>
+<p>This is the mandatory declaration statement which defines the type of your script. It must be a call to either
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_indicator">indicator()</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_strategy">strategy()</a>, or
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_library">library()</a>.</p>
+</div>
+<div class="section" id="import-statements">
+<h3><a class="toc-backref" href="#id7">&lt;import_statements&gt;</a><a class="headerlink" href="#import-statements" title="Permalink to this headline">¶</a></h3>
+<p>If your script uses one or more <a class="reference internal" href="../concepts/Libraries.html#pagelibraries"><span class="std std-ref">Pine Script™ libraries</span></a>,
+your <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#op_import">import</a> statements belong here.</p>
+</div>
+<div class="section" id="constant-declarations">
+<h3><a class="toc-backref" href="#id8">&lt;constant_declarations&gt;</a><a class="headerlink" href="#constant-declarations" title="Permalink to this headline">¶</a></h3>
+<p>While there is a “constant” form in Pine Script™, there is no formal “constant” type.
+We nonetheless use “constant” to denote variables of any type meeting these criteria:</p>
+<ul class="simple">
+<li>They are initialized using a literal (e.g., <code class="docutils literal notranslate"><span class="pre">100</span></code> or <code class="docutils literal notranslate"><span class="pre">"AAPL"</span></code>) or a built-in of “const” form (e.g., <code class="docutils literal notranslate"><span class="pre">color.green</span></code>).</li>
+<li>Their value does not change during the script’s execution, meaning their value is never redefined using <a class="reference internal" href="../language/Operators.html#pageoperators-reassignmentoperator"><span class="std std-ref">:=</span></a>.</li>
+</ul>
+<p>We use <code class="docutils literal notranslate"><span class="pre">SNAKE_CASE</span></code> to name these variables and group their declaration near the top of the script. For example:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">// ————— Constants</span><span class="w"></span>
+<span class="k">int </span><span class="w">    </span><span class="nx">MS_IN_MIN</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="mi">60</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1000</span><span class="w"></span>
+<span class="k">int </span><span class="w">    </span><span class="nx">MS_IN_HOUR</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="nx">MS_IN_MIN</span><span class="w">  </span><span class="o">*</span><span class="w"> </span><span class="mi">60</span><span class="w"></span>
+<span class="k">int </span><span class="w">    </span><span class="nx">MS_IN_DAY</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="nx">MS_IN_HOUR</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">24</span><span class="w"></span>
+
+<span class="k">color </span><span class="w">  </span><span class="nx">GRAY</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="l">#808080ff</span><span class="w"></span>
+<span class="k">color </span><span class="w">  </span><span class="nx">LIME</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="l">#00FF00ff</span><span class="w"></span>
+<span class="k">color </span><span class="w">  </span><span class="nx">MAROON</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="l">#800000ff</span><span class="w"></span>
+<span class="k">color </span><span class="w">  </span><span class="nx">ORANGE</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="l">#FF8000ff</span><span class="w"></span>
+<span class="k">color </span><span class="w">  </span><span class="nx">PINK</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="l">#FF0080ff</span><span class="w"></span>
+<span class="k">color </span><span class="w">  </span><span class="nx">TEAL</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="l">#008080ff</span><span class="w"></span>
+<span class="k">color </span><span class="w">  </span><span class="nx">BG_DIV</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="ni">color.new</span><span class="p">(</span><span class="nx">ORANGE</span><span class="p">,</span><span class="w"> </span><span class="mi">90</span><span class="p">)</span><span class="w"></span>
+<span class="k">color </span><span class="w">  </span><span class="nx">BG_RESETS</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="ni">color.new</span><span class="p">(</span><span class="nx">GRAY</span><span class="p">,</span><span class="w"> </span><span class="mi">90</span><span class="p">)</span><span class="w"></span>
+
+<span class="k">string </span><span class="w"> </span><span class="nx">RST1</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="s2">"No reset; cumulate since the beginning of the chart"</span><span class="w"></span>
+<span class="k">string </span><span class="w"> </span><span class="nx">RST2</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="s2">"On a stepped higher timeframe (HTF)"</span><span class="w"></span>
+<span class="k">string </span><span class="w"> </span><span class="nx">RST3</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="s2">"On a fixed HTF"</span><span class="w"></span>
+<span class="k">string </span><span class="w"> </span><span class="nx">RST4</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="s2">"At a fixed time"</span><span class="w"></span>
+<span class="k">string </span><span class="w"> </span><span class="nx">RST5</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="s2">"At the beginning of the regular session"</span><span class="w"></span>
+<span class="k">string </span><span class="w"> </span><span class="nx">RST6</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="s2">"At the first visible chart bar"</span><span class="w"></span>
+<span class="k">string </span><span class="w"> </span><span class="nx">RST7</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="s2">"Fixed rolling period"</span><span class="w"></span>
+
+<span class="k">string </span><span class="w"> </span><span class="nx">LTF1</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="s2">"Least precise, covering many chart bars"</span><span class="w"></span>
+<span class="k">string </span><span class="w"> </span><span class="nx">LTF2</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="s2">"Less precise, covering some chart bars"</span><span class="w"></span>
+<span class="k">string </span><span class="w"> </span><span class="nx">LTF3</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="s2">"More precise, covering less chart bars"</span><span class="w"></span>
+<span class="k">string </span><span class="w"> </span><span class="nx">LTF4</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="s2">"Most precise, 1min intrabars"</span><span class="w"></span>
+
+<span class="k">string </span><span class="w"> </span><span class="nx">TT_TOTVOL</span><span class="w">     </span><span class="o">=</span><span class="w"> </span><span class="s2">"The 'Bodies' value is the transparency of the total volume candle bodies. Zero is opaque, 100 is transparent."</span><span class="w"></span>
+<span class="k">string </span><span class="w"> </span><span class="nx">TT_RST_HTF</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="s2">"This value is used when '"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">RST3</span><span class="w"> </span><span class="o">+</span><span class="s2">"' is selected."</span><span class="w"></span>
+<span class="k">string </span><span class="w"> </span><span class="nx">TT_RST_TIME</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="s2">"These values are used when '"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">RST4</span><span class="w"> </span><span class="o">+</span><span class="s2">"' is selected.</span>
+<span class="s2">  A reset will occur when the time is greater or equal to the bar's open time, and less than its close time.\nHour: 0-23\nMinute: 0-59"</span><span class="w"></span>
+<span class="k">string </span><span class="w"> </span><span class="nx">TT_RST_PERIOD</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"This value is used when '"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">RST7</span><span class="w"> </span><span class="o">+</span><span class="s2">"' is selected."</span><span class="w"></span>
+</pre></div>
+</div>
+<p>In this example:</p>
+<ul class="simple">
+<li>The <code class="docutils literal notranslate"><span class="pre">RST*</span></code> and <code class="docutils literal notranslate"><span class="pre">LTF*</span></code> constants will be used as tuple elements in the <code class="docutils literal notranslate"><span class="pre">options</span></code> argument of <code class="docutils literal notranslate"><span class="pre">input.*()</span></code> calls.</li>
+<li>The <code class="docutils literal notranslate"><span class="pre">TT_*</span></code> constants will be used as <code class="docutils literal notranslate"><span class="pre">tooltip</span></code> arguments in <code class="docutils literal notranslate"><span class="pre">input.*()</span></code> calls. Note how we use a line continuation for long string literals.</li>
+<li>We do not use <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#op_var">var</a> to initialize constants.
+The Pine Script™ runtime is optimized to handle declarations on each bar, but
+using <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#op_var">var</a> to initialize a variable only the first time it is declared
+incurs a minor penalty on script performance because of the maintenance that
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#op_var">var</a> variables require on further bars.</li>
+</ul>
+<p>Note that:</p>
+<ul class="simple">
+<li>Literals used in more than one place in a script should always be declared as a constant.
+Using the constant rather than the literal makes it more readable if it is given a meaningful name, and the practice makes code easier to maintain.
+Even though the quantity of milliseconds in a day is unlikely to change in the future, <code class="docutils literal notranslate"><span class="pre">MS_IN_DAY</span></code> is more meaningful than <code class="docutils literal notranslate"><span class="pre">1000</span> <span class="pre">*</span> <span class="pre">60</span> <span class="pre">*</span> <span class="pre">60</span> <span class="pre">*</span> <span class="pre">24</span></code>.</li>
+<li>Constants only used in the local block of a function or <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#op_if">if</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#op_while">while</a>, etc., statement for example, can be declared in that local block.</li>
+</ul>
+</div>
+<div class="section" id="inputs">
+<h3><a class="toc-backref" href="#id9">&lt;inputs&gt;</a><a class="headerlink" href="#inputs" title="Permalink to this headline">¶</a></h3>
+<p>It is <strong>much</strong> easier to read scripts when all their inputs are in the same code section.
+Placing that section at the beginning of the script also reflects how they are processed at runtime, i.e., before the rest of the script is executed.</p>
+<p>Suffixing input variable names with <code class="docutils literal notranslate"><span class="pre">input</span></code> makes them more readily identifiable when they are used later in the script:
+<code class="docutils literal notranslate"><span class="pre">maLengthInput</span></code>, <code class="docutils literal notranslate"><span class="pre">bearColorInput</span></code>, <code class="docutils literal notranslate"><span class="pre">showAvgInput</span></code>, etc.</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">// ————— Inputs</span><span class="w"></span>
+<span class="k">string </span><span class="w"> </span><span class="nx">resetInput</span><span class="w">              </span><span class="o">=</span><span class="w"> </span><span class="ni">input.string</span><span class="p">(</span><span class="nx">RST2</span><span class="p">,</span><span class="w">        </span><span class="s2">"CVD Resets"</span><span class="p">,</span><span class="w">                       </span><span class="nx">inline</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"00"</span><span class="p">,</span><span class="w"> </span><span class="nx">options</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[</span><span class="nx">RST1</span><span class="p">,</span><span class="w"> </span><span class="nx">RST2</span><span class="p">,</span><span class="w"> </span><span class="nx">RST3</span><span class="p">,</span><span class="w"> </span><span class="nx">RST4</span><span class="p">,</span><span class="w"> </span><span class="nx">RST5</span><span class="p">,</span><span class="w"> </span><span class="nx">RST6</span><span class="p">,</span><span class="w"> </span><span class="nx">RST7</span><span class="o">]</span><span class="p">)</span><span class="w"></span>
+<span class="k">string </span><span class="w"> </span><span class="nx">fixedTfInput</span><span class="w">            </span><span class="o">=</span><span class="w"> </span><span class="ni">input.timeframe</span><span class="p">(</span><span class="s2">"D"</span><span class="p">,</span><span class="w">      </span><span class="s2">"  Fixed HTF:  "</span><span class="p">,</span><span class="w">                   </span><span class="nx">tooltip</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">TT_RST_HTF</span><span class="p">)</span><span class="w"></span>
+<span class="k">int </span><span class="w">    </span><span class="nx">hourInput</span><span class="w">               </span><span class="o">=</span><span class="w"> </span><span class="ni">input.int</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span><span class="w">              </span><span class="s2">"  Fixed time hour:  "</span><span class="p">,</span><span class="w">             </span><span class="nx">inline</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"01"</span><span class="p">,</span><span class="w"> </span><span class="nx">minval</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nx">maxval</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">23</span><span class="p">)</span><span class="w"></span>
+<span class="k">int </span><span class="w">    </span><span class="nx">minuteInput</span><span class="w">             </span><span class="o">=</span><span class="w"> </span><span class="ni">input.int</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span><span class="w">             </span><span class="s2">"minute"</span><span class="p">,</span><span class="w">                           </span><span class="nx">inline</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"01"</span><span class="p">,</span><span class="w"> </span><span class="nx">minval</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nx">maxval</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">59</span><span class="p">,</span><span class="w"> </span><span class="nx">tooltip</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">TT_RST_TIME</span><span class="p">)</span><span class="w"></span>
+<span class="k">int </span><span class="w">    </span><span class="nx">fixedPeriodInput</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="ni">input.int</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="w">             </span><span class="s2">"  Fixed period:  "</span><span class="p">,</span><span class="w">                </span><span class="nx">inline</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"02"</span><span class="p">,</span><span class="w"> </span><span class="nx">minval</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="nx">tooltip</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">TT_RST_PERIOD</span><span class="p">)</span><span class="w"></span>
+<span class="k">string </span><span class="w"> </span><span class="nx">ltfModeInput</span><span class="w">            </span><span class="o">=</span><span class="w"> </span><span class="ni">input.string</span><span class="p">(</span><span class="nx">LTF3</span><span class="p">,</span><span class="w">        </span><span class="s2">"Intrabar precision"</span><span class="p">,</span><span class="w">               </span><span class="nx">inline</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"03"</span><span class="p">,</span><span class="w"> </span><span class="nx">options</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[</span><span class="nx">LTF1</span><span class="p">,</span><span class="w"> </span><span class="nx">LTF2</span><span class="p">,</span><span class="w"> </span><span class="nx">LTF3</span><span class="p">,</span><span class="w"> </span><span class="nx">LTF4</span><span class="o">]</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="function-declarations">
+<span id="pagestyleguide-functiondeclarations"></span><h3><a class="toc-backref" href="#id10">&lt;function_declarations&gt;</a><a class="headerlink" href="#function-declarations" title="Permalink to this headline">¶</a></h3>
+<p>All user-defined functions must be defined in the script’s global scope; nested function definitions are not allowed in Pine Script™.</p>
+<p>Optimal function design should minimize the use of global variables in the function’s scope, as they undermine function portability.
+When it can’t be avoided, those functions must follow the global variable declarations in the code, which entails they can’t always be placed in the &lt;function_declarations&gt; section.
+Such dependencies on global variables should ideally be documented in the function’s comments.</p>
+<p>It will also help readers if you document the function’s objective, parameters and result.
+The same syntax used in <a class="reference internal" href="../concepts/Libraries.html#pagelibraries"><span class="std std-ref">libraries</span></a> can be used to document your functions.
+This can make it easier to port your functions to a library should you ever decide to do so.
+Placing the documentation inside the function, as opposed to outside of it as is done in libraries, will prevent confusion:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/</span><span class="w"></span>
+<span class="c">// © TradingView</span><span class="w"></span>
+
+<span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"&lt;function_declarations&gt;"</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="nx">true</span><span class="p">)</span><span class="w"></span>
+
+<span class="k">string </span><span class="nx">SIZE_LARGE</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="s2">"Large"</span><span class="w"></span>
+<span class="k">string </span><span class="nx">SIZE_NORMAL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"Normal"</span><span class="w"></span>
+<span class="k">string </span><span class="nx">SIZE_SMALL</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="s2">"Small"</span><span class="w"></span>
+
+<span class="k">string </span><span class="nx">sizeInput</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">input.string</span><span class="p">(</span><span class="nx">SIZE_NORMAL</span><span class="p">,</span><span class="w"> </span><span class="s2">"Size"</span><span class="p">,</span><span class="w"> </span><span class="nx">options</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[</span><span class="nx">SIZE_LARGE</span><span class="p">,</span><span class="w"> </span><span class="nx">SIZE_NORMAL</span><span class="p">,</span><span class="w"> </span><span class="nx">SIZE_SMALL</span><span class="o">]</span><span class="p">)</span><span class="w"></span>
+
+<span class="nx">getSize</span><span class="p">(</span><span class="k">simple string </span><span class="nx">userSize</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"></span>
+<span class="w">    </span><span class="c">// @function        Used to produce an argument for the `size` parameter in built-in functions.</span><span class="w"></span>
+<span class="w">    </span><span class="c">// @param userSize  (simple string) User-selected size.</span><span class="w"></span>
+<span class="w">    </span><span class="c">// @returns         One of the `size.*` built-in constants.</span><span class="w"></span>
+<span class="w">    </span><span class="c">// Dependencies:    SIZE_LARGE, SIZE_NORMAL, SIZE_SMALL</span><span class="w"></span>
+<span class="w">    </span><span class="nx">result</span><span class="w"> </span><span class="o">=</span><span class="w"></span>
+<span class="w">      </span><span class="k">switch </span><span class="nx">userSize</span><span class="w"></span>
+<span class="w">        </span><span class="nx">SIZE_LARGE</span><span class="w">  </span><span class="o">=&gt;</span><span class="w"> </span><span class="ni">size.large</span><span class="w"></span>
+<span class="w">        </span><span class="nx">SIZE_NORMAL</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="ni">size.normal</span><span class="w"></span>
+<span class="w">        </span><span class="nx">SIZE_SMALL</span><span class="w">  </span><span class="o">=&gt;</span><span class="w"> </span><span class="ni">size.small</span><span class="w"></span>
+<span class="w">        </span><span class="o">=&gt;</span><span class="w"> </span><span class="ni">size.auto</span><span class="w"></span>
+
+<span class="k">if </span><span class="ni">ta.rising</span><span class="p">(</span><span class="no">close</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="ni">label.new</span><span class="p">(</span><span class="ni">bar_index</span><span class="p">,</span><span class="w"> </span><span class="no">na</span><span class="p">,</span><span class="w"> </span><span class="nx">yloc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">yloc.abovebar</span><span class="p">,</span><span class="w"> </span><span class="nx">style</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">label.style_arrowup</span><span class="p">,</span><span class="w"> </span><span class="nx">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">getSize</span><span class="p">(</span><span class="nx">sizeInput</span><span class="p">))</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="calculations">
+<h3><a class="toc-backref" href="#id11">&lt;calculations&gt;</a><a class="headerlink" href="#calculations" title="Permalink to this headline">¶</a></h3>
+<p>This is where the script’s core calculations and logic should be placed.
+Code can be easier to read when variable declarations are placed near the code segment using the variables.
+Some programmers prefer to place all their non-constant variable declarations at the beginning of this section,
+which is not always possible for all variables, as some may require some calculations to have been executed before their declaration.</p>
+</div>
+<div class="section" id="strategy-calls">
+<h3><a class="toc-backref" href="#id12">&lt;strategy_calls&gt;</a><a class="headerlink" href="#strategy-calls" title="Permalink to this headline">¶</a></h3>
+<p>Strategies are easier to read when strategy calls are grouped in the same section of the script.</p>
+</div>
+<div class="section" id="visuals">
+<h3><a class="toc-backref" href="#id13">&lt;visuals&gt;</a><a class="headerlink" href="#visuals" title="Permalink to this headline">¶</a></h3>
+<p>This section should ideally include all the statements producing the script’s visuals, whether they be plots, drawings, background colors, candle-plotting, etc.
+See the Pine Script™ User Manual’s section on <a class="reference internal" href="../concepts/Colors.html#pagecolors-zindex"><span class="std std-ref">here</span></a> for more information on how the relative depth of visuals is determined.</p>
+</div>
+<div class="section" id="alerts">
+<h3><a class="toc-backref" href="#id14">&lt;alerts&gt;</a><a class="headerlink" href="#alerts" title="Permalink to this headline">¶</a></h3>
+<p>Alert code will usually require the script’s calculations to have executed before it, so it makes sense to put it at the end of the script.</p>
+</div>
+</div>
+<div class="section" id="spacing">
+<h2><a class="toc-backref" href="#id15">Spacing</a><a class="headerlink" href="#spacing" title="Permalink to this headline">¶</a></h2>
+<p>A space should be used on both sides of all operators, except unary operators (<code class="docutils literal notranslate"><span class="pre">-1</span></code>).
+A space is also recommended after all commas and when using named function arguments, as in <code class="docutils literal notranslate"><span class="pre">plot(series</span> <span class="pre">=</span> <span class="pre">close)</span></code></p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="k">int </span><span class="nx">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">close</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="no">open</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="w"></span>
+<span class="k">var int </span><span class="nx">newLen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="w"></span>
+<span class="nx">newLen</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">min</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="nx">newlen</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"></span>
+<span class="k">float </span><span class="nx">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="nx">b</span><span class="w"></span>
+<span class="k">float </span><span class="nx">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">d</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="nx">e</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="nx">d</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nx">e</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="nx">d</span><span class="w"></span>
+<span class="k">int </span><span class="nx">index</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">bar_index</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mi">2</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="no">close</span><span class="p">,</span><span class="w"> </span><span class="k">color </span><span class="o">=</span><span class="w"> </span><span class="ni">color.red</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="line-wrapping">
+<h2><a class="toc-backref" href="#id16">Line wrapping</a><a class="headerlink" href="#line-wrapping" title="Permalink to this headline">¶</a></h2>
+<p>Line wrapping can make long lines easier to read.
+Line wraps are defined by using an indentation level that is not a multiple of four, as four spaces or a tab are used to define local blocks.
+Here we use two spaces:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="ni">plot</span><span class="p">(</span><span class="w"></span>
+<span class="w">  </span><span class="k">series </span><span class="o">=</span><span class="w"> </span><span class="no">close</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="nx">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"Close"</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="k">color </span><span class="o">=</span><span class="w"> </span><span class="ni">color.blue</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="nx">show_last</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="w"></span>
+<span class="w">  </span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="vertical-alignment">
+<h2><a class="toc-backref" href="#id17">Vertical alignment</a><a class="headerlink" href="#vertical-alignment" title="Permalink to this headline">¶</a></h2>
+<p>Vertical alignment using tabs or spaces can be useful in code sections containing many similar lines such as constant declarations or inputs.
+They can make mass edits much easier using the Pine Script™ Editor’s multi-cursor feature (<kbd class="kbd docutils literal notranslate">ctrl</kbd> + <kbd class="kbd docutils literal notranslate">alt</kbd> + <kbd class="kbd docutils literal notranslate">🠅</kbd>/<kbd class="kbd docutils literal notranslate">🠇</kbd>):</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">// Colors used as defaults in inputs.</span><span class="w"></span>
+<span class="k">color </span><span class="nx">COLOR_AQUA</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="l">#0080FFff</span><span class="w"></span>
+<span class="k">color </span><span class="nx">COLOR_BLACK</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="l">#000000ff</span><span class="w"></span>
+<span class="k">color </span><span class="nx">COLOR_BLUE</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="l">#013BCAff</span><span class="w"></span>
+<span class="k">color </span><span class="nx">COLOR_CORAL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="l">#FF8080ff</span><span class="w"></span>
+<span class="k">color </span><span class="nx">COLOR_GOLD</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="l">#CCCC00ff</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="explicit-typing">
+<h2><a class="toc-backref" href="#id18">Explicit typing</a><a class="headerlink" href="#explicit-typing" title="Permalink to this headline">¶</a></h2>
+<p>Including the type of variables when declaring them is not required and is usually overkill for small scripts; we do not systematically use it.
+It can be useful to make the type of a function’s result clearer, and to distinguish a variable’s declaration (using <code class="docutils literal notranslate"><span class="pre">=</span></code>) from its reassignments (using <code class="docutils literal notranslate"><span class="pre">:=</span></code>).
+Using explicit typing can also make it easier for readers to find their way in larger scripts.</p>
+<a class="reference external image-reference" href="https://www.tradingview.com/"><div align="center" class="align-center"><img alt="../_images/TradingView-Logo-Block.svg" src="../_images/TradingView-Logo-Block.svg" width="200px"/></div>
+</a>
+</div>
+</div>
+</div>
+<div class="footer-relations">
+<div class="pull-left">
+<a class="btn btn-default" href="index.html" title="previous chapter (use the left arrow)">Writing scripts</a>
+</div>
+<div class="pull-right">
+<a class="btn btn-default" href="Debugging.html" title="next chapter (use the right arrow)">Debugging</a>
+</div>
+</div>
+<div class="clearer"></div>
+</div>

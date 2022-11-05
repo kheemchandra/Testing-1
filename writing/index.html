@@ -1,0 +1,124 @@
+<div id="right-column">
+<div aria-label="breadcrumbs navigation" role="navigation">
+<ol class="breadcrumb">
+<li><a href="../index.html">User Manual</a></li>
+<li>Writing scripts</li>
+</ol>
+</div>
+<div class="document clearer body">
+<div class="section" id="writing-scripts">
+<span id="indexwriting"></span><h1>Writing scripts<a class="headerlink" href="#writing-scripts" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound" id="writingtoc">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Style_guide.html">Style guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="Style_guide.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Style_guide.html#naming-conventions">Naming Conventions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Style_guide.html#script-organization">Script organization</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="Style_guide.html#license">&lt;license&gt;</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Style_guide.html#version">&lt;version&gt;</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Style_guide.html#declaration-statement">&lt;declaration_statement&gt;</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Style_guide.html#import-statements">&lt;import_statements&gt;</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Style_guide.html#constant-declarations">&lt;constant_declarations&gt;</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Style_guide.html#inputs">&lt;inputs&gt;</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Style_guide.html#function-declarations">&lt;function_declarations&gt;</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Style_guide.html#calculations">&lt;calculations&gt;</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Style_guide.html#strategy-calls">&lt;strategy_calls&gt;</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Style_guide.html#visuals">&lt;visuals&gt;</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Style_guide.html#alerts">&lt;alerts&gt;</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Style_guide.html#spacing">Spacing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Style_guide.html#line-wrapping">Line wrapping</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Style_guide.html#vertical-alignment">Vertical alignment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Style_guide.html#explicit-typing">Explicit typing</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Debugging.html">Debugging</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="Debugging.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Debugging.html#the-lay-of-the-land">The lay of the land</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Debugging.html#displaying-numeric-values">Displaying numeric values</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="Debugging.html#when-the-script-s-scale-is-unimportant">When the script’s scale is unimportant</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Debugging.html#when-the-script-s-scale-must-be-preserved">When the script’s scale must be preserved</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Debugging.html#displaying-strings">Displaying strings</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="Debugging.html#labels-on-each-bar">Labels on each bar</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Debugging.html#labels-on-last-bar">Labels on last bar</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Debugging.html#debugging-conditions">Debugging conditions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="Debugging.html#single-conditions">Single conditions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Debugging.html#compound-conditions">Compound conditions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Debugging.html#debugging-from-inside-functions">Debugging from inside functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Debugging.html#debugging-from-inside-for-loops">Debugging from inside `for` loops</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="Debugging.html#extracting-a-single-value">Extracting a single value</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Debugging.html#using-lines-and-labels">Using lines and labels</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Debugging.html#extracting-multiple-values">Extracting multiple values</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Debugging.html#tips">Tips</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Publishing.html">Publishing scripts</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="Publishing.html#script-visibility-and-access">Script visibility and access</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="Publishing.html#when-you-publish-a-script">When you publish a script</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Publishing.html#visibility">Visibility</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Publishing.html#access">Access</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Publishing.html#preparing-a-publication">Preparing a publication</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Publishing.html#publishing-a-script">Publishing a script</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Publishing.html#updating-a-publication">Updating a publication</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Limitations.html">Limitations</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="Limitations.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Limitations.html#time">Time</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="Limitations.html#script-compilation">Script compilation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Limitations.html#script-execution">Script execution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Limitations.html#loop-execution">Loop execution</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Limitations.html#chart-visuals">Chart visuals</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="Limitations.html#plot-limits">Plot limits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Limitations.html#line-box-and-label-limits">Line, box, and label limits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Limitations.html#table-limits">Table limits</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Limitations.html#request-calls">`request.*()` calls</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="Limitations.html#number-of-calls">Number of calls</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Limitations.html#intrabars">Intrabars</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Limitations.html#script-size-and-memory">Script size and memory</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="Limitations.html#compiled-tokens">Compiled tokens</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Limitations.html#local-blocks">Local blocks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Limitations.html#variables">Variables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Limitations.html#arrays-and-matrices">Arrays and matrices</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Limitations.html#other-limitations">Other limitations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="Limitations.html#maximum-bars-back">Maximum bars back</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Limitations.html#maximum-bars-forward">Maximum bars forward</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Limitations.html#chart-bars">Chart bars</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Limitations.html#trade-orders-in-backtesting">Trade orders in backtesting</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="footer-relations">
+<div class="pull-left">
+<a class="btn btn-default" href="../concepts/Timeframes.html" title="previous chapter (use the left arrow)">Timeframes</a>
+</div>
+<div class="pull-right">
+<a class="btn btn-default" href="Style_guide.html" title="next chapter (use the right arrow)">Style guide</a>
+</div>
+</div>
+<div class="clearer"></div>
+</div>

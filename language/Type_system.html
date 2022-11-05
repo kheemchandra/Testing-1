@@ -1,0 +1,615 @@
+<div id="right-column">
+<div aria-label="breadcrumbs navigation" role="navigation">
+<ol class="breadcrumb">
+<li><a href="../index.html">User Manual</a></li>
+<li><a href="index.html">Language</a></li>
+<li>Type system</li>
+</ol>
+</div>
+<div class="document clearer body">
+<a class="reference external image-reference" href="https://www.tradingview.com/pine-script-docs/en/v5/Introduction.html"><div align="right" class="align-right"><img alt="Pine Script™ logo" height="100" src="../_images/Pine_Script_logo.svg" width="100"/></div>
+</a>
+<div class="section" id="type-system">
+<span id="pagetypesystem"></span><h1>Type system<a class="headerlink" href="#type-system" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><a class="reference internal" href="#introduction" id="id3">Introduction</a><ul>
+<li><a class="reference internal" href="#forms" id="id4">Forms</a></li>
+<li><a class="reference internal" href="#types" id="id5">Types</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#using-forms-and-types" id="id6">Using forms and types</a><ul>
+<li><a class="reference internal" href="#id1" id="id7">Forms</a><ul>
+<li><a class="reference internal" href="#const" id="id8">const</a></li>
+<li><a class="reference internal" href="#input" id="id9">input</a></li>
+<li><a class="reference internal" href="#simple" id="id10">simple</a></li>
+<li><a class="reference internal" href="#series" id="id11">series</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id2" id="id12">Types</a><ul>
+<li><a class="reference internal" href="#int" id="id13">int</a></li>
+<li><a class="reference internal" href="#float" id="id14">float</a></li>
+<li><a class="reference internal" href="#bool" id="id15">bool</a></li>
+<li><a class="reference internal" href="#color" id="id16">color</a></li>
+<li><a class="reference internal" href="#string" id="id17">string</a></li>
+<li><a class="reference internal" href="#plot-and-hline" id="id18">plot and hline</a></li>
+<li><a class="reference internal" href="#line-label-box-and-table" id="id19">line, label, box and table</a></li>
+<li><a class="reference internal" href="#array" id="id20">array</a></li>
+<li><a class="reference internal" href="#void" id="id21">void</a></li>
+<li><a class="reference internal" href="#tuples" id="id22">Tuples</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#na-value" id="id23">`na` value</a></li>
+<li><a class="reference internal" href="#type-casting" id="id24">Type casting</a></li>
+</ul>
+</div>
+<div class="section" id="introduction">
+<h2><a class="toc-backref" href="#id3">Introduction</a><a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>Pine Script™’s type system is important because it determines what sort of values can be used when calling Pine Script™ functions, which is a requirement to do pretty much anything in Pine Script™.
+While it is possible to write very simple scripts without knowing anything about the type system,
+a reasonable understanding of it is necessary to achieve any degree of profiency with the language,
+and in-depth knowledge of its subtleties will allow you to exploit the full potential of Pine Script™.</p>
+<p>The type system uses the <em>form type</em> pair to qualify the type of all values, be they literals, a variable, the result of an expression,
+the value returned by functions or the arguments supplied when calling a function.</p>
+<p>The <em>form</em> expresses when a value is known.</p>
+<p>The <em>type</em> denotes the nature of a value.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">We will often use “type” to refer to the “form type” pair.</p>
+</div>
+<p>The type system is intimately linked to Pine Script™’s <a class="reference internal" href="Execution_model.html#pageexecutionmodel"><span class="std std-ref">execution model</span></a> and <a class="reference internal" href="Time_series.html#pagetimeseries"><span class="std std-ref">time series</span></a> concepts.
+Understanding all three is key to making the most of the power of Pine Script™.</p>
+<div class="section" id="forms">
+<span id="pagetypesystem-forms"></span><h3><a class="toc-backref" href="#id4">Forms</a><a class="headerlink" href="#forms" title="Permalink to this headline">¶</a></h3>
+<p>Pine Script™ <strong>forms</strong> identify when a variable’s value is known. They are:</p>
+<ul class="simple">
+<li>“const” for values known at compile time (when adding an indicator to a chart or saving it in the Pine Script™ Editor)</li>
+<li>“input” for values known at input time (when values are changed in a script’s “Settings/Inputs” tab)</li>
+<li>“simple” for values known at bar zero (when the script begins execution on the chart’s first historical bar)</li>
+<li>“series” for values known on each bar (any time during the execution of a script on any bar)</li>
+</ul>
+<p>Forms are organized in the following hierarchy: <strong>const &lt; input &lt; simple &lt; series</strong>, where “const” is considered a <em>weaker</em> form than “input”, for example, and “series” <em>stronger</em> than “simple”.
+The form hierarchy translates into the rule that, whenever a given form is required, a weaker form is also allowed.</p>
+<p>An expression’s result is always of the strongest form used in the expression’s calculation. Furthermore, once a variable acquires a stronger form, that state is irreversible;
+it can never be converted back to a weaker form. A variable of “series” form can thus never be converted back to a “simple” form, for use with a function that requires arguments of that form.</p>
+<p>Note that of all these forms, only the “series” form allows values to change dynamically, bar to bar, during the script’s execution over each bar of the chart’s history.
+Such values include <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_close">close</a> or <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_hlc3">hlc3</a> or any variable calculated using values of “series” form.
+Variables of “const”, “input” or “simple” forms cannot change values once execution of the script has begun.</p>
+</div>
+<div class="section" id="types">
+<span id="pagetypesystem-types"></span><h3><a class="toc-backref" href="#id5">Types</a><a class="headerlink" href="#types" title="Permalink to this headline">¶</a></h3>
+<p>Pine Script™ <strong>types</strong> identify the nature of a value. They are:</p>
+<ul class="simple">
+<li>The fundamental types: “int”, “float”, “bool”, “color” and “string”</li>
+<li>The special types: “plot”, “hline”, “line”, “label”, “box”, “table”, “array”</li>
+<li>“void”</li>
+<li>tuples</li>
+</ul>
+<p>Each fundamental type refers to the nature of the value contained in a variable: <code class="docutils literal notranslate"><span class="pre">1</span></code> is of type “int”, <code class="docutils literal notranslate"><span class="pre">1.0</span></code> is of type “float”, <code class="docutils literal notranslate"><span class="pre">"AAPL"</span></code> is of type “string”, etc.
+The special types all contain IDs referring to an object of the type’s name, e.g., a variable of type “label” contains an ID (or <em>pointer</em>) referring to a label, and so on.
+The “void” type means no value is returned.
+Tuples are a syntactic arrangement of variables, e.g., <code class="docutils literal notranslate"><span class="pre">[macdLine,</span> <span class="pre">signalLine,</span> <span class="pre">histLine]</span></code>.</p>
+<p>The Pine Script™ compiler can automatically convert some types into others when a value is not of the required type. The auto-casting rules are: <strong>int</strong> 🠆 <strong>float</strong> 🠆 <strong>bool</strong>.
+See the <a class="reference internal" href="#pagetypesystem-typecasting"><span class="std std-ref">Type casting</span></a> section of this page for more information on type casting.</p>
+<p>Except in function signatures, Pine Script™ forms are implicit in code; they are never declared because they are always determined by the compiler.
+Types, however, can be specified when declaring variables, e.g.:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="nx">true</span><span class="p">)</span><span class="w"></span>
+<span class="k">int </span><span class="nx">periodInput</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">input.int</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span><span class="w"> </span><span class="s2">"Period"</span><span class="p">,</span><span class="w"> </span><span class="nx">minval</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"></span>
+<span class="k">float </span><span class="nx">ma</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">ta.sma</span><span class="p">(</span><span class="no">close</span><span class="p">,</span><span class="w"> </span><span class="nx">periodInput</span><span class="p">)</span><span class="w"></span>
+<span class="k">bool </span><span class="nx">xUp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">ta.crossover</span><span class="p">(</span><span class="no">close</span><span class="p">,</span><span class="w"> </span><span class="nx">ma</span><span class="p">)</span><span class="w"></span>
+<span class="k">color </span><span class="nx">maColor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">close</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="nx">ma</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="ni">color.lime</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="ni">color.fuchsia</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="nx">ma</span><span class="p">,</span><span class="w"> </span><span class="s2">"MA"</span><span class="p">,</span><span class="w"> </span><span class="nx">maColor</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plotchar</span><span class="p">(</span><span class="nx">xUp</span><span class="p">,</span><span class="w"> </span><span class="s2">"Cross Up"</span><span class="p">,</span><span class="w"> </span><span class="s2">"▲"</span><span class="p">,</span><span class="w"> </span><span class="ni">location.top</span><span class="p">,</span><span class="w"> </span><span class="nx">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">size.tiny</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="using-forms-and-types">
+<h2><a class="toc-backref" href="#id6">Using forms and types</a><a class="headerlink" href="#using-forms-and-types" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3><a class="toc-backref" href="#id7">Forms</a><a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="const">
+<h4><a class="toc-backref" href="#id8">const</a><a class="headerlink" href="#const" title="Permalink to this headline">¶</a></h4>
+<p>Values of “const” form must be known at compile time, before your script has access to any information related to the symbol/timeframe information it is running on.
+Compilation occurs when you save a script in the Pine Script™ Editor, which doesn’t even require it to already be running on your chart. “const” variables cannot change during the execution of a script.</p>
+<p>Variables of “const” form can be intialized using a <em>literal</em> value, or calculated from expressions using only literal values or other variables of “const” form.
+Pine Script™’s <a class="reference internal" href="../writing/Style_guide.html#pagestyleguide"><span class="std std-ref">Style guide</span></a> recommends using upper case SNAKE_CASE to name variables of “const” form.
+While it is not a requirement, “const” variables are often declared using the
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#op_var">var</a> keyword so they are only initialized on the first bar of the dataset.
+See the <a class="reference internal" href="Variable_declarations.html#pagevariabledeclarations-var"><span class="std std-ref">section on `var`</span></a> for more information.</p>
+<p>These are examples of literal values:</p>
+<ul class="simple">
+<li><em>literal int</em>: <code class="docutils literal notranslate"><span class="pre">1</span></code>, <code class="docutils literal notranslate"><span class="pre">-1</span></code>, <code class="docutils literal notranslate"><span class="pre">42</span></code></li>
+<li><em>literal float</em>: <code class="docutils literal notranslate"><span class="pre">1.</span></code>, <code class="docutils literal notranslate"><span class="pre">1.0</span></code>, <code class="docutils literal notranslate"><span class="pre">3.14</span></code>, <code class="docutils literal notranslate"><span class="pre">6.02E-23</span></code>, <code class="docutils literal notranslate"><span class="pre">3e8</span></code></li>
+<li><em>literal bool</em>: <code class="docutils literal notranslate"><span class="pre">true</span></code>, <code class="docutils literal notranslate"><span class="pre">false</span></code></li>
+<li><em>literal string</em>: <code class="docutils literal notranslate"><span class="pre">"A</span> <span class="pre">text</span> <span class="pre">literal"</span></code>, <code class="docutils literal notranslate"><span class="pre">"Embedded</span> <span class="pre">single</span> <span class="pre">quotes</span> <span class="pre">'text'"</span></code>, <code class="docutils literal notranslate"><span class="pre">'Embedded</span> <span class="pre">double</span> <span class="pre">quotes</span> <span class="pre">"text"'</span></code></li>
+<li><em>literal color</em>: <code class="docutils literal notranslate"><span class="pre">#FF55C6</span></code>, <code class="docutils literal notranslate"><span class="pre">#FF55C6ff</span></code></li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">In Pine Script™, the built-in variables <code class="docutils literal notranslate"><span class="pre">open</span></code>, <code class="docutils literal notranslate"><span class="pre">high</span></code>, <code class="docutils literal notranslate"><span class="pre">low</span></code>, <code class="docutils literal notranslate"><span class="pre">close</span></code>, <code class="docutils literal notranslate"><span class="pre">volume</span></code>, <code class="docutils literal notranslate"><span class="pre">time</span></code>,
+<code class="docutils literal notranslate"><span class="pre">hl2</span></code>, <code class="docutils literal notranslate"><span class="pre">hlc3</span></code>, <code class="docutils literal notranslate"><span class="pre">ohlc4</span></code>, etc., are not of “const” form. Because they change bar to bar, they are of <em>series</em> form.</p>
+</div>
+<p>The “const” form is a requirement for the arguments to the <code class="docutils literal notranslate"><span class="pre">title</span></code> and <code class="docutils literal notranslate"><span class="pre">shorttitle</span></code> parameters in
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_indicator">indicator()</a>, for example.
+All these are valid variables that can be used as arguments for those parameters when calling the function:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="nx">NAME1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"My indicator"</span><span class="w"></span>
+<span class="k">var </span><span class="nx">NAME2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"My Indicator"</span><span class="w"></span>
+<span class="k">var </span><span class="nx">NAME3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"My"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">"Indicator"</span><span class="w"></span>
+<span class="k">var </span><span class="nx">NAME4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">NAME2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">" No. 2"</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="nx">NAME4</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="nx">true</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="no">close</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>This will trigger a compilation error:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="k">var </span><span class="nx">NAME</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"My indicator for "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="ni">syminfo.type</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="nx">NAME</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="nx">true</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="no">close</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>The reason for the error is that the <code class="docutils literal notranslate"><span class="pre">NAME</span></code> variable’s calculation depends on the value of
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_syminfo{dot}type">syminfo.type</a>
+which is a “simple string” (<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_syminfo{dot}type">syminfo.type</a>
+returns a string corresponding to the sector the chart’s symbol belongs to, eg., <code class="docutils literal notranslate"><span class="pre">"crypto"</span></code>, <code class="docutils literal notranslate"><span class="pre">"forex"</span></code>, etc.).</p>
+<p>Note that using the <code class="docutils literal notranslate"><span class="pre">:=</span></code> operator to assign a new value to a previously declared “const” variable will transform it into a “simple” variable, e.g., here with <code class="docutils literal notranslate"><span class="pre">name1</span></code>,
+for which we do not use an uppercase name because it is not of “const” form:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="k">var </span><span class="nx">name1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"My Indicator "</span><span class="w"></span>
+<span class="k">var </span><span class="nx">NAME2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"No. 2"</span><span class="w"></span>
+<span class="nx">name1</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">name1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">NAME2</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="input">
+<span id="pagetypesystem-input"></span><h4><a class="toc-backref" href="#id9">input</a><a class="headerlink" href="#input" title="Permalink to this headline">¶</a></h4>
+<p>Values of “input” form are known when the values initialized through <code class="docutils literal notranslate"><span class="pre">input.*()</span></code> functions are determined.
+These functions determine the values that can be modified by script users in the script’s “Settings/Inputs” tab.
+When these values are changed, this always triggers a re-execution of the script from the beginning of the chart’s history (bar zero),
+so variables of “input” form are always known when the script begins execution, and they do not change during the script’s execution.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_input{dot}source">input.source()</a> function yields a value of “series” type — not “input”.
+This is because built-in variables such as <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_open">open</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_high">high</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_low">low</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_close">close</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_hl2">hl2</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_hlc3">hlc3</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_ohlc4">ohlc4</a>, etc., are of “series” form.</p>
+</div>
+<p>The script plots the moving average of a user-defined source and period from a symbol and timeframe also determined through inputs:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="nx">true</span><span class="p">)</span><span class="w"></span>
+<span class="nx">symbolInput</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">input.symbol</span><span class="p">(</span><span class="s2">"AAPL"</span><span class="p">,</span><span class="w"> </span><span class="s2">"Symbol"</span><span class="p">)</span><span class="w"></span>
+<span class="nx">timeframeInput</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">input.timeframe</span><span class="p">(</span><span class="s2">"D"</span><span class="p">,</span><span class="w"> </span><span class="s2">"Timeframe"</span><span class="p">)</span><span class="w"></span>
+<span class="nx">sourceInput</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">input.source</span><span class="p">(</span><span class="no">close</span><span class="p">,</span><span class="w"> </span><span class="s2">"Source"</span><span class="p">)</span><span class="w"></span>
+<span class="nx">periodInput</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">input</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="s2">"Period"</span><span class="p">)</span><span class="w"></span>
+<span class="nx">v</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">request.security</span><span class="p">(</span><span class="nx">symbolInput</span><span class="p">,</span><span class="w"> </span><span class="nx">timeframeInput</span><span class="p">,</span><span class="w"> </span><span class="ni">ta.sma</span><span class="p">(</span><span class="nx">sourceInput</span><span class="p">,</span><span class="w"> </span><span class="nx">periodInput</span><span class="p">))</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="nx">v</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Note that:</p>
+<ul class="simple">
+<li>The <code class="docutils literal notranslate"><span class="pre">symbolInput</span></code>, <code class="docutils literal notranslate"><span class="pre">timeframeInput</span></code> and <code class="docutils literal notranslate"><span class="pre">periodInput</span></code> variables are of “input” form.</li>
+<li>The <code class="docutils literal notranslate"><span class="pre">sourceInput</span></code> variable is of “series” form because it is determined from a call to <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_input{dot}source">input.source()</a>.</li>
+<li>Our <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_request{dot}security">request.security()</a> call
+is valid because its <code class="docutils literal notranslate"><span class="pre">symbol</span></code> and <code class="docutils literal notranslate"><span class="pre">timeframe</span></code> parameters require a “simple” argument and the “input” form we use is weaker than “simple”.
+The function’s <code class="docutils literal notranslate"><span class="pre">expression</span></code> parameter requires a “series” form argument, and that is what form our <code class="docutils literal notranslate"><span class="pre">sourceInput</span></code> variable is.
+Note that because a “series” form is required there, we could have used “const”, “input” or “simple” forms as well.</li>
+<li>As per our style guide’s recommendations, we use the “Input” suffix with our input variables to help readers of our code remember the origin of these variables.</li>
+</ul>
+<p>Wherever an “input” form is required, a “const” form can also be used.</p>
+</div>
+<div class="section" id="simple">
+<h4><a class="toc-backref" href="#id10">simple</a><a class="headerlink" href="#simple" title="Permalink to this headline">¶</a></h4>
+<p>Values of “simple” form are known only when a script begins execution on the first bar of a chart’s history,
+and they never change during the execution of the script.
+Built-in variables of the <code class="docutils literal notranslate"><span class="pre">syminfo.*</span></code>, <code class="docutils literal notranslate"><span class="pre">timeframe.*</span></code> and <code class="docutils literal notranslate"><span class="pre">ticker.*</span></code> families, for example,
+all return results of “simple” form because their value depends on the chart’s symbol, which can only be detected when the script executes on it.</p>
+<p>A “simple” form argument is also required for the <code class="docutils literal notranslate"><span class="pre">length</span></code> argument of functions such as
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_ta{dot}ema">ta.ema()</a> or
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_ta{dot}rma">ta.rma()</a>
+which cannot work with dynamic lengths that could change during the script’s execution.</p>
+<p>Wherever a “simple” form is required, a “const” or “input” form can also be used.</p>
+</div>
+<div class="section" id="series">
+<h4><a class="toc-backref" href="#id11">series</a><a class="headerlink" href="#series" title="Permalink to this headline">¶</a></h4>
+<p>Values of “series” form (also sometimes called <em>dynamic</em>) provide the most flexibility because they can change on any bar,
+or even multiples times during the same bar, in loops for example.
+Built-in variables such as <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_open">open</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_close">close</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_high">high</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_time">time</a> or
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_volume">volume</a> are of “series” form,
+as would be the result of expressions calculated using them.
+Functions such as <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_barssince">barssince()</a> or
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_crossover">crossover()</a> yield a result of “series” form because it varies bar to bar,
+as does that of the <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#op_[]">[]</a> history-referencing operator used to access past values of a time series.
+While the “series” form is the most common form used in Pine Script™, it is not always allowed as arguments to Pine Script™ built-in functions.</p>
+<p>Suppose you want to display the value of pivots on your chart. This will require converting values into strings,
+so the string values your code will be using will be of “series string” type.
+Pine Script™’s <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_label{dot}new">label.new()</a> function
+can be used to place such “series string” text on the chart because its <code class="docutils literal notranslate"><span class="pre">text</span></code> parameter accepts arguments of “series” form:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="nx">true</span><span class="p">)</span><span class="w"></span>
+<span class="nx">pivotBarsInput</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">input</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"></span>
+<span class="nx">hiP</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">ta.pivothigh</span><span class="p">(</span><span class="no">high</span><span class="p">,</span><span class="w"> </span><span class="nx">pivotBarsInput</span><span class="p">,</span><span class="w"> </span><span class="nx">pivotBarsInput</span><span class="p">)</span><span class="w"></span>
+<span class="k">if </span><span class="nx">not</span><span class="w"> </span><span class="no">na</span><span class="p">(</span><span class="nx">hiP</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="ni">label.new</span><span class="p">(</span><span class="ni">bar_index</span><span class="o">[</span><span class="nx">pivotBarsInput</span><span class="o">]</span><span class="p">,</span><span class="w"> </span><span class="nx">hiP</span><span class="p">,</span><span class="w"> </span><span class="ni">str.tostring</span><span class="p">(</span><span class="nx">hiP</span><span class="p">,</span><span class="w"> </span><span class="ni">format.mintick</span><span class="p">),</span><span class="w"></span>
+<span class="w">     </span><span class="nx">style</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">label.style_label_down</span><span class="p">,</span><span class="w"></span>
+<span class="w">     </span><span class="k">color </span><span class="o">=</span><span class="w"> </span><span class="no">na</span><span class="p">,</span><span class="w"></span>
+<span class="w">     </span><span class="nx">textcolor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">color.silver</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plotchar</span><span class="p">(</span><span class="nx">hiP</span><span class="p">,</span><span class="w"> </span><span class="s2">"hiP"</span><span class="p">,</span><span class="w"> </span><span class="s2">"•"</span><span class="p">,</span><span class="w"> </span><span class="ni">location.top</span><span class="p">,</span><span class="w"> </span><span class="nx">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">size.tiny</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Note that:</p>
+<ul class="simple">
+<li>The <code class="docutils literal notranslate"><span class="pre">str.tostring(hiP,</span> <span class="pre">format.mintick)</span></code> call we use to convert the pivot’s value to a string yields a “series string” result,
+which will work with <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_label{dot}new">label.new()</a>.</li>
+<li>While prices appear at the pivot, the pivots actually require <code class="docutils literal notranslate"><span class="pre">pivotBarsInput</span></code> bars to have elapsed before they can be detected.
+Pivot prices only appear on the pivot because we plot them in the past after the pivot’s detection,
+using <code class="docutils literal notranslate"><span class="pre">bar_index[pivotBarsInput]</span></code> (the <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_bar_index">bar_index</a>’s value,
+offset <code class="docutils literal notranslate"><span class="pre">pivotBarsInput</span></code> bars back). In real time, these prices would only appear <code class="docutils literal notranslate"><span class="pre">pivotBarsInput</span></code> bars after the actual pivot.</li>
+<li>We print a blue dot using <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plotchar">plotchar()</a> when a pivot is detected in our code.</li>
+<li>Pine Script™’s <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plotshape">plotshape()</a> can also be used to position text on the chart,
+but because its <code class="docutils literal notranslate"><span class="pre">text</span></code> parameter requires a “const string” argument,
+we could not have used it in place of <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_label{dot}new">label.new()</a> in our script.</li>
+</ul>
+<p>Wherever a “series” form is required, a “const”, “input” or “simple” form can also be used.</p>
+</div>
+</div>
+<div class="section" id="id2">
+<h3><a class="toc-backref" href="#id12">Types</a><a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="int">
+<h4><a class="toc-backref" href="#id13">int</a><a class="headerlink" href="#int" title="Permalink to this headline">¶</a></h4>
+<p>Integer literals must be written in decimal notation, e.g.:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="mi">1</span><span class="w"></span>
+<span class="o">-</span><span class="mi">1</span><span class="w"></span>
+<span class="mi">750</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Built-in variables such as
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_bar_index">bar_index</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_time">time</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_timenow">timenow</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_time_close">time_close</a>, or
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_dayofmonth">dayofmonth</a> all return values of type “int”.</p>
+</div>
+<div class="section" id="float">
+<h4><a class="toc-backref" href="#id14">float</a><a class="headerlink" href="#float" title="Permalink to this headline">¶</a></h4>
+<p>Floating-point literals contain a delimiter (the symbol <code class="docutils literal notranslate"><span class="pre">.</span></code>) and may also contain the symbol <code class="docutils literal notranslate"><span class="pre">e</span></code> or <code class="docutils literal notranslate"><span class="pre">E</span></code>
+(which means “multiply by 10 to the power of X”, where X is the number after the symbol <code class="docutils literal notranslate"><span class="pre">e</span></code>), e.g.:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="mi">3</span><span class="mf">.14159</span><span class="w">    </span><span class="c">// Rounded value of Pi (π)</span><span class="w"></span>
+<span class="o">-</span><span class="w"> </span><span class="mi">3</span><span class="mf">.0</span><span class="w"></span>
+<span class="mi">6</span><span class="mf">.02e23</span><span class="w">    </span><span class="c">// 6.02 * 10^23 (a very large value)</span><span class="w"></span>
+<span class="mi">1</span><span class="mf">.6e-19</span><span class="w">    </span><span class="c">// 1.6 * 10^-19 (a very small value)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>The internal precision of floats in Pine Script™ is 1e-10.</p>
+</div>
+<div class="section" id="bool">
+<h4><a class="toc-backref" href="#id15">bool</a><a class="headerlink" href="#bool" title="Permalink to this headline">¶</a></h4>
+<p>There are only two literals representing <em>bool</em> values:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="k">true </span><span class="w">   </span><span class="c">// true value</span><span class="w"></span>
+<span class="k">false </span><span class="w">  </span><span class="c">// false value</span><span class="w"></span>
+</pre></div>
+</div>
+<p>When an expression of type “bool” returns <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_na">na</a>
+and it is used to test a conditional statement or operator, the “false” branch is executed.</p>
+</div>
+<div class="section" id="color">
+<span id="pagetypesystem-color"></span><h4><a class="toc-backref" href="#id16">color</a><a class="headerlink" href="#color" title="Permalink to this headline">¶</a></h4>
+<p>Color literals have the following format: <code class="docutils literal notranslate"><span class="pre">#RRGGBB</span></code> or <code class="docutils literal notranslate"><span class="pre">#RRGGBBAA</span></code>. The letter pairs represent <code class="docutils literal notranslate"><span class="pre">00</span></code> to <code class="docutils literal notranslate"><span class="pre">FF</span></code> hexadecimal values (0 to 255 in decimal) where:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">RR</span></code>, <code class="docutils literal notranslate"><span class="pre">GG</span></code> and <code class="docutils literal notranslate"><span class="pre">BB</span></code> pairs are the values for the color’s red, green and blue components</li>
+<li><code class="docutils literal notranslate"><span class="pre">AA</span></code> is an optional value for the color’s transparency (or <em>alpha</em> component) where <code class="docutils literal notranslate"><span class="pre">00</span></code> is invisible and <code class="docutils literal notranslate"><span class="pre">FF</span></code> opaque. When no <code class="docutils literal notranslate"><span class="pre">AA</span></code> pair is supplied, <code class="docutils literal notranslate"><span class="pre">FF</span></code> is used.</li>
+<li>The hexadecimal letters can be upper or lower case</li>
+</ul>
+<p>Examples:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="l">#000000</span><span class="w">      </span><span class="c">// black color</span><span class="w"></span>
+<span class="l">#FF0000</span><span class="w">      </span><span class="c">// red color</span><span class="w"></span>
+<span class="l">#00FF00</span><span class="w">      </span><span class="c">// green color</span><span class="w"></span>
+<span class="l">#0000FF</span><span class="w">      </span><span class="c">// blue color</span><span class="w"></span>
+<span class="l">#FFFFFF</span><span class="w">      </span><span class="c">// white color</span><span class="w"></span>
+<span class="l">#808080</span><span class="w">      </span><span class="c">// gray color</span><span class="w"></span>
+<span class="l">#3ff7a0</span><span class="w">      </span><span class="c">// some custom color</span><span class="w"></span>
+<span class="l">#FF000080</span><span class="w">    </span><span class="c">// 50% transparent red color</span><span class="w"></span>
+<span class="l">#FF0000ff</span><span class="w">    </span><span class="c">// same as #FF0000, fully opaque red color</span><span class="w"></span>
+<span class="l">#FF000000</span><span class="w">    </span><span class="c">// completely transparent color</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Pine Script™ also has <a class="reference internal" href="../concepts/Colors.html#pagecolors-constantcolors"><span class="std std-ref">built-in color constants</span></a> such as
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_color{dot}green">color.green</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_color{dot}red">color.red</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_color{dot}orange">color.orange</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_color{dot}blue">color.blue</a>
+(the default color used in <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plot">plot()</a> and other plotting functions),  etc.</p>
+<p>When using color built-ins, is possible to add transparency information to them with
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_color{dot}new">color.new</a>.</p>
+<p>Note that when specifying red, green or blue components in <code class="docutils literal notranslate"><span class="pre">color.*()</span></code> functions, a 0-255 decimal value must be used.
+When specifying transparency in such functions, it is in the form of a 0-100 value (which can be of “float” type to access the underlying 255 potential valoues)
+where the scale 00-FF scale for color literals is inverted: 100 is thus invisible and 0 is opaque.</p>
+<p>Here is an example:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">"Shading the chart's background"</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="nx">true</span><span class="p">)</span><span class="w"></span>
+<span class="nx">BASE_COLOR</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">color.navy</span><span class="w"></span>
+<span class="nx">bgColor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">dayofweek</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="ni">dayofweek.monday</span><span class="w">    </span><span class="o">?</span><span class="w"> </span><span class="ni">color.new</span><span class="p">(</span><span class="nx">BASE_COLOR</span><span class="p">,</span><span class="w"> </span><span class="mi">50</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"></span>
+<span class="w">          </span><span class="ni">dayofweek</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="ni">dayofweek.tuesday</span><span class="w">   </span><span class="o">?</span><span class="w"> </span><span class="ni">color.new</span><span class="p">(</span><span class="nx">BASE_COLOR</span><span class="p">,</span><span class="w"> </span><span class="mi">60</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"></span>
+<span class="w">          </span><span class="ni">dayofweek</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="ni">dayofweek.wednesday</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="ni">color.new</span><span class="p">(</span><span class="nx">BASE_COLOR</span><span class="p">,</span><span class="w"> </span><span class="mi">70</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"></span>
+<span class="w">          </span><span class="ni">dayofweek</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="ni">dayofweek.thursday</span><span class="w">  </span><span class="o">?</span><span class="w"> </span><span class="ni">color.new</span><span class="p">(</span><span class="nx">BASE_COLOR</span><span class="p">,</span><span class="w"> </span><span class="mi">80</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"></span>
+<span class="w">          </span><span class="ni">dayofweek</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="ni">dayofweek.friday</span><span class="w">    </span><span class="o">?</span><span class="w"> </span><span class="ni">color.new</span><span class="p">(</span><span class="nx">BASE_COLOR</span><span class="p">,</span><span class="w"> </span><span class="mi">90</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"></span>
+<span class="w">          </span><span class="ni">color.new</span><span class="p">(</span><span class="ni">color.blue</span><span class="p">,</span><span class="w"> </span><span class="mi">80</span><span class="p">)</span><span class="w"></span>
+<span class="ni">bgcolor</span><span class="p">(</span><span class="nx">bgColor</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>See the page on <a class="reference internal" href="../concepts/Colors.html#pagecolors"><span class="std std-ref">colors</span></a> for more information on using colors in Pine Script™.</p>
+</div>
+<div class="section" id="string">
+<h4><a class="toc-backref" href="#id17">string</a><a class="headerlink" href="#string" title="Permalink to this headline">¶</a></h4>
+<p>String literals may be enclosed in single or double quotation marks, e.g.:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="s2">"This is a double quoted string literal"</span><span class="w"></span>
+<span class="s1">'This is a single quoted string literal'</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Single and double quotation marks are functionally equivalent.
+A string enclosed within double quotation marks
+may contain any number of single quotation marks, and vice versa:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="s2">"It's an example"</span><span class="w"></span>
+<span class="s1">'The "Star" indicator'</span><span class="w"></span>
+</pre></div>
+</div>
+<p>You can escape the string’s delimiter in the string by using a backslash. For example:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="s1">'It\'s an example'</span><span class="w"></span>
+<span class="s2">"The \"Star\" indicator"</span><span class="w"></span>
+</pre></div>
+</div>
+<p>You can concatenate strings using the <code class="docutils literal notranslate"><span class="pre">+</span></code> operator.</p>
+</div>
+<div class="section" id="plot-and-hline">
+<span id="pagetypesystem-plotandhline"></span><h4><a class="toc-backref" href="#id18">plot and hline</a><a class="headerlink" href="#plot-and-hline" title="Permalink to this headline">¶</a></h4>
+<p>Pine Script™’s <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_fill">fill()</a> function fills the space between two lines with a color.
+Both lines must have been plotted with either <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plot">plot()</a> or
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_hline">hline()</a> function calls.
+Each plotted line is referred to in the <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_fill">fill()</a>
+function using IDs which are of “plot” or “hline” type, e.g.:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="nx">true</span><span class="p">)</span><span class="w"></span>
+<span class="nx">plotID1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">plot</span><span class="p">(</span><span class="no">high</span><span class="p">)</span><span class="w"></span>
+<span class="nx">plotID2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">plot</span><span class="p">(</span><span class="ni">math.max</span><span class="p">(</span><span class="no">close</span><span class="p">,</span><span class="w"> </span><span class="no">open</span><span class="p">))</span><span class="w"></span>
+<span class="ni">fill</span><span class="p">(</span><span class="nx">plotID1</span><span class="p">,</span><span class="w"> </span><span class="nx">plotID2</span><span class="p">,</span><span class="w"> </span><span class="ni">color.yellow</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Note that there is no <code class="docutils literal notranslate"><span class="pre">plot</span></code> or <code class="docutils literal notranslate"><span class="pre">hline</span></code> keyword to explicitly declare the type of
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plot">plot()</a> or
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_hline">hline()</a> IDs.</p>
+</div>
+<div class="section" id="line-label-box-and-table">
+<h4><a class="toc-backref" href="#id19">line, label, box and table</a><a class="headerlink" href="#line-label-box-and-table" title="Permalink to this headline">¶</a></h4>
+<p>Drawings were introduced in Pine Script™ v4. These objects are created with the
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_line{dot}new">line.new()</a>,
+and <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_label{dot}new">label.new()</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_box{dot}new">box.new()</a> and
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_table{dot}new">table.new()</a> functions.</p>
+<p>These functions all return an ID that uniquely identifies each drawing object.
+The ID’s type is “series line”, “series label”, “series box” and “series table”, respectively, and an ID can exist in no other form than “series”.
+Drawing IDs act like a pointer in that they are used to reference a specific instance of a drawing in all the related functions of its namespace.
+The line ID returned by a <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_line{dot}new">line.new()</a>
+call is then used to refer to that line using <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_line{dot}delete">line.delete()</a>, for example.</p>
+</div>
+<div class="section" id="array">
+<h4><a class="toc-backref" href="#id20">array</a><a class="headerlink" href="#array" title="Permalink to this headline">¶</a></h4>
+<p>Arrays in Pine Script™ are identified by an array ID. There is no single type representing an array ID,
+but rather an overloaded version of a subset of Pine Script™ types which represents the type of an array’s elements.
+These type names are constructed by appending the <code class="docutils literal notranslate"><span class="pre">[]</span></code> suffix (not to be confused with the
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#op_[]">[]</a> history-referencing operator) to one of the Pine Script™ types allowed for array elements:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">int[]</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">float[]</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">bool[]</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">color[]</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">string[]</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">line[]</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">label[]</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">box[]</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">table[]</span></code></li>
+</ul>
+<p>An array containing elements of type “int” initalized with one element of value 10 can be declared in the following, equivalent ways:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="nx">a1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">array.new_int</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">)</span><span class="w"></span>
+<span class="ni">int</span><span class="o">[]</span><span class="w"> </span><span class="nx">a2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">array.new_int</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">)</span><span class="w"></span>
+<span class="nx">a3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">array.from</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="w"></span>
+<span class="ni">int</span><span class="o">[]</span><span class="w"> </span><span class="nx">a4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">array.from</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="void">
+<h4><a class="toc-backref" href="#id21">void</a><a class="headerlink" href="#void" title="Permalink to this headline">¶</a></h4>
+<p>There is a “void” type in Pine Script™. Functions having only side-effects and returning no usable result return the “void” type.
+An example of such a function is <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_alert">alert()</a>;
+it does something (triggers an alert event), but it returns no useful value.</p>
+<p>A “void” result cannot be used in an expression or assigned to a variable. No <code class="docutils literal notranslate"><span class="pre">void</span></code> keyword exists in Pine Script™, as variables cannot be declared using the “void” type.</p>
+</div>
+<div class="section" id="tuples">
+<span id="pagetypesystem-tuples"></span><h4><a class="toc-backref" href="#id22">Tuples</a><a class="headerlink" href="#tuples" title="Permalink to this headline">¶</a></h4>
+<p>A <em>tuple</em> is a comma-separated set of expressions enclosed in brackets that can be used when a function or a local block must return more than one variable as a result.
+For example:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="nx">calcSumAndMult</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="nx">b</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"></span>
+<span class="w">    </span><span class="nx">sum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">b</span><span class="w"></span>
+<span class="w">    </span><span class="nx">mult</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">a</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nx">b</span><span class="w"></span>
+<span class="w">    </span><span class="o">[</span><span class="nx">sum</span><span class="p">,</span><span class="w"> </span><span class="nx">mult</span><span class="o">]</span><span class="w"></span>
+</pre></div>
+</div>
+<p>In this example there is a 2-tuple on the last statement of the function’s code block, which is the result returned by the function. Tuple elements can be of any type.
+There is also a special syntax for calling functions that return tuples, which uses a <em>tuple declaration</em> on the left side of the equal sign in what is a multi-variable declaration.
+The result of a function such as <code class="docutils literal notranslate"><span class="pre">calcSumAndMult()</span></code> that returns a tuple must be assigned to a <em>tuple declaration</em>, i.e.,
+a set of comma-separated list of <em>new</em> variables that will receive the values returned by the function.
+Here, the value of the <code class="docutils literal notranslate"><span class="pre">sum</span></code> and <code class="docutils literal notranslate"><span class="pre">mult</span></code> variables calculated by the function will be assigned to the <code class="docutils literal notranslate"><span class="pre">s</span></code> and <code class="docutils literal notranslate"><span class="pre">m</span></code> variables:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="o">[</span><span class="nx">s</span><span class="p">,</span><span class="w"> </span><span class="nx">m</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">calcSumAndMul</span><span class="p">(</span><span class="no">high</span><span class="p">,</span><span class="w"> </span><span class="no">low</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Note that the type of <code class="docutils literal notranslate"><span class="pre">s</span></code> and <code class="docutils literal notranslate"><span class="pre">m</span></code> cannot be explicitly defined; it is always inferred by the type of the function return results.</p>
+<p>Tuples can be useful to request multiple values in one <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_request{dot}security">request.security()</a> call, e.g.:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="nx">roundedOHLC</span><span class="p">()</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"></span>
+<span class="w">    </span><span class="o">[</span><span class="ni">math.round_to_mintick</span><span class="p">(</span><span class="no">open</span><span class="p">),</span><span class="w"> </span><span class="ni">math.round_to_mintick</span><span class="p">(</span><span class="no">high</span><span class="p">),</span><span class="w"> </span><span class="ni">math.round_to_mintick</span><span class="p">(</span><span class="no">low</span><span class="p">),</span><span class="w"> </span><span class="ni">math.round_to_mintick</span><span class="p">(</span><span class="no">close</span><span class="p">)</span><span class="o">]</span><span class="w"></span>
+<span class="o">[</span><span class="nx">op</span><span class="p">,</span><span class="w"> </span><span class="nx">hi</span><span class="p">,</span><span class="w"> </span><span class="nx">lo</span><span class="p">,</span><span class="w"> </span><span class="nx">cl</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">request.security</span><span class="p">(</span><span class="ni">syminfo.tickerid</span><span class="p">,</span><span class="w"> </span><span class="s2">"D"</span><span class="p">,</span><span class="w"> </span><span class="nx">roundedOHLC</span><span class="p">())</span><span class="w"></span>
+</pre></div>
+</div>
+<p>or:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="o">[</span><span class="nx">op</span><span class="p">,</span><span class="w"> </span><span class="nx">hi</span><span class="p">,</span><span class="w"> </span><span class="nx">lo</span><span class="p">,</span><span class="w"> </span><span class="nx">cl</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">request.security</span><span class="p">(</span><span class="ni">syminfo.tickerid</span><span class="p">,</span><span class="w"> </span><span class="s2">"D"</span><span class="p">,</span><span class="w"> </span><span class="o">[</span><span class="ni">math.round_to_mintick</span><span class="p">(</span><span class="no">open</span><span class="p">),</span><span class="w"> </span><span class="ni">math.round_to_mintick</span><span class="p">(</span><span class="no">high</span><span class="p">),</span><span class="w"> </span><span class="ni">math.round_to_mintick</span><span class="p">(</span><span class="no">low</span><span class="p">),</span><span class="w"> </span><span class="ni">math.round_to_mintick</span><span class="p">(</span><span class="no">close</span><span class="p">)</span><span class="o">]</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>or this form if no rounding is required:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="o">[</span><span class="nx">op</span><span class="p">,</span><span class="w"> </span><span class="nx">hi</span><span class="p">,</span><span class="w"> </span><span class="nx">lo</span><span class="p">,</span><span class="w"> </span><span class="nx">cl</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">request.security</span><span class="p">(</span><span class="ni">syminfo.tickerid</span><span class="p">,</span><span class="w"> </span><span class="s2">"D"</span><span class="p">,</span><span class="w"> </span><span class="o">[</span><span class="no">open</span><span class="p">,</span><span class="w"> </span><span class="no">high</span><span class="p">,</span><span class="w"> </span><span class="no">low</span><span class="p">,</span><span class="w"> </span><span class="no">close</span><span class="o">]</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Tuples can also be used as return results of local blocks, in an <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#op_if">if</a> statement for example:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="o">[</span><span class="nx">v1</span><span class="p">,</span><span class="w"> </span><span class="nx">v2</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">if </span><span class="no">close</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="no">open</span><span class="w"></span>
+<span class="w">    </span><span class="o">[</span><span class="no">high</span><span class="p">,</span><span class="w"> </span><span class="no">close</span><span class="o">]</span><span class="w"></span>
+<span class="k">else</span>
+<span class="w">    </span><span class="o">[</span><span class="no">close</span><span class="p">,</span><span class="w"> </span><span class="no">low</span><span class="o">]</span><span class="w"></span>
+</pre></div>
+</div>
+<p>They cannot be used in ternaries, however, because the return values of a ternary statement are not considered as local blocks. This is not allowed:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">// Not allowed.</span><span class="w"></span>
+<span class="o">[</span><span class="nx">v1</span><span class="p">,</span><span class="w"> </span><span class="nx">v2</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">close</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="no">open</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="o">[</span><span class="no">high</span><span class="p">,</span><span class="w"> </span><span class="no">close</span><span class="o">]</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="o">[</span><span class="no">close</span><span class="p">,</span><span class="w"> </span><span class="no">low</span><span class="o">]</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="na-value">
+<span id="pagetypesystem-navalue"></span><h2><a class="toc-backref" href="#id23">`na` value</a><a class="headerlink" href="#na-value" title="Permalink to this headline">¶</a></h2>
+<p>In Pine Script™ there is a special value called <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v4/#var_na">na</a>, which is an acronym for <em>not available</em>, meaning
+the value of an expression or variable is undefined. It is similar to the <code class="docutils literal notranslate"><span class="pre">null</span></code> value in Java, or <code class="docutils literal notranslate"><span class="pre">None</span></code> in Python.</p>
+<p><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v4/#var_na">na</a> values can be automatically cast to almost any type.
+In some cases, however, the Pine Script™ compiler cannot automatically infer a type for an
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v4/#var_na">na</a> value because more that one automatic type-casting rule can be applied.
+For example:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">// Compilation error!</span><span class="w"></span>
+<span class="nx">myVar</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">na</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Here, the compiler cannot determine if <code class="docutils literal notranslate"><span class="pre">myVar</span></code> will be used to plot something, as in <code class="docutils literal notranslate"><span class="pre">plot(myVar)</span></code> where its type would be “float”, or to set some text as in
+<code class="docutils literal notranslate"><span class="pre">label.set_text(lb,</span> <span class="pre">text</span> <span class="pre">=</span> <span class="pre">myVar)</span></code> where its type would be “string”, or for some other purpose. Such cases must be explicitly resolved in one of two ways:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="k">float </span><span class="nx">myVar</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">na</span><span class="w"></span>
+</pre></div>
+</div>
+<p>or:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="nx">myVar</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">float</span><span class="p">(</span><span class="no">na</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>To test if some value is <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v4/#var_na">na</a>,
+a special function must be used: <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v4/#fun_na">na()</a>. For example:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="nx">myClose</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">na</span><span class="p">(</span><span class="nx">myVar</span><span class="p">)</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="no">close</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Do not use the <code class="docutils literal notranslate"><span class="pre">==</span></code> operator to test for <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v4/#var_na">na</a> values, as this method is unreliable.</p>
+<p>Designing your calculations so they are <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v4/#var_na">na</a>-resistant is often useful.
+In this example, we define a condition that is <code class="docutils literal notranslate"><span class="pre">true</span></code> when the bar’s <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_close">close</a>
+is higher than the previous one. For this calculation to work correctly on the dataset’s first bar where no previous close exists and <code class="docutils literal notranslate"><span class="pre">close[1]</span></code> will return
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v4/#var_na">na</a>, we use the
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v4/#fun_nz">nz()</a> function to replace it with the current bar’s
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_open">open</a> for that special case:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="k">bool </span><span class="nx">risingClose</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">close</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="ni">nz</span><span class="p">(</span><span class="no">close</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="p">,</span><span class="w"> </span><span class="no">open</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Protecting against <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v4/#var_na">na</a> values can also be useful to prevent an initial
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v4/#var_na">na</a> value from propagating in a calculation’s result on all bars.
+This happens here because the initial value of <code class="docutils literal notranslate"><span class="pre">ath</span></code> is <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v4/#var_na">na</a>, and
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_math{dot}max">math.max()</a> returns
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v4/#var_na">na</a> if one of its arguments is <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v4/#var_na">na</a>:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">// Declare `ath` and initialize it with `na` on the first bar.</span><span class="w"></span>
+<span class="k">var float </span><span class="nx">ath</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">na</span><span class="w"></span>
+<span class="c">// On all bars, calculate the maximum between the `high` and the previous value of `ath`.</span><span class="w"></span>
+<span class="nx">ath</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="ni">math.max</span><span class="p">(</span><span class="nx">ath</span><span class="p">,</span><span class="w"> </span><span class="no">high</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>To protect against this, we could instead use:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="k">var float </span><span class="nx">ath</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">na</span><span class="w"></span>
+<span class="nx">ath</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="ni">math.max</span><span class="p">(</span><span class="ni">nz</span><span class="p">(</span><span class="nx">ath</span><span class="p">),</span><span class="w"> </span><span class="no">high</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>where we are replacing any <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v4/#var_na">na</a> values of <code class="docutils literal notranslate"><span class="pre">ath</span></code> with zero. Even better would be:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="k">var float </span><span class="nx">ath</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">high</span><span class="w"></span>
+<span class="nx">ath</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="ni">math.max</span><span class="p">(</span><span class="nx">ath</span><span class="p">,</span><span class="w"> </span><span class="no">high</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="type-casting">
+<span id="pagetypesystem-typecasting"></span><h2><a class="toc-backref" href="#id24">Type casting</a><a class="headerlink" href="#type-casting" title="Permalink to this headline">¶</a></h2>
+<p>There is an automatic type-casting mechanism in Pine Script™ which can <em>cast</em> (or convert) certain types to another.
+The auto-casting rules are: <strong>int</strong> 🠆 <strong>float</strong> 🠆 <strong>bool</strong>, which means that when a “float” is required, an “int” can be used in its place,
+and when a “bool” value is required, an “int” or “float” value can be used in its place.</p>
+<p>See auto-casting in action in this code:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span><span class="w"></span>
+<span class="ni">plotshape</span><span class="p">(</span><span class="no">close</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Note that:</p>
+<ul class="simple">
+<li><a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plotshape">plotshape(()</a> requires a “series bool” argument for its first parameter named <code class="docutils literal notranslate"><span class="pre">series</span></code>.
+The <code class="docutils literal notranslate"><span class="pre">true</span></code>/<code class="docutils literal notranslate"><span class="pre">false</span></code> value of that “bool” argument determines if the function plots a shape or not.</li>
+<li>We are here calling <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_plotshape">plotshape(()</a> with
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_close">close</a> as its first argument.
+This would not be allowed without Pine Script™’s auto-casting rules, which allow a “float” to be cast to a “bool”.
+When a “float” is cast to a bool, any non-zero values are converted to <code class="docutils literal notranslate"><span class="pre">true</span></code>, and zero values are converted to <code class="docutils literal notranslate"><span class="pre">false</span></code>.
+As a result of this, our code will plot an “X” on all bars, as long as <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#var_close">close</a> is not equal to zero.</li>
+</ul>
+<p>It may sometimes be necessary to cast one type into another because auto-casting rules will not suffice.
+For these cases, explicit type-casting functions exist. They are:
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_int">int()</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_float">float()</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_bool">bool()</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_color">color()</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_string">string()</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_line">line()</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_label">label()</a>,
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_box">box()</a>, and
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_table">table()</a>.</p>
+<p>This is code that will not compile because we fail to convert the type of the argument used for <code class="docutils literal notranslate"><span class="pre">length</span></code> when calling
+<a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_ta{dot}sma">ta.sma()</a>:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span><span class="w"></span>
+<span class="nx">len</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="mf">.0</span><span class="w"></span>
+<span class="nx">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">ta.sma</span><span class="p">(</span><span class="no">close</span><span class="p">,</span><span class="w"> </span><span class="nx">len</span><span class="p">)</span><span class="w"> </span><span class="c">// Compilation error!</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>The code fails to compile with the following error:
+<em>Cannot call ‘ta.sma` with argument ‘length’=’len’. An argument of ‘const float’ type was used but a ‘series int’ is expected;</em>.
+The compiler is telling us that we supplied a “float” value where an “int” is required. There is no auto-casting rule that can automatically cast a “float” to an “int”,
+so we will need to do the job ourselves. For this, we will use the <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_int">int()</a>
+function to force the type conversion of the value we supply as a length to <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v5/#fun_ta{dot}sma">ta.sma()</a> from “float” to “int”:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">//@version=5</span><span class="w"></span>
+<span class="ni">indicator</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span><span class="w"></span>
+<span class="nx">len</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="mf">.0</span><span class="w"></span>
+<span class="nx">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">ta.sma</span><span class="p">(</span><span class="no">close</span><span class="p">,</span><span class="w"> </span><span class="ni">int</span><span class="p">(</span><span class="nx">len</span><span class="p">))</span><span class="w"></span>
+<span class="ni">plot</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Explicit type-casting can also be useful when declaring variables and initializing them to <a class="reference external" href="https://www.tradingview.com/pine-script-reference/v4/#var_na">na</a> which can be done in two ways:</p>
+<div class="highlight-pine notranslate"><div class="highlight"><pre><span></span><span class="c">// Cast `na` to the "label" type.</span><span class="w"></span>
+<span class="nx">lbl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ni">label</span><span class="p">(</span><span class="no">na</span><span class="p">)</span><span class="w"></span>
+<span class="c">// Explicitly declare the type of the new variable.</span><span class="w"></span>
+<span class="k">label </span><span class="nx">lbl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">na</span><span class="w"></span>
+</pre></div>
+</div>
+<a class="reference external image-reference" href="https://www.tradingview.com/"><div align="center" class="align-center"><img alt="../_images/TradingView-Logo-Block.svg" src="../_images/TradingView-Logo-Block.svg" width="200px"/></div>
+</a>
+</div>
+</div>
+</div>
+<div class="footer-relations">
+<div class="pull-left">
+<a class="btn btn-default" href="Loops.html" title="previous chapter (use the left arrow)">Loops</a>
+</div>
+<div class="pull-right">
+<a class="btn btn-default" href="Built-ins.html" title="next chapter (use the right arrow)">Built-ins</a>
+</div>
+</div>
+<div class="clearer"></div>
+</div>
